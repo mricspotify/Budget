@@ -580,20 +580,28 @@ function renderTrend(cy,cm){
     labels.push(MONTHS_SHORT[d.getMonth()]);
     data.push(Math.round(getMonthExp(d.getFullYear(),d.getMonth()).reduce((s,e)=>s+e.amount,0)));
   }
-  if(tChart)tChart.destroy();
-  const ctx=document.getElementById('trendChart').getContext('2d');
-  tChart=new Chart(ctx,{
-    type:'bar',
-    data:{labels,datasets:[{data,backgroundColor:'rgba(127,119,221,0.75)',borderRadius:6,borderSkipped:false}]},
-    options:{
-      responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{callbacks:{label:v=>v.raw+'€'}}},
-      scales:{
-        x:{grid:{display:false},ticks:{color:'rgba(238,238,245,0.38)',font:{size:11}},border:{display:false}},
-        y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'rgba(238,238,245,0.38)',font:{size:10},callback:v=>v+'€'},border:{display:false}}
+  const canvas=document.getElementById('trendChart');
+  if(!canvas)return;
+  if(typeof Chart==='undefined'){
+    canvas.parentElement.innerHTML='<div style="text-align:center;color:var(--muted);padding:40px 0;font-size:13px">Graphique non disponible</div>';
+    return;
+  }
+  try{
+    if(tChart)tChart.destroy();
+    const ctx=canvas.getContext('2d');
+    tChart=new Chart(ctx,{
+      type:'bar',
+      data:{labels,datasets:[{data,backgroundColor:'rgba(127,119,221,0.75)',borderRadius:6,borderSkipped:false}]},
+      options:{
+        responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:false},tooltip:{callbacks:{label:v=>v.raw+'€'}}},
+        scales:{
+          x:{grid:{display:false},ticks:{color:'rgba(238,238,245,0.38)',font:{size:11}},border:{display:false}},
+          y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'rgba(238,238,245,0.38)',font:{size:10},callback:v=>v+'€'},border:{display:false}}
+        }
       }
-    }
-  });
+    });
+  }catch(e){console.warn('Chart error:',e);}
 }
 
 // ADD FORM
@@ -666,7 +674,7 @@ function closeActionSheet(e){
   if(e.target.classList.contains('action-sheet-bg'))document.getElementById('action-sheet').remove();
 }
 
-
+function editExpense(id){
   const e=expenses.find(x=>x.id===id);
   if(!e)return;
   editingId=id;
@@ -787,11 +795,13 @@ function showToast(msg){
 }
 
 // INIT
-load();
-buildCatGrid();
-checkNewMonth();
-renderDash();
-renderSettings();
+try{
+  load();
+  buildCatGrid();
+  checkNewMonth();
+  renderDash();
+  renderSettings();
+}catch(e){console.warn('Init error:',e);}
 </script>
 </body>
 </html>
