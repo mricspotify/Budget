@@ -354,7 +354,7 @@ function getAllMonths(){
 }
 
 function calcSaveTotal(){
-  // Reste : salaire + remb - dépenses, tous les mois (positifs ET négatifs)
+  // Reste : salaire + remb - dépenses (tous mois, positifs ET négatifs)
   let resteTotal=0;
   getAllMonths().forEach(key=>{
     const[y,m]=key.split('-').map(Number);const mo=m-1;
@@ -364,13 +364,13 @@ function calcSaveTotal(){
     const inc=getInc(y,mo);
     if(inc>0)resteTotal+=inc+bon-dep;
   });
-  // Rentrées exceptionnelles (monthBon uniquement) — déjà dans reste, on les enlève pour éviter doublon
-  // Non : monthBon est dans getBon → déjà dans reste. Donc on n'ajoute PAS rentreesTotal séparément.
-  // Mais on veut les afficher comme cartes séparées → calcul correct sans doublon :
-  // resteTotal inclut déjà remb+héritage+intérêts via getBon
-  // Pour le total global on affiche juste resteTotal + comptes manuels
+  // Rentrées exceptionnelles hors remboursements (héritage + intérêts)
+  let rentreesTotal=0;
+  Object.values(monthBon).forEach(bons=>bons.forEach(b=>{
+    if(!b.desc.toLowerCase().includes('rembours'))rentreesTotal+=b.amount;
+  }));
   const accsTotal=userAccounts.reduce((s,a)=>s+a.balance,0);
-  return resteTotal+accsTotal;
+  return resteTotal+rentreesTotal+accsTotal;
 }
 
 function renderDash(){
@@ -538,9 +538,10 @@ function renderSave(){
     if(inc>0){const reste=inc+bon-dep;resteTotal+=reste;resteParMois.push({key,y,m:mo,reste});}
   });
 
-  // ── Rentrées groupées : monthBon UNIQUEMENT (les expenses cat rentree sont des doublons) ──
+  // ── Rentrées exceptionnelles : monthBon SAUF remboursements (déjà dans reste) ──
   const rentreesMap={};
   Object.entries(monthBon).forEach(([k,bons])=>bons.forEach(b=>{
+    if(b.desc.toLowerCase().includes('rembours'))return; // remb déjà dans reste accumulé
     if(!rentreesMap[b.desc])rentreesMap[b.desc]={total:0,items:[]};
     const[y,mo]=k.split('-');
     rentreesMap[b.desc].total+=b.amount;
@@ -550,9 +551,10 @@ function renderSave(){
 
 
   // ── Total global ──
-  // grandTotal = resteTotal (inclut déjà remb+héritage+intérêts via getBon) + comptes manuels
+  // grandTotal = resteTotal (inclut remb) + rentrées exceptionnelles + comptes manuels
+  const rentreesTotal=Object.values(rentreesMap).reduce((s,v)=>s+v.total,0);
   const accsTotal=userAccounts.reduce((s,a)=>s+a.balance,0);
-  const grandTotal=resteTotal+accsTotal;
+  const grandTotal=resteTotal+rentreesTotal+accsTotal;
   const goal=Math.ceil(grandTotal/10000)*10000||10000;
   const prev=goal-10000;
   const pct=grandTotal>0?Math.min(100,Math.round(((grandTotal-prev)/(goal-prev))*100)):0;
