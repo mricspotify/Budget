@@ -312,6 +312,7 @@ function load(){try{expenses=JSON.parse(localStorage.getItem(SK))||EXP_DEF;recur
 function mk(y,m){return y+'-'+String(m+1).padStart(2,'0');}
 function getInc(y,m){return parseFloat(monthInc[mk(y,m)])||0;}
 function getBon(y,m){return (monthBon[mk(y,m)]||[]).reduce((s,b)=>s+b.amount,0);}
+function getBonRemb(y,m){return (monthBon[mk(y,m)]||[]).filter(b=>b.desc.toLowerCase().includes('rembours')).reduce((s,b)=>s+b.amount,0);}
 function getExp(y,m){return expenses.filter(e=>{const d=new Date(e.date);return d.getFullYear()===y&&d.getMonth()===m;});}
 function sumCat(txs){const b={};Object.keys(CAT).forEach(k=>b[k]=0);txs.forEach(e=>{if(b[e.cat]!==undefined)b[e.cat]+=e.amount;else b.autre+=e.amount;});return b;}
 function fa(n){return parseFloat(n).toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';}
@@ -354,15 +355,15 @@ function getAllMonths(){
 }
 
 function calcSaveTotal(){
-  // Reste : salaire + remb - dépenses (tous mois, positifs ET négatifs)
+  // Reste : salaire + remboursements seulement - dépenses (tous mois)
   let resteTotal=0;
   getAllMonths().forEach(key=>{
     const[y,m]=key.split('-').map(Number);const mo=m-1;
     const txs=getExp(y,mo);
     const dep=txs.filter(e=>e.cat!=='rentree').reduce((s,e)=>s+e.amount,0);
-    const bon=getBon(y,mo);
+    const remb=getBonRemb(y,mo);
     const inc=getInc(y,mo);
-    if(inc>0)resteTotal+=inc+bon-dep;
+    if(inc>0)resteTotal+=inc+remb-dep;
   });
   // Rentrées exceptionnelles hors remboursements (héritage + intérêts)
   let rentreesTotal=0;
@@ -526,16 +527,16 @@ function renderSave(){
   const typeIcons={banque:'🏦',invest:'📈',crypto:'₿',epargne:'💳',cash:'💵',autre:'🔮'};
   const typeColors={banque:'var(--bl)',invest:'var(--am)',crypto:'#F7931A',epargne:'var(--te)',cash:'var(--te)',autre:'var(--mu2)'};
 
-  // ── Reste accumulé : salaire + remb - dépenses, tous les mois (positifs ET négatifs) ──
+  // ── Reste accumulé : salaire + remboursements seulement - dépenses (tous mois) ──
   let resteTotal=0;
   const resteParMois=[];
   getAllMonths().forEach(key=>{
     const[y,m]=key.split('-').map(Number);const mo=m-1;
     const txs=getExp(y,mo);
     const dep=txs.filter(e=>e.cat!=='rentree').reduce((s,e)=>s+e.amount,0);
-    const bon=getBon(y,mo);
+    const remb=getBonRemb(y,mo);
     const inc=getInc(y,mo);
-    if(inc>0){const reste=inc+bon-dep;resteTotal+=reste;resteParMois.push({key,y,m:mo,reste});}
+    if(inc>0){const reste=inc+remb-dep;resteTotal+=reste;resteParMois.push({key,y,m:mo,reste});}
   });
 
   // ── Rentrées exceptionnelles : monthBon SAUF remboursements (déjà dans reste) ──
