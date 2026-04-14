@@ -353,27 +353,21 @@ function getAllMonths(){
   return [...s].sort();
 }
 
-function getInvestDescs(){
-  return new Set(expenses.filter(e=>e.cat==='invest'||e.cat==='epargne').map(e=>e.desc));
-}
 function calcSaveTotal(){
-  const investDescs=getInvestDescs();
-  // Reste : salaire - dépenses réelles (hors rentree, hors investissements)
+  // Reste : salaire - toutes dépenses (hors rentree)
   let resteTotal=0;
   getAllMonths().forEach(key=>{
     const[y,m]=key.split('-').map(Number);const mo=m-1;
     const txs=getExp(y,mo);
-    const dep=txs.filter(e=>e.cat!=='rentree'&&!investDescs.has(e.desc)).reduce((s,e)=>s+e.amount,0);
+    const dep=txs.filter(e=>e.cat!=='rentree').reduce((s,e)=>s+e.amount,0);
     const inc=getInc(y,mo);
     if(inc>0){const reste=inc-dep;if(reste>0)resteTotal+=reste;}
   });
   // Rentrées exceptionnelles (monthBon uniquement)
   const rentreesTotal=Object.values(monthBon).reduce((s,bons)=>s+bons.reduce((a,b)=>a+b.amount,0),0);
-  // Investissements (toutes dépenses dont desc = actif connu)
-  const epargneTotal=expenses.filter(e=>investDescs.has(e.desc)&&e.cat!=='rentree').reduce((s,e)=>s+e.amount,0);
   // Comptes manuels
   const accsTotal=userAccounts.reduce((s,a)=>s+a.balance,0);
-  return resteTotal+rentreesTotal+epargneTotal+accsTotal;
+  return resteTotal+rentreesTotal+accsTotal;
 }
 
 function renderDash(){
@@ -529,14 +523,13 @@ function renderSave(){
   const typeIcons={banque:'🏦',invest:'📈',crypto:'₿',epargne:'💳',cash:'💵',autre:'🔮'};
   const typeColors={banque:'var(--bl)',invest:'var(--am)',crypto:'#F7931A',epargne:'var(--te)',cash:'var(--te)',autre:'var(--mu2)'};
 
-  // ── Reste accumulé : salaire - dépenses réelles (hors rentree, hors investissements) ──
-  const investDescs=getInvestDescs();
+  // ── Reste accumulé : salaire - toutes dépenses (hors rentree) ──
   let resteTotal=0;
   const resteParMois=[];
   getAllMonths().forEach(key=>{
     const[y,m]=key.split('-').map(Number);const mo=m-1;
     const txs=getExp(y,mo);
-    const dep=txs.filter(e=>e.cat!=='rentree'&&!investDescs.has(e.desc)).reduce((s,e)=>s+e.amount,0);
+    const dep=txs.filter(e=>e.cat!=='rentree').reduce((s,e)=>s+e.amount,0);
     const inc=getInc(y,mo);
     if(inc>0){const reste=inc-dep;if(reste>0){resteTotal+=reste;resteParMois.push({key,y,m:mo,reste});}}
   });
@@ -550,20 +543,12 @@ function renderSave(){
     rentreesMap[b.desc].items.push({date:k,amount:b.amount,label:MONTHS[parseInt(mo)-1]+' '+y});
   }));
 
-  // ── Investissements : toutes dépenses dont la desc correspond à un actif connu ──
-  const investMap={};
-  expenses.filter(e=>investDescs.has(e.desc)&&e.cat!=='rentree').forEach(e=>{
-    if(!investMap[e.desc])investMap[e.desc]={total:0,items:[]};
-    const d=new Date(e.date);
-    investMap[e.desc].total+=e.amount;
-    investMap[e.desc].items.push({date:e.date,amount:e.amount,label:d.getDate().toString().padStart(2,'0')+' '+MS[d.getMonth()]+' '+d.getFullYear()});
-  });
+
 
   // ── Total global ──
   const rentreesTotal=Object.values(rentreesMap).reduce((s,v)=>s+v.total,0);
-  const epargneTotal=Object.values(investMap).reduce((s,v)=>s+v.total,0);
   const accsTotal=userAccounts.reduce((s,a)=>s+a.balance,0);
-  const grandTotal=resteTotal+rentreesTotal+epargneTotal+accsTotal;
+  const grandTotal=resteTotal+rentreesTotal+accsTotal;
   const goal=Math.ceil(grandTotal/10000)*10000||10000;
   const prev=goal-10000;
   const pct=grandTotal>0?Math.min(100,Math.round(((grandTotal-prev)/(goal-prev))*100)):0;
@@ -573,7 +558,7 @@ function renderSave(){
   document.getElementById('save-prev').textContent=fr(prev);
   document.getElementById('save-next').textContent=fr(goal);
 
-  window._saveData={resteParMois,rentreesMap,investMap};
+  window._saveData={resteParMois,rentreesMap};
 
   function makeCard(icon,name,sub,amount,color,onclickStr,menuStr=''){
     return '<div class="sav-card" onclick="'+onclickStr+'" style="--card-color:'+color+'">'+
@@ -606,13 +591,6 @@ function renderSave(){
   });
 
   // Investissements
-  Object.entries(investMap).sort((a,b)=>b[1].total-a[1].total).forEach(([desc,data])=>{
-    const safe=desc.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-    const icon=desc.toLowerCase().includes('btc')||desc.toLowerCase().includes('bitcoin')?'₿':
-                desc.toLowerCase().includes('s&p')||desc.toLowerCase().includes('sp5')?'📊':'📈';
-    html+=makeCard(icon,desc,'Investi · '+data.items.length+' achat'+(data.items.length>1?'s':''),data.total,'var(--am)',"openSavePop('invest','"+safe+"')");
-  });
-
   // Comptes manuels
   userAccounts.forEach((a,i)=>{
     const color=typeColors[a.type]||'var(--mu2)';
