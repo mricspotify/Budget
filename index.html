@@ -97,6 +97,16 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:-apple-sy
 .badge{font-size:10px;padding:3px 9px;border-radius:20px;font-weight:600}
 .inv-row{display:flex;justify-content:space-between;font-size:12px;padding:3px 0;color:var(--mu2)}
 .inv-row b{color:var(--tx);font-weight:500}
+.sav-card{background:var(--s2);border:0.5px solid var(--b);border-radius:14px;padding:14px 15px;margin-bottom:9px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:background .15s;border-left:2.5px solid var(--card-color)}
+.sav-card:active{background:var(--s3)}
+.sav-left{display:flex;align-items:center;gap:12px;flex:1;min-width:0}
+.sav-icon{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.sav-info{flex:1;min-width:0}
+.sav-name{font-size:14px;font-weight:600;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sav-sub{font-size:11px;color:var(--mu);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sav-right{display:flex;align-items:center;gap:8px;flex-shrink:0;margin-left:10px}
+.sav-amt{font-size:14px;font-weight:700;letter-spacing:-.02em}
+.sav-menu{width:28px;height:28px;border-radius:7px;border:0.5px solid var(--b2);background:var(--s3);color:var(--mu2);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;letter-spacing:1px;font-family:inherit;flex-shrink:0}
 .recur-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--b)}
 .recur-item:last-child{border-bottom:none}
 .recur-info{flex:1}
@@ -154,10 +164,10 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:-apple-sy
           <div class="mnav"><button class="mnb" onclick="changeMonth(-1)">‹</button><button class="mnb" onclick="changeMonth(1)">›</button></div>
         </div>
         <div class="grid2">
-          <div class="card"><div class="cl">Revenu</div><div class="cv" style="color:var(--te)" id="d-inc">—</div><div id="d-bonuses"></div></div>
-          <div class="card"><div class="cl">Dépensé</div><div class="cv" style="color:var(--co)" id="d-dep">—</div></div>
-          <div class="card"><div class="cl">Reste</div><div class="cv" id="d-rest">—</div></div>
-          <div class="card"><div class="cl">Épargne totale</div><div class="cv" style="color:var(--am)" id="d-save">—</div></div>
+          <div class="card" style="border-left:2.5px solid var(--bl)"><div class="cl">Revenu</div><div class="cv" style="color:var(--bl)" id="d-inc">—</div><div id="d-bonuses"></div></div>
+          <div class="card" style="border-left:2.5px solid var(--co)"><div class="cl">Dépensé</div><div class="cv" style="color:var(--co)" id="d-dep">—</div></div>
+          <div class="card" style="border-left:2.5px solid var(--te)"><div class="cl">Reste</div><div class="cv" style="color:var(--te)" id="d-rest">—</div></div>
+          <div class="card" style="border-left:2.5px solid var(--am)"><div class="cl">Épargne totale</div><div class="cv" style="color:var(--am)" id="d-save">—</div></div>
         </div>
         <div id="cat-cards" style="margin-bottom:12px"></div>
         <div class="sec"><div class="sh">Répartition</div><div id="breakdown"></div></div>
@@ -379,7 +389,7 @@ function renderDash(){
   document.getElementById('d-inc').textContent=inc>0?fa(inc):'— €';
   document.getElementById('d-dep').textContent=fa(total);
   const re=document.getElementById('d-rest');
-  re.textContent=fa(rest);re.style.color=rest>=0?'var(--pu)':'var(--re)';
+  re.textContent=fa(rest);re.style.color=rest>=0?'var(--te)':'var(--re)';
   document.getElementById('d-save').textContent=fr(calcSaveTotal());
   // Bonuses
   const bons=monthBon[mk(y,m)]||[];
@@ -502,42 +512,43 @@ function renderHist(){
     const sortedRentreeAmt=sortedRentrees.reduce((s,e)=>s+e.amount,0);
     const inc=getInc(g.y,g.m);const bon=getBon(g.y,g.m);
     const eco=inc>0?Math.max(0,inc+sortedRentreeAmt-total):null;
-    return '<div style="margin-bottom:18px"><div class="mhrow"><span class="mhtitle">'+g.lbl+'</span><span class="mhmeta">'+fa(total)+(eco!==null?' · <span style="color:var(--te)">'+fa(eco)+' épargnés</span>':'')+'</span></div><div class="txlist">'+
+    const borderColor=eco!==null&&eco>0?'var(--te)':'var(--co)';
+    return '<div style="margin-bottom:18px"><div class="mhrow"><span class="mhtitle">'+g.lbl+'</span><span class="mhmeta">'+fa(total)+(eco!==null?' · <span style="color:var(--te)">'+fa(eco)+' épargnés</span>':'')+'</span></div><div class="txlist" style="border-left:2.5px solid '+borderColor+'">'+
       sorted.map(e=>{const cfg=CAT[e.cat]||CAT.autre;const d=new Date(e.date);return '<div class="txrow"><div class="txic" style="background:'+cfg.color+'22">'+cfg.icon+'</div><div class="txinfo"><div class="txname">'+e.desc+'</div><div class="txdate">'+d.getDate().toString().padStart(2,'0')+' '+MS[d.getMonth()]+'</div></div><div style="display:flex;align-items:center;gap:6px"><span class="txamt">'+fa(e.amount)+'</span><button class="txmenu" onclick="openAS(\''+e.id+'\',event)">···</button></div></div>';}).join('')+
       '<div style="display:flex;justify-content:space-between;padding:8px 13px;font-size:11px;color:var(--mu);border-top:0.5px solid var(--b)"><span>'+sorted.length+' transaction'+(sorted.length>1?'s':'')+'</span><span>'+fa(total)+'</span></div></div></div>';
   }).join('');
 }
 
 function renderSave(){
-  const icons={banque:'🏦',invest:'📈',crypto:'₿',epargne:'💳',cash:'💵',autre:'🔮'};
+  const typeIcons={banque:'🏦',invest:'📈',crypto:'₿',epargne:'💳',cash:'💵',autre:'🔮'};
+  const typeColors={banque:'var(--bl)',invest:'var(--am)',crypto:'#F7931A',epargne:'var(--te)',cash:'var(--te)',autre:'var(--mu2)'};
 
-  // ── Reste accumulé par mois ──
+  // ── Reste accumulé (salaire - dépenses, sans rentrées) ──
   let resteTotal=0;
   const resteParMois=[];
   getAllMonths().forEach(key=>{
     const[y,m]=key.split('-').map(Number);const mo=m-1;
     const txs=getExp(y,mo);
     const dep=txs.filter(e=>e.cat!=='rentree'&&e.cat!=='epargne').reduce((s,e)=>s+e.amount,0);
-    const rent=txs.filter(e=>e.cat==='rentree').reduce((s,e)=>s+e.amount,0);
-    const bon=getBon(y,mo);
     const inc=getInc(y,mo);
-    if(inc>0){const reste=inc+rent+bon-dep;if(reste>0){resteTotal+=reste;resteParMois.push({key,y,m:mo,reste});}}
+    if(inc>0){const reste=inc-dep;if(reste>0){resteTotal+=reste;resteParMois.push({key,y,m:mo,reste});}}
   });
 
-  // ── Rentrées exceptionnelles groupées par description (hors remboursements) ──
+  // ── Rentrées groupées par description (héritage, intérêts, remboursements...) ──
   const rentreesMap={};
   Object.entries(monthBon).forEach(([k,bons])=>bons.forEach(b=>{
-    if(b.desc.toLowerCase().includes('rembours'))return;
-    if(!rentreesMap[b.desc])rentreesMap[b.desc]={total:0,items:[]};
-    const[y,m]=k.split('-');
-    rentreesMap[b.desc].total+=b.amount;
-    rentreesMap[b.desc].items.push({date:k,desc:b.desc,amount:b.amount,label:MONTHS[parseInt(m)-1]+' '+y});
+    const key=b.desc;
+    if(!rentreesMap[key])rentreesMap[key]={total:0,items:[]};
+    const[y,mo]=k.split('-');
+    rentreesMap[key].total+=b.amount;
+    rentreesMap[key].items.push({date:k,amount:b.amount,label:MONTHS[parseInt(mo)-1]+' '+y});
   }));
-  expenses.filter(e=>e.cat==='rentree'&&!e.desc.toLowerCase().includes('rembours')).forEach(e=>{
-    if(!rentreesMap[e.desc])rentreesMap[e.desc]={total:0,items:[]};
+  expenses.filter(e=>e.cat==='rentree').forEach(e=>{
+    const key=e.desc;
+    if(!rentreesMap[key])rentreesMap[key]={total:0,items:[]};
     const d=new Date(e.date);
-    rentreesMap[e.desc].total+=e.amount;
-    rentreesMap[e.desc].items.push({date:e.date,desc:e.desc,amount:e.amount,label:d.getDate().toString().padStart(2,'0')+' '+MS[d.getMonth()]+' '+d.getFullYear()});
+    rentreesMap[key].total+=e.amount;
+    rentreesMap[key].items.push({date:e.date,amount:e.amount,label:d.getDate().toString().padStart(2,'0')+' '+MS[d.getMonth()]+' '+d.getFullYear()});
   });
 
   // ── Investissements groupés par description ──
@@ -546,7 +557,7 @@ function renderSave(){
     if(!investMap[e.desc])investMap[e.desc]={total:0,items:[]};
     const d=new Date(e.date);
     investMap[e.desc].total+=e.amount;
-    investMap[e.desc].items.push({date:e.date,desc:e.desc,amount:e.amount,label:d.getDate().toString().padStart(2,'0')+' '+MS[d.getMonth()]+' '+d.getFullYear()});
+    investMap[e.desc].items.push({date:e.date,amount:e.amount,label:d.getDate().toString().padStart(2,'0')+' '+MS[d.getMonth()]+' '+d.getFullYear()});
   });
 
   // ── Total global ──
@@ -563,115 +574,136 @@ function renderSave(){
   document.getElementById('save-prev').textContent=fr(prev);
   document.getElementById('save-next').textContent=fr(goal);
 
-  const ic=document.getElementById('inv-cards-list');
-  const ac=document.getElementById('accounts-cards');
+  window._saveData={resteParMois,rentreesMap,investMap};
+
+  function makeCard(icon,name,sub,amount,color,onclickStr,menuStr=''){
+    return '<div class="sav-card" onclick="'+onclickStr+'" style="--card-color:'+color+'">'+
+      '<div class="sav-left">'+
+        '<div class="sav-icon" style="background:'+color+'22;color:'+color+'">'+icon+'</div>'+
+        '<div class="sav-info">'+
+          '<div class="sav-name">'+name+'</div>'+
+          '<div class="sav-sub">'+sub+'</div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="sav-right">'+
+        '<div class="sav-amt" style="color:'+color+'">'+fa(amount)+'</div>'+
+        menuStr+
+      '</div>'+
+    '</div>';
+  }
+
   let html='';
 
-  // ── Carte : Reste accumulé ──
-  html+='<div class="inv-card tap" style="margin-bottom:8px;cursor:pointer" onclick="openSavePop(\'reste\')">'+
-    '<div class="inv-top">'+
-      '<div><div class="inv-name">💵 Reste accumulé</div><div class="inv-sub">Cumul des restes mensuels</div></div>'+
-      '<span style="font-size:15px;font-weight:700;color:var(--te)">'+fa(resteTotal)+'</span>'+
-    '</div>'+
-  '</div>';
+  // Reste accumulé
+  html+=makeCard('💵','Reste accumulé','Cumul mensuel · '+resteParMois.length+' mois',resteTotal,'var(--te)',"openSavePop('reste')");
 
-  // ── Cartes : Rentrées exceptionnelles ──
+  // Rentrées
   Object.entries(rentreesMap).sort((a,b)=>b[1].total-a[1].total).forEach(([desc,data])=>{
-    const safeDesc=desc.replace(/'/g,"\\'");
-    html+='<div class="inv-card tap" style="margin-bottom:8px;cursor:pointer" onclick="openSavePop(\'rentree\',\''+safeDesc+'\')">'+
-      '<div class="inv-top">'+
-        '<div><div class="inv-name">💸 '+desc+'</div><div class="inv-sub">Rentrée exceptionnelle</div></div>'+
-        '<span style="font-size:15px;font-weight:700;color:var(--bl)">'+fa(data.total)+'</span>'+
-      '</div>'+
-    '</div>';
+    const safe=desc.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    const icon=desc.toLowerCase().includes('héritage')||desc.toLowerCase().includes('heritage')?'🏛️':
+                desc.toLowerCase().includes('intér')||desc.toLowerCase().includes('inter')?'💹':
+                desc.toLowerCase().includes('rembours')?'🔄':'💸';
+    html+=makeCard(icon,desc,'Rentrée exceptionnelle · '+data.items.length+' entrée'+(data.items.length>1?'s':''),data.total,'var(--bl)',"openSavePop('rentree','"+safe+"')");
   });
 
-  // ── Cartes : Investissements ──
+  // Investissements
   Object.entries(investMap).sort((a,b)=>b[1].total-a[1].total).forEach(([desc,data])=>{
-    const safeDesc=desc.replace(/'/g,"\\'");
-    html+='<div class="inv-card tap" style="margin-bottom:8px;cursor:pointer" onclick="openSavePop(\'invest\',\''+safeDesc+'\')">'+
-      '<div class="inv-top">'+
-        '<div><div class="inv-name">📈 '+desc+'</div><div class="inv-sub">Total investi</div></div>'+
-        '<span style="font-size:15px;font-weight:700;color:var(--am)">'+fa(data.total)+'</span>'+
-      '</div>'+
-    '</div>';
+    const safe=desc.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    const icon=desc.toLowerCase().includes('btc')||desc.toLowerCase().includes('bitcoin')?'₿':
+                desc.toLowerCase().includes('s&p')||desc.toLowerCase().includes('sp5')?'📊':'📈';
+    html+=makeCard(icon,desc,'Investi · '+data.items.length+' achat'+(data.items.length>1?'s':''),data.total,'var(--am)',"openSavePop('invest','"+safe+"')");
   });
 
-  // ── Cartes : Comptes manuels ──
+  // Comptes manuels
   userAccounts.forEach((a,i)=>{
-    html+='<div class="inv-card" style="margin-bottom:8px">'+
-      '<div class="inv-top">'+
-        '<div><div class="inv-name">'+(icons[a.type]||'🔮')+' '+a.name+'</div><div class="inv-sub">'+a.type+'</div></div>'+
-        '<button class="txmenu" onclick="openInvAS('+i+')">···</button>'+
-      '</div>'+
-      '<div class="inv-row"><span>Solde</span><b>'+fa(a.balance)+'</b></div>'+
-    '</div>';
+    const color=typeColors[a.type]||'var(--mu2)';
+    const icon=typeIcons[a.type]||'🔮';
+    const menu='<button class="sav-menu" onclick="event.stopPropagation();openInvAS('+i+')" title="Options">···</button>';
+    html+=makeCard(icon,a.name,a.type+' · Compte manuel',a.balance,color,"openSavePop('compte',"+i+")",menu);
   });
 
-  if(!html)html='<div style="color:var(--mu);font-size:14px;padding:40px 0;text-align:center">Aucune donnée —<br>importe ton fichier JSON</div>';
+  if(!html)html='<div style="color:var(--mu);font-size:14px;padding:48px 0;text-align:center;line-height:1.8">Aucune donnée<br><span style="font-size:12px">Importe ton fichier JSON</span></div>';
+
+  const ic=document.getElementById('inv-cards-list');
+  const ac=document.getElementById('accounts-cards');
   if(ic)ic.innerHTML=html;
   if(ac)ac.innerHTML='';
-
-  // Stocker les données pour les popups
-  window._saveData={resteParMois,rentreesMap,investMap};
 }
 
 function openSavePop(type,desc){
   const d=window._saveData||{};
-  let title='',items=[];
+  let title='',sub='',items=[],total=0,color='var(--pu)';
 
   if(type==='reste'){
     title='💵 Reste accumulé';
-    items=(d.resteParMois||[]).slice().reverse().map(({y,m,reste})=>({
+    sub='Salaire − dépenses de chaque mois';
+    color='var(--te)';
+    const sorted=(d.resteParMois||[]).slice().reverse();
+    total=sorted.reduce((s,r)=>s+r.reste,0);
+    items=sorted.map(({y,m,reste})=>({
       label:MONTHS[m]+' '+y,
-      sub:'Salaire + rentrées − dépenses',
+      sub:'Salaire − dépenses fixes/courantes',
       amt:'+'+fa(reste),
       color:'var(--te)'
     }));
   } else if(type==='rentree'){
     const data=(d.rentreesMap||{})[desc]||{total:0,items:[]};
-    title='💸 '+desc;
+    const icon=desc.toLowerCase().includes('héritage')||desc.toLowerCase().includes('heritage')?'🏛️':
+               desc.toLowerCase().includes('intér')||desc.toLowerCase().includes('inter')?'💹':
+               desc.toLowerCase().includes('rembours')?'🔄':'💸';
+    title=icon+' '+desc;
+    sub='Rentrée exceptionnelle';
+    color='var(--bl)';
+    total=data.total;
     items=[...data.items].sort((a,b)=>b.date.localeCompare(a.date)).map(it=>({
-      label:it.label,
-      sub:it.desc,
-      amt:'+'+fa(it.amount),
-      color:'var(--bl)'
+      label:it.label,sub:desc,amt:'+'+fa(it.amount),color:'var(--bl)'
     }));
   } else if(type==='invest'){
     const data=(d.investMap||{})[desc]||{total:0,items:[]};
-    title='📈 '+desc;
+    const icon=desc.toLowerCase().includes('btc')||desc.toLowerCase().includes('bitcoin')?'₿':
+               desc.toLowerCase().includes('s&p')||desc.toLowerCase().includes('sp5')?'📊':'📈';
+    title=icon+' '+desc;
+    sub='Total investi depuis le début';
+    color='var(--am)';
+    total=data.total;
     items=[...data.items].sort((a,b)=>b.date.localeCompare(a.date)).map(it=>({
-      label:it.label,
-      sub:'Catégorie Épargne',
-      amt:fa(it.amount),
-      color:'var(--am)'
+      label:it.label,sub:'Achat '+desc,amt:fa(it.amount),color:'var(--am)'
     }));
+  } else if(type==='compte'){
+    const a=userAccounts[desc];
+    if(!a)return;
+    const typeIcons2={banque:'🏦',invest:'📈',crypto:'₿',epargne:'💳',cash:'💵',autre:'🔮'};
+    const typeColors2={banque:'var(--bl)',invest:'var(--am)',crypto:'#F7931A',epargne:'var(--te)',cash:'var(--te)',autre:'var(--mu2)'};
+    title=(typeIcons2[a.type]||'🔮')+' '+a.name;
+    sub='Compte '+a.type;
+    color=typeColors2[a.type]||'var(--pu)';
+    total=a.balance;
+    items=[{label:'Solde actuel',sub:'Saisi manuellement',amt:fa(a.balance),color}];
   }
 
   const rows=items.length===0
-    ?'<div style="text-align:center;color:var(--mu);padding:24px">Aucune donnée</div>'
-    :items.map(it=>'<div style="display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:0.5px solid var(--b)">'+
-        '<div><div style="font-size:13px;font-weight:500">'+it.label+'</div>'+
-        '<div style="font-size:11px;color:var(--mu);margin-top:1px">'+it.sub+'</div></div>'+
+    ?'<div style="text-align:center;color:var(--mu);padding:32px 0;font-size:13px">Aucune entrée</div>'
+    :items.map(it=>
+      '<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:0.5px solid var(--b)">'+
+        '<div><div style="font-size:13px;font-weight:500;color:var(--tx)">'+it.label+'</div>'+
+        '<div style="font-size:11px;color:var(--mu);margin-top:2px">'+it.sub+'</div></div>'+
         '<span style="font-size:13px;font-weight:600;color:'+it.color+'">'+it.amt+'</span>'+
       '</div>'
     ).join('');
 
-  const total=type==='reste'
-    ?(d.resteParMois||[]).reduce((s,r)=>s+r.reste,0)
-    :type==='rentree'?((d.rentreesMap||{})[desc]||{total:0}).total
-    :((d.investMap||{})[desc]||{total:0}).total;
-
   document.body.insertAdjacentHTML('beforeend',
     '<div class="overlay" id="savepop" onclick="if(event.target.id===\'savepop\')this.remove()">'+
-    '<div class="modal" style="max-height:80vh;display:flex;flex-direction:column">'+
-      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">'+
-        '<div style="font-size:17px;font-weight:600">'+title+'</div>'+
-        '<span style="font-size:16px;font-weight:700;color:var(--pu)">'+fa(total)+'</span>'+
+    '<div class="modal" style="max-height:82vh;display:flex;flex-direction:column;padding-bottom:max(20px,env(safe-area-inset-bottom))">'+
+      '<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:2px">'+
+        '<div style="font-size:18px;font-weight:700;letter-spacing:-.02em">'+title+'</div>'+
+        '<span style="font-size:17px;font-weight:700;color:'+color+'">'+fa(total)+'</span>'+
       '</div>'+
-      '<div style="font-size:11px;color:var(--mu);margin-bottom:14px">'+items.length+' entrée'+(items.length>1?'s':'')+'</div>'+
-      '<div style="overflow-y:auto;flex:1">'+rows+'</div>'+
-      '<button onclick="document.getElementById(\'savepop\').remove()" style="width:100%;background:var(--s3);border:none;color:var(--mu2);border-radius:12px;padding:13px;font-size:15px;cursor:pointer;font-family:inherit;margin-top:14px">Fermer</button>'+
+      '<div style="font-size:12px;color:var(--mu);margin-bottom:14px">'+sub+' · '+items.length+' entrée'+(items.length>1?'s':'')+'</div>'+
+      '<div style="overflow-y:auto;flex:1;margin:0 -2px;padding:0 2px">'+rows+'</div>'+
+      '<button onclick="document.getElementById(\'savepop\').remove()" '+
+        'style="width:100%;background:var(--s3);border:none;color:var(--mu2);border-radius:12px;padding:13px;font-size:15px;cursor:pointer;font-family:inherit;margin-top:14px;flex-shrink:0">'+
+        'Fermer'+
+      '</button>'+
     '</div></div>'
   );
 }
