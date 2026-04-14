@@ -195,10 +195,7 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:-apple-sy
           <div class="prog-wrap"><div class="prog-bar" id="save-bar"></div></div>
           <div class="prog-info"><span id="save-prev">—</span><span style="color:var(--pu)" id="save-pct">—</span><span id="save-next">—</span></div>
         </div>
-        <div class="inv-card"><div class="inv-top"><div><div class="inv-name">S&P 500</div><div class="inv-sub">ETF — DCA mensuel</div></div><div style="display:flex;align-items:center;gap:8px"><span class="badge" style="background:var(--tedim);color:var(--te)">Actif</span><button class="txmenu" onclick="openInvAS('sp500')">···</button></div></div><div class="inv-row"><span>Investi total</span><b>340 €</b></div><div class="inv-row"><span>Versement mensuel</span><b>80 €</b></div></div>
-        <div class="inv-card"><div class="inv-top"><div><div class="inv-name">Bitcoin</div><div class="inv-sub">Crypto — DCA mensuel</div></div><div style="display:flex;align-items:center;gap:8px"><span class="badge" style="background:var(--tedim);color:var(--te)">Actif</span><button class="txmenu" onclick="openInvAS('btc')">···</button></div></div><div class="inv-row"><span>Investi total</span><b>290,98 €</b></div><div class="inv-row"><span>Versement mensuel</span><b>80 €</b></div></div>
-        <div class="inv-card"><div class="inv-top"><div><div class="inv-name">Intérêts</div><div class="inv-sub">Livret / placement</div></div><div style="display:flex;align-items:center;gap:8px"><span class="badge" style="background:var(--tedim);color:var(--te)">Actif</span><button class="txmenu" onclick="openInvAS('interets')">···</button></div></div><div class="inv-row"><span>Cumulé</span><b>853,61 €</b></div></div>
-        <div class="inv-card"><div class="inv-top"><div><div class="inv-name">Héritage</div><div class="inv-sub">Épargne reçue</div></div><div style="display:flex;align-items:center;gap:8px"><span class="badge" style="background:var(--amdim);color:var(--am)">Ponctuel</span><button class="txmenu" onclick="openInvAS('heritage')">···</button></div></div><div class="inv-row"><span>Montant reçu</span><b>2 058 €</b></div></div>
+        <div id="inv-cards-list"></div>
         <div id="accounts-cards"></div>
         <button class="btnp" style="margin-top:4px" onclick="openAccountModal()">+ Ajouter un compte</button>
       </div>
@@ -207,7 +204,7 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:-apple-sy
     <div class="page" id="page-set">
       <div class="inner">
         <div class="ptitle">Paramètres</div>
- 
+
         <!-- Revenus -->
         <div class="sec">
           <div class="sh" onclick="toggleSection('inc-body')" style="cursor:pointer">
@@ -219,7 +216,7 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:-apple-sy
           </div>
           <div id="inc-body"><div id="inc-list"></div></div>
         </div>
- 
+
         <!-- Rentrées -->
         <div class="sec">
           <div class="sh" onclick="toggleSection('bon-body')" style="cursor:pointer">
@@ -231,7 +228,7 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:-apple-sy
           </div>
           <div id="bon-body"><div id="bonus-list"></div></div>
         </div>
- 
+
         <!-- Récurrentes -->
         <div class="sec">
           <div class="sh" onclick="toggleSection('rec-body')" style="cursor:pointer">
@@ -243,14 +240,14 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:-apple-sy
           </div>
           <div id="rec-body"><div id="recur-list"></div></div>
         </div>
- 
+
         <!-- Données -->
         <div class="sec">
           <div class="sh">Données</div>
           <div class="srow"><div><div class="slbl">Nombre de dépenses</div></div><span class="sval" id="s-count">—</span></div>
           <div class="srow"><div><div class="slbl">Réinitialiser</div><div class="ssub">Supprime tout l'historique</div></div><button onclick="resetAll()" style="background:var(--redim);border:0.5px solid var(--re);color:var(--re);border-radius:7px;padding:5px 10px;font-size:12px;cursor:pointer;font-family:inherit">Reset</button></div>
         </div>
- 
+
         <!-- Import / Export -->
         <div class="sec">
           <div class="sh">Données personnelles</div>
@@ -290,23 +287,18 @@ const CAT={
   autre:  {label:'Autre',   icon:'📌',color:'#888780'},
   rentree:{label:'Rentrée',  icon:'💸',color:'#1D9E75'},
 };
-const SAVINGS=6383;
-const RECUR_DEF=[
-  {id:'r1',desc:'Forfait Mobile',amount:7.63,cat:'fixes',active:true},
-  {id:'r2',desc:'Internet',amount:19.99,cat:'fixes',active:true},
-  {id:'r3',desc:'iCloud+',amount:0.99,cat:'fixes',active:true},
-  {id:'r4',desc:'ChatGPT',amount:22.99,cat:'fixes',active:true},
-];
+const SAVINGS=0;
+const RECUR_DEF=[];
 const INC_DEF={};
 const BON_DEF={};
 const EXP_DEF=[];
- 
+
 let expenses=[],recurItems=[],monthInc={},monthBon={},lastMonth='',offset=0;
 let editId=null,selCatVal=null,histFilt='all',tChart=null,selRecurCat=null;
 const SK='bg11',SR='br10',SI='bi10',SB='bb10',SL='bl10';
- 
-function save(){try{localStorage.setItem(SK,JSON.stringify(expenses));localStorage.setItem(SR,JSON.stringify(recurItems));localStorage.setItem(SI,JSON.stringify(monthInc));localStorage.setItem(SB,JSON.stringify(monthBon));localStorage.setItem(SL,lastMonth);}catch(e){}}
-function load(){try{expenses=JSON.parse(localStorage.getItem(SK))||EXP_DEF;recurItems=JSON.parse(localStorage.getItem(SR))||RECUR_DEF;monthInc=JSON.parse(localStorage.getItem(SI))||INC_DEF;monthBon=JSON.parse(localStorage.getItem(SB))||BON_DEF;lastMonth=localStorage.getItem(SL)||'';}catch(e){expenses=EXP_DEF;recurItems=RECUR_DEF;monthInc=INC_DEF;monthBon=BON_DEF;}}
+
+function save(){try{localStorage.setItem(SK,JSON.stringify(expenses));localStorage.setItem(SR,JSON.stringify(recurItems));localStorage.setItem(SI,JSON.stringify(monthInc));localStorage.setItem(SB,JSON.stringify(monthBon));localStorage.setItem(SL,lastMonth);}catch(e){}supaSave();}
+function load(){try{expenses=JSON.parse(localStorage.getItem(SK))||EXP_DEF;recurItems=JSON.parse(localStorage.getItem(SR))||RECUR_DEF;monthInc=JSON.parse(localStorage.getItem(SI))||INC_DEF;monthBon=JSON.parse(localStorage.getItem(SB))||BON_DEF;lastMonth=localStorage.getItem(SL)||'';userAccounts=JSON.parse(localStorage.getItem('bg11_acc'))||[];}catch(e){expenses=EXP_DEF;recurItems=RECUR_DEF;monthInc=INC_DEF;monthBon=BON_DEF;userAccounts=[];}}
 function mk(y,m){return y+'-'+String(m+1).padStart(2,'0');}
 function getInc(y,m){return parseFloat(monthInc[mk(y,m)])||0;}
 function getBon(y,m){return (monthBon[mk(y,m)]||[]).reduce((s,b)=>s+b.amount,0);}
@@ -314,7 +306,7 @@ function getExp(y,m){return expenses.filter(e=>{const d=new Date(e.date);return 
 function sumCat(txs){const b={};Object.keys(CAT).forEach(k=>b[k]=0);txs.forEach(e=>{if(b[e.cat]!==undefined)b[e.cat]+=e.amount;else b.autre+=e.amount;});return b;}
 function fa(n){return parseFloat(n).toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';}
 function fr(n){return Math.round(n).toLocaleString('fr-FR')+' €';}
- 
+
 function checkMonth(){
   const now=new Date();const key=mk(now.getFullYear(),now.getMonth());
   if(key!==lastMonth){
@@ -328,7 +320,7 @@ function checkMonth(){
     if(!monthInc[key])setTimeout(()=>openSalModal(false),600);
   }
 }
- 
+
 function showPage(id,btn){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
@@ -340,9 +332,9 @@ function showPage(id,btn){
   if(id==='save')renderSave();
   if(id==='add'&&!editId)resetForm();
 }
- 
+
 function changeMonth(d){offset+=d;renderDash();}
- 
+
 function renderDash(){
   const now=new Date();
   const ref=new Date(now.getFullYear(),now.getMonth()+offset,1);
@@ -363,7 +355,7 @@ function renderDash(){
   document.getElementById('d-dep').textContent=fa(total);
   const re=document.getElementById('d-rest');
   re.textContent=fa(rest);re.style.color=rest>=0?'var(--pu)':'var(--re)';
-  document.getElementById('d-save').textContent=fr(SAVINGS);
+  document.getElementById('d-save').textContent=fr(userAccounts.reduce((s,a)=>s+a.balance,0));
   // Bonuses
   const bons=monthBon[mk(y,m)]||[];
   document.getElementById('d-bonuses').innerHTML=rentreeTxs.map(b=>`<div style="font-size:11px;color:var(--te);margin-top:3px">+${fa(b.amount)} ${b.desc}</div>`).join('');
@@ -381,7 +373,7 @@ function renderDash(){
   document.getElementById('breakdown').innerHTML=cats.map(([k,v])=>{const c=CAT[k];const pct=Math.round(v/maxV*100);return '<div class="brow"><div class="bdot" style="background:'+c.color+'"></div><span class="bname">'+c.label+'</span><div class="btrack"><div class="bbar" style="background:'+c.color+';width:'+pct+'%"></div></div><span class="bamt" style="color:'+c.color+'">'+fa(v)+'</span></div>';}).join('');
   renderTrend(y,m);
 }
- 
+
 function openCatPop(cat,y,m){
   const c=CAT[cat];
   const txs=getExp(y,m).filter(e=>e.cat===cat).sort((a,b)=>new Date(b.date)-new Date(a.date));
@@ -394,7 +386,7 @@ function openCatPop(cat,y,m){
   '</div><button onclick="document.getElementById(\'catpop\').remove()" style="width:100%;background:var(--s3);border:none;color:var(--mu2);border-radius:12px;padding:13px;font-size:15px;cursor:pointer;font-family:inherit;margin-top:12px">Fermer</button></div></div>';
   document.body.insertAdjacentHTML('beforeend',html);
 }
- 
+
 function renderTrend(cy,cm){
   const canvas=document.getElementById('trendChart');
   const canvas2=document.getElementById('saveChart');
@@ -426,11 +418,11 @@ function renderTrend(cy,cm){
     window.sChart=new Chart(canvas2.getContext('2d'),chartOpts(saveData,'rgba(29,158,117,0.75)','rgba(226,75,74,0.7)'));
   }catch(e){}
 }
- 
+
 function buildCatGrid(){
   document.getElementById('cat-grid').innerHTML=Object.entries(CAT).map(([k,c])=>'<button class="catb" onclick="pickCat(this,\''+k+'\')"><span class="catic">'+c.icon+'</span>'+c.label+'</button>').join('');
 }
-function pickCat(btn,cat){document.querySelectorAll('.catb').forEach(b=>b.classList.remove('sel'));btn.classList.add('sel');selCatVal=cat;}
+function pickCat(btn,cat){document.querySelectorAll('#cat-grid .catb').forEach(b=>b.classList.remove('sel'));btn.classList.add('sel');selCatVal=cat;}
 function resetForm(){
   editId=null;selCatVal=null;
   document.getElementById('f-desc').value='';document.getElementById('f-amount').value='';
@@ -463,7 +455,7 @@ function openAS(id,ev){
   ev.stopPropagation();const e=expenses.find(x=>x.id===id);if(!e)return;
   document.body.insertAdjacentHTML('beforeend','<div class="as" id="xas" onclick="if(event.target.classList.contains(\'as-bg\'))document.getElementById(\'xas\').remove()"><div class="as-bg"></div><div class="as-box"><div style="text-align:center;padding:6px 8px 12px;font-size:13px;color:var(--mu);border-bottom:0.5px solid var(--b);margin-bottom:4px">'+e.desc+' · '+fa(e.amount)+'</div><div class="as-item" onclick="document.getElementById(\'xas\').remove();editExp(\''+id+'\')"><span style="font-size:18px">✏️</span><span>Modifier</span></div><div class="as-item" style="color:var(--re)" onclick="document.getElementById(\'xas\').remove();delExp(\''+id+'\')"><span style="font-size:18px">🗑️</span><span>Supprimer</span></div><button class="as-cancel" onclick="document.getElementById(\'xas\').remove()">Annuler</button></div></div>');
 }
- 
+
 function buildFilter(){
   const bar=document.getElementById('filterbar');
   bar.innerHTML=[{k:'all',l:'Tout'},...Object.entries(CAT).map(([k,c])=>({k,l:c.icon+' '+c.label}))].map(f=>'<button class="fchip'+(histFilt===f.k?' on':'')+'" onclick="setFilt(\''+f.k+'\')">'+f.l+'</button>').join('');
@@ -490,33 +482,35 @@ function renderHist(){
       '<div style="display:flex;justify-content:space-between;padding:8px 13px;font-size:11px;color:var(--mu);border-top:0.5px solid var(--b)"><span>'+sorted.length+' transaction'+(sorted.length>1?'s':'')+'</span><span>'+fa(total)+'</span></div></div></div>';
   }).join('');
 }
- 
+
 function renderSave(){
   const accsTotal=userAccounts.reduce((s,a)=>s+a.balance,0);
-  const total=SAVINGS+accsTotal;
-  const goal=Math.ceil(total/10000)*10000||10000;
+  const goal=Math.ceil(accsTotal/10000)*10000||10000;
   const prev=goal-10000;
-  const pct=Math.min(100,Math.round(((total-prev)/(goal-prev))*100));
-  document.getElementById('save-total').textContent=fr(total);
+  const pct=accsTotal>0?Math.min(100,Math.round(((accsTotal-prev)/(goal-prev))*100)):0;
+  document.getElementById('save-total').textContent=fr(accsTotal);
   document.getElementById('save-bar').style.width=pct+'%';
   document.getElementById('save-pct').textContent=pct+'% · Prochain objectif '+fr(goal);
   document.getElementById('save-prev').textContent=fr(prev);
   document.getElementById('save-next').textContent=fr(goal);
-  // Render account cards
   const icons={banque:'🏦',invest:'📈',crypto:'₿',epargne:'💳',cash:'💵',autre:'🔮'};
+  const ic=document.getElementById('inv-cards-list');
   const ac=document.getElementById('accounts-cards');
-  if(ac){
-    ac.innerHTML=userAccounts.map((a,i)=>
-      '<div class="inv-card"><div class="inv-top">'+
-        '<div><div class="inv-name">'+(icons[a.type]||'🔮')+' '+a.name+'</div><div class="inv-sub">'+a.type+'</div></div>'+
-        '<button class="txmenu" onclick="openAccAS('+i+')">···</button>'+
+  if(ic) ic.innerHTML=userAccounts.length===0
+    ?'<div style="color:var(--mu);font-size:13px;padding:16px 0;text-align:center">Aucun compte — appuie sur + Ajouter un compte</div>'
+    :'';
+  if(ac) ac.innerHTML=userAccounts.map((a,i)=>
+    '<div class="inv-card">'+
+      '<div class="inv-top">'+
+        '<div><div class="inv-name">'+(icons[a.type]||'🔮')+' '+a.name+'</div>'+
+        '<div class="inv-sub">'+a.type+'</div></div>'+
+        '<button class="txmenu" onclick="openInvAS('+i+')">···</button>'+
       '</div>'+
       '<div class="inv-row"><span>Solde</span><b>'+fa(a.balance)+'</b></div>'+
-      '</div>'
-    ).join('');
-  }
+    '</div>'
+  ).join('');
 }
- 
+
 function renderSet(){
   document.getElementById('s-count').textContent=expenses.length;
   // Revenus
@@ -534,21 +528,21 @@ function renderSet(){
   // Récurrentes
   document.getElementById('recur-list').innerHTML=recurItems.map(r=>'<div class="recur-item"><div style="font-size:18px">'+(CAT[r.cat]?.icon||'📌')+'</div><div class="recur-info"><div class="recur-name">'+r.desc+'</div><div class="recur-amt">'+fa(r.amount)+' · '+(CAT[r.cat]?.label||'Autre')+'</div></div><div style="display:flex;gap:6px;align-items:center"><button class="txmenu" onclick="openRecurAS(\''+r.id+'\',event)">···</button><button class="toggle '+(r.active?'on':'off')+'" onclick="toggleRecur(\''+r.id+'\')"></button></div></div>').join('');
 }
- 
+
 function editInc(key,cur){
   const[y,m]=key.split('-');const lbl=MONTHS[parseInt(m)]+' '+y;
   document.body.insertAdjacentHTML('beforeend','<div class="saloverlay" id="salover" onclick="if(event.target.id===\'salover\')this.remove()"><div class="salmodal"><div class="salemoji">💰</div><div class="saltitle">Modifier le revenu</div><div class="salsub">'+lbl+'</div><input class="salinput" type="number" id="salin" inputmode="decimal" value="'+cur+'"><div class="salhint">Modifie le salaire pour ce mois</div><button class="btnp" onclick="saveInc(\''+key+'\')">Confirmer</button><button onclick="document.getElementById(\'salover\').remove()" style="width:100%;background:none;border:none;color:var(--mu);padding:12px;cursor:pointer;font-family:inherit;font-size:14px;margin-top:4px">Annuler</button></div></div>');
   setTimeout(()=>document.getElementById('salin').focus(),100);
 }
 function saveInc(key){const v=parseFloat(document.getElementById('salin').value);if(!v||v<=0){showToast('Montant invalide');return;}monthInc[key]=v;save();document.getElementById('salover').remove();renderSet();renderDash();showToast('Revenu modifié ✓');}
- 
+
 function openSalModal(fromSet){
   const now=new Date();const y=now.getFullYear(),m=now.getMonth();const ex=getInc(y,m);
   document.body.insertAdjacentHTML('beforeend','<div class="saloverlay" id="salover" onclick="if(event.target.id===\'salover\')this.remove()"><div class="salmodal"><div class="salemoji">💰</div><div class="saltitle">'+(fromSet?'Ajouter un revenu':'Nouveau mois !')+'</div><div class="salsub">'+MONTHS[m]+' '+y+' — Quel est ton salaire ?</div><input class="salinput" type="number" id="salin" placeholder="1500" inputmode="decimal" value="'+(ex||'')+'"><div class="salhint">Modifiable à tout moment dans Réglages</div><button class="btnp" onclick="saveSal('+y+','+m+')">Confirmer</button>'+(fromSet?'<button onclick="document.getElementById(\'salover\').remove()" style="width:100%;background:none;border:none;color:var(--mu);padding:12px;cursor:pointer;font-family:inherit;font-size:14px;margin-top:4px">Annuler</button>':'')+'</div></div>');
   setTimeout(()=>document.getElementById('salin').focus(),100);
 }
 function saveSal(y,m){const v=parseFloat(document.getElementById('salin').value);if(!v||v<=0){showToast('Montant invalide');return;}monthInc[mk(y,m)]=v;save();document.getElementById('salover').remove();renderDash();renderSet();showToast('Revenu enregistré ✓');}
- 
+
 function openBonusModal(){
   const now=new Date();
   document.body.insertAdjacentHTML('beforeend','<div class="overlay" id="bonpop" onclick="if(event.target.id===\'bonpop\')this.remove()"><div class="modal"><div class="modal-title">Nouvelle rentrée d\'argent</div><div class="fsec" style="margin-bottom:10px"><label class="fl">Description</label><input class="fi" type="text" id="bon-desc" placeholder="Ex: Remboursement"></div><div class="fsec" style="margin-bottom:10px"><label class="fl">Montant (€)</label><input class="fi" type="number" id="bon-amt" placeholder="0.00" inputmode="decimal"></div><div class="fsec" style="margin-bottom:10px"><label class="fl">Mois (AAAA-MM)</label><input class="fi" type="text" id="bon-month" placeholder="'+(now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0'))+'" value="'+(now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0'))+'"></div><button class="btnp" onclick="saveBonus()">Ajouter</button><button onclick="document.getElementById(\'bonpop\').remove()" style="width:100%;background:none;border:none;color:var(--mu);padding:12px;cursor:pointer;font-family:inherit;font-size:14px;margin-top:4px">Annuler</button></div></div>');
@@ -562,7 +556,7 @@ function saveBonus(){
   monthBon[month].push({desc,amount:amt});
   save();document.getElementById('bonpop').remove();renderSet();renderDash();showToast('Rentrée ajoutée ✓');
 }
- 
+
 function openRecurModal(){
   selRecurCat=null;
   document.body.insertAdjacentHTML('beforeend','<div class="overlay" id="recpop" onclick="if(event.target.id===\'recpop\')this.remove()"><div class="modal"><div class="modal-title">Nouvelle récurrence</div><div class="fsec" style="margin-bottom:10px"><label class="fl">Description</label><input class="fi" type="text" id="rec-desc" placeholder="Ex: Netflix"></div><div class="fsec" style="margin-bottom:10px"><label class="fl">Montant (€)</label><input class="fi" type="number" id="rec-amt" placeholder="0.00" inputmode="decimal"></div><div class="fsec" style="margin-bottom:10px"><label class="fl">Catégorie</label><div class="catg">'+Object.entries(CAT).map(([k,c])=>'<button class="catb" onclick="pickRCat(this,\''+k+'\')"><span class="catic">'+c.icon+'</span>'+c.label+'</button>').join('')+'</div></div><button class="btnp" onclick="saveRecur()">Ajouter</button><button onclick="document.getElementById(\'recpop\').remove()" style="width:100%;background:none;border:none;color:var(--mu);padding:12px;cursor:pointer;font-family:inherit;font-size:14px;margin-top:4px">Annuler</button></div></div>');
@@ -572,10 +566,10 @@ function saveRecur(){const desc=document.getElementById('rec-desc').value.trim()
 function openRecurAS(id,ev){ev.stopPropagation();document.body.insertAdjacentHTML('beforeend','<div class="as" id="xras" onclick="if(event.target.classList.contains(\'as-bg\'))document.getElementById(\'xras\').remove()"><div class="as-bg"></div><div class="as-box"><div class="as-item" style="color:var(--re)" onclick="document.getElementById(\'xras\').remove();delRecur(\''+id+'\')"><span style="font-size:18px">🗑️</span><span>Supprimer</span></div><button class="as-cancel" onclick="document.getElementById(\'xras\').remove()">Annuler</button></div></div>');}
 function delRecur(id){if(!confirm('Supprimer ?'))return;recurItems=recurItems.filter(r=>r.id!==id);save();renderSet();}
 function toggleRecur(id){const r=recurItems.find(x=>x.id===id);if(r)r.active=!r.active;save();renderSet();}
- 
-function resetAll(){if(!confirm('Supprimer TOUTES les données ?'))return;expenses=EXP_DEF;monthInc=INC_DEF;monthBon=BON_DEF;lastMonth='';save();renderDash();renderSet();showToast('Réinitialisé');}
+
+function resetAll(){if(!confirm('Supprimer TOUTES les données ?'))return;expenses=EXP_DEF;monthInc=INC_DEF;monthBon=BON_DEF;lastMonth='';recurItems=RECUR_DEF;userAccounts=[];save();saveAccounts();renderDash();renderSet();renderSave();showToast('Réinitialisé');}
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
- 
+
 // INV CARDS ACTION SHEET
 const INV_INFO={
   sp500:{name:'S&P 500',sub:'ETF — DCA mensuel'},
@@ -583,19 +577,21 @@ const INV_INFO={
   interets:{name:'Intérêts',sub:'Livret / placement'},
   heritage:{name:'Héritage',sub:'Épargne reçue'},
 };
-function openInvAS(key){
-  const info=INV_INFO[key];
+// INV CARDS — dynamiques
+function openInvAS(idx){
+  const a=userAccounts[idx];
   document.body.insertAdjacentHTML('beforeend',
     '<div class="as" id="xias" onclick="if(event.target.classList.contains(\'as-bg\'))document.getElementById(\'xias\').remove()">'+
     '<div class="as-bg"></div><div class="as-box">'+
-    '<div style="text-align:center;padding:6px 8px 12px;font-size:13px;color:var(--mu);border-bottom:0.5px solid var(--b);margin-bottom:4px">'+info.name+'</div>'+
-    '<div class="as-item" onclick="document.getElementById(\'xias\').remove();showToast(\'Modification à venir\')"><span style="font-size:18px">✏️</span><span>Modifier</span></div>'+
+    '<div style="text-align:center;padding:6px 8px 12px;font-size:13px;color:var(--mu);border-bottom:0.5px solid var(--b);margin-bottom:4px">'+a.name+'</div>'+
+    '<div class="as-item" onclick="document.getElementById(\'xias\').remove();openAccountModal('+idx+')"><span style="font-size:18px">✏️</span><span>Modifier</span></div>'+
+    '<div class="as-item" style="color:var(--re)" onclick="document.getElementById(\'xias\').remove();deleteAccount('+idx+')"><span style="font-size:18px">🗑️</span><span>Supprimer</span></div>'+
     '<button class="as-cancel" onclick="document.getElementById(\'xias\').remove()">Annuler</button>'+
     '</div></div>'
   );
 }
- 
- 
+
+
 function toggleSection(id){
   const el=document.getElementById(id);
   const arrow=document.getElementById(id.replace('body','arrow'));
@@ -604,7 +600,7 @@ function toggleSection(id){
   el.style.display=open?'none':'block';
   if(arrow)arrow.textContent=open?'▸':'▾';
 }
- 
+
 // IMPORT / EXPORT
 function exportData(){
   const data={expenses,monthInc,monthBon,recurItems,accounts:userAccounts};
@@ -627,18 +623,19 @@ function importData(input){
       if(data.monthBon)monthBon=data.monthBon;
       if(data.recurItems)recurItems=data.recurItems;
       if(data.accounts)userAccounts=data.accounts;
-      save();renderDash();renderSet();renderSave();buildFilter();
-      showToast('Données importées ✓');
+      save();
+      supaSave().then(()=>showToast('Données importées et sauvegardées ✓'));
+      renderDash();renderSet();renderSave();buildFilter();
     }catch(err){showToast('Fichier invalide');}
   };
   reader.readAsText(file);
   input.value='';
 }
- 
+
 // ACCOUNTS (comptes bancaires / crypto)
-let userAccounts=JSON.parse(localStorage.getItem('bg11_acc')||'[]');
+let userAccounts=[];
 function saveAccounts(){try{localStorage.setItem('bg11_acc',JSON.stringify(userAccounts));}catch(e){}}
- 
+
 function openAccountModal(editIdx){
   const acc=editIdx!==undefined?userAccounts[editIdx]:null;
   document.body.insertAdjacentHTML('beforeend',
@@ -673,21 +670,11 @@ function saveAccount(editIdx){
 }
 function deleteAccount(idx){
   if(!confirm('Supprimer ce compte ?'))return;
-  userAccounts.splice(idx,1);saveAccounts();document.getElementById('accpop').remove();renderSave();showToast('Compte supprimé');
+  userAccounts.splice(idx,1);saveAccounts();
+  try{document.getElementById('accpop').remove();}catch(e){}
+  renderSave();showToast('Compte supprimé');
 }
-function openAccAS(idx){
-  const a=userAccounts[idx];
-  document.body.insertAdjacentHTML('beforeend',
-    '<div class="as" id="xaas" onclick="if(event.target.classList.contains(\'as-bg\'))document.getElementById(\'xaas\').remove()">'+
-    '<div class="as-bg"></div><div class="as-box">'+
-    '<div style="text-align:center;padding:6px 8px 12px;font-size:13px;color:var(--mu);border-bottom:0.5px solid var(--b);margin-bottom:4px">'+a.name+' · '+fa(a.balance)+'</div>'+
-    '<div class="as-item" onclick="document.getElementById(\'xaas\').remove();openAccountModal('+idx+')"><span style="font-size:18px">✏️</span><span>Modifier</span></div>'+
-    '<div class="as-item" style="color:var(--re)" onclick="document.getElementById(\'xaas\').remove();deleteAccount('+idx+')"><span style="font-size:18px">🗑️</span><span>Supprimer</span></div>'+
-    '<button class="as-cancel" onclick="document.getElementById(\'xaas\').remove()">Annuler</button>'+
-    '</div></div>'
-  );
-}
- 
+
 // BONUS EDIT
 function editBonus(key,idx){
   const b=monthBon[key][idx];
@@ -718,8 +705,78 @@ function deleteBonusEdit(key,idx){
   if(monthBon[key].length===0)delete monthBon[key];
   save();document.getElementById('bonover').remove();renderSet();renderDash();showToast('Rentrée supprimée');
 }
- 
- 
+
+// SUPABASE
+const SUPA_URL='https://wkpdvqlnolnaqsukziez.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndrcGR2cWxub2xuYXFzdWt6aWV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwNDAwMTAsImV4cCI6MjA5MTYxNjAxMH0.fPxl96RJbj0UyZ1Zf_1djZJ7xRTt69u02082_AwhS6Q';
+const SUPA_ROW_ID=1;
+
+async function supaSave(){
+  try{
+    const payload={
+      id:SUPA_ROW_ID,
+      expenses:JSON.stringify(expenses),
+      month_inc:JSON.stringify(monthInc),
+      month_bon:JSON.stringify(monthBon),
+      recur_items:JSON.stringify(recurItems),
+      accounts:JSON.stringify(userAccounts),
+      last_month:lastMonth
+    };
+    const r=await fetch(SUPA_URL+'/rest/v1/budget_data',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Prefer':'resolution=merge-duplicates'},
+      body:JSON.stringify(payload)
+    });
+    if(!r.ok)console.warn('supaSave error',r.status);
+  }catch(e){console.warn('supaSave failed',e);}
+}
+
+async function supaLoad(){
+  try{
+    const r=await fetch(SUPA_URL+'/rest/v1/budget_data?id=eq.'+SUPA_ROW_ID,{
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}
+    });
+    if(!r.ok)return false;
+    const rows=await r.json();
+    if(!rows||rows.length===0)return false;
+    const d=rows[0];
+    if(d.expenses){expenses=JSON.parse(d.expenses);}
+    if(d.month_inc){monthInc=JSON.parse(d.month_inc);}
+    if(d.month_bon){monthBon=JSON.parse(d.month_bon);}
+    if(d.recur_items){recurItems=JSON.parse(d.recur_items);}
+    if(d.accounts){userAccounts=JSON.parse(d.accounts);}
+    if(d.last_month){lastMonth=d.last_month;}
+    // Sync localStorage
+    try{
+      localStorage.setItem(SK,JSON.stringify(expenses));
+      localStorage.setItem(SR,JSON.stringify(recurItems));
+      localStorage.setItem(SI,JSON.stringify(monthInc));
+      localStorage.setItem(SB,JSON.stringify(monthBon));
+      localStorage.setItem(SL,lastMonth);
+      localStorage.setItem('bg11_acc',JSON.stringify(userAccounts));
+    }catch(e){}
+    return true;
+  }catch(e){console.warn('supaLoad failed',e);return false;}
+}
+
+// INIT
+async function init(){
+  load(); // charge localStorage en premier (rapide)
+  renderDash();renderSet();renderSave();buildFilter();buildCatGrid();
+  document.getElementById('f-date').value=new Date().toISOString().split('T')[0];
+  // Puis essaie de charger depuis Supabase (plus récent)
+  const loaded=await supaLoad();
+  if(loaded){
+    checkMonth();
+    renderDash();renderSet();renderSave();buildFilter();
+    showToast('Données chargées ✓');
+  } else {
+    checkMonth();
+    renderDash();renderSet();renderSave();buildFilter();
+  }
+}
+init();
+
 </script>
 </body>
 </html>
