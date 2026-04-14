@@ -354,20 +354,23 @@ function getAllMonths(){
 }
 
 function calcSaveTotal(){
-  // Reste : salaire - toutes dépenses (hors rentree)
+  // Reste : salaire + remb - dépenses, tous les mois (positifs ET négatifs)
   let resteTotal=0;
   getAllMonths().forEach(key=>{
     const[y,m]=key.split('-').map(Number);const mo=m-1;
     const txs=getExp(y,mo);
     const dep=txs.filter(e=>e.cat!=='rentree').reduce((s,e)=>s+e.amount,0);
+    const bon=getBon(y,mo);
     const inc=getInc(y,mo);
-    if(inc>0){const reste=inc-dep;if(reste>0)resteTotal+=reste;}
+    if(inc>0)resteTotal+=inc+bon-dep;
   });
-  // Rentrées exceptionnelles (monthBon uniquement)
-  const rentreesTotal=Object.values(monthBon).reduce((s,bons)=>s+bons.reduce((a,b)=>a+b.amount,0),0);
-  // Comptes manuels
+  // Rentrées exceptionnelles (monthBon uniquement) — déjà dans reste, on les enlève pour éviter doublon
+  // Non : monthBon est dans getBon → déjà dans reste. Donc on n'ajoute PAS rentreesTotal séparément.
+  // Mais on veut les afficher comme cartes séparées → calcul correct sans doublon :
+  // resteTotal inclut déjà remb+héritage+intérêts via getBon
+  // Pour le total global on affiche juste resteTotal + comptes manuels
   const accsTotal=userAccounts.reduce((s,a)=>s+a.balance,0);
-  return resteTotal+rentreesTotal+accsTotal;
+  return resteTotal+accsTotal;
 }
 
 function renderDash(){
@@ -523,15 +526,16 @@ function renderSave(){
   const typeIcons={banque:'🏦',invest:'📈',crypto:'₿',epargne:'💳',cash:'💵',autre:'🔮'};
   const typeColors={banque:'var(--bl)',invest:'var(--am)',crypto:'#F7931A',epargne:'var(--te)',cash:'var(--te)',autre:'var(--mu2)'};
 
-  // ── Reste accumulé : salaire - toutes dépenses (hors rentree) ──
+  // ── Reste accumulé : salaire + remb - dépenses, tous les mois (positifs ET négatifs) ──
   let resteTotal=0;
   const resteParMois=[];
   getAllMonths().forEach(key=>{
     const[y,m]=key.split('-').map(Number);const mo=m-1;
     const txs=getExp(y,mo);
     const dep=txs.filter(e=>e.cat!=='rentree').reduce((s,e)=>s+e.amount,0);
+    const bon=getBon(y,mo);
     const inc=getInc(y,mo);
-    if(inc>0){const reste=inc-dep;if(reste>0){resteTotal+=reste;resteParMois.push({key,y,m:mo,reste});}}
+    if(inc>0){const reste=inc+bon-dep;resteTotal+=reste;resteParMois.push({key,y,m:mo,reste});}
   });
 
   // ── Rentrées groupées : monthBon UNIQUEMENT (les expenses cat rentree sont des doublons) ──
@@ -546,9 +550,9 @@ function renderSave(){
 
 
   // ── Total global ──
-  const rentreesTotal=Object.values(rentreesMap).reduce((s,v)=>s+v.total,0);
+  // grandTotal = resteTotal (inclut déjà remb+héritage+intérêts via getBon) + comptes manuels
   const accsTotal=userAccounts.reduce((s,a)=>s+a.balance,0);
-  const grandTotal=resteTotal+rentreesTotal+accsTotal;
+  const grandTotal=resteTotal+accsTotal;
   const goal=Math.ceil(grandTotal/10000)*10000||10000;
   const prev=goal-10000;
   const pct=grandTotal>0?Math.min(100,Math.round(((grandTotal-prev)/(goal-prev))*100)):0;
