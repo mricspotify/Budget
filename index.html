@@ -353,20 +353,24 @@ function getAllMonths(){
   return [...s].sort();
 }
 
+function getInvestDescs(){
+  return new Set(expenses.filter(e=>e.cat==='invest'||e.cat==='epargne').map(e=>e.desc));
+}
 function calcSaveTotal(){
-  // Reste : salaire - dépenses (fixes+courses+extras uniquement)
+  const investDescs=getInvestDescs();
+  // Reste : salaire - dépenses réelles (hors rentree, hors investissements)
   let resteTotal=0;
   getAllMonths().forEach(key=>{
     const[y,m]=key.split('-').map(Number);const mo=m-1;
     const txs=getExp(y,mo);
-    const dep=txs.filter(e=>e.cat!=='rentree'&&e.cat!=='epargne'&&e.cat!=='invest').reduce((s,e)=>s+e.amount,0);
+    const dep=txs.filter(e=>e.cat!=='rentree'&&!investDescs.has(e.desc)).reduce((s,e)=>s+e.amount,0);
     const inc=getInc(y,mo);
     if(inc>0){const reste=inc-dep;if(reste>0)resteTotal+=reste;}
   });
-  // Rentrées exceptionnelles (monthBon)
+  // Rentrées exceptionnelles (monthBon uniquement)
   const rentreesTotal=Object.values(monthBon).reduce((s,bons)=>s+bons.reduce((a,b)=>a+b.amount,0),0);
-  // Investissements (cat invest + epargne)
-  const epargneTotal=expenses.filter(e=>e.cat==='invest'||e.cat==='epargne').reduce((s,e)=>s+e.amount,0);
+  // Investissements (toutes dépenses dont desc = actif connu)
+  const epargneTotal=expenses.filter(e=>investDescs.has(e.desc)&&e.cat!=='rentree').reduce((s,e)=>s+e.amount,0);
   // Comptes manuels
   const accsTotal=userAccounts.reduce((s,a)=>s+a.balance,0);
   return resteTotal+rentreesTotal+epargneTotal+accsTotal;
@@ -525,31 +529,30 @@ function renderSave(){
   const typeIcons={banque:'🏦',invest:'📈',crypto:'₿',epargne:'💳',cash:'💵',autre:'🔮'};
   const typeColors={banque:'var(--bl)',invest:'var(--am)',crypto:'#F7931A',epargne:'var(--te)',cash:'var(--te)',autre:'var(--mu2)'};
 
-  // ── Reste accumulé : salaire - toutes dépenses (fixes+courses+extras, hors rentree/epargne/invest) ──
+  // ── Reste accumulé : salaire - dépenses réelles (hors rentree, hors investissements) ──
+  const investDescs=getInvestDescs();
   let resteTotal=0;
   const resteParMois=[];
   getAllMonths().forEach(key=>{
     const[y,m]=key.split('-').map(Number);const mo=m-1;
     const txs=getExp(y,mo);
-    const dep=txs.filter(e=>e.cat!=='rentree'&&e.cat!=='epargne'&&e.cat!=='invest').reduce((s,e)=>s+e.amount,0);
+    const dep=txs.filter(e=>e.cat!=='rentree'&&!investDescs.has(e.desc)).reduce((s,e)=>s+e.amount,0);
     const inc=getInc(y,mo);
     if(inc>0){const reste=inc-dep;if(reste>0){resteTotal+=reste;resteParMois.push({key,y,m:mo,reste});}}
   });
 
-  // ── Rentrées groupées par description (héritage, intérêts, remboursements...) ──
-  // Source unique : monthBon uniquement (évite les doublons avec expenses cat rentree)
+  // ── Rentrées groupées : monthBon UNIQUEMENT (les expenses cat rentree sont des doublons) ──
   const rentreesMap={};
   Object.entries(monthBon).forEach(([k,bons])=>bons.forEach(b=>{
-    const key=b.desc;
-    if(!rentreesMap[key])rentreesMap[key]={total:0,items:[]};
+    if(!rentreesMap[b.desc])rentreesMap[b.desc]={total:0,items:[]};
     const[y,mo]=k.split('-');
-    rentreesMap[key].total+=b.amount;
-    rentreesMap[key].items.push({date:k,amount:b.amount,label:MONTHS[parseInt(mo)-1]+' '+y});
+    rentreesMap[b.desc].total+=b.amount;
+    rentreesMap[b.desc].items.push({date:k,amount:b.amount,label:MONTHS[parseInt(mo)-1]+' '+y});
   }));
 
-  // ── Investissements groupés par description (cat: invest) ──
+  // ── Investissements : toutes dépenses dont la desc correspond à un actif connu ──
   const investMap={};
-  expenses.filter(e=>e.cat==='invest'||e.cat==='epargne').forEach(e=>{
+  expenses.filter(e=>investDescs.has(e.desc)&&e.cat!=='rentree').forEach(e=>{
     if(!investMap[e.desc])investMap[e.desc]={total:0,items:[]};
     const d=new Date(e.date);
     investMap[e.desc].total+=e.amount;
