@@ -404,7 +404,6 @@ const CAT={
   transport:{label:'Transport', icon:'🚗',color:'#378ADD'},
   extras:   {label:'Extras',    icon:'✨',color:'#EF9F27'},
   invest:   {label:'Invest',    icon:'📈',color:'#378ADD'},
-  epargne:  {label:'Épargne',   icon:'💰',color:'#D85A30'},
   autre:    {label:'Autre',     icon:'📌',color:'#888780'},
   rentree:  {label:'Rentrée',   icon:'💸',color:'#1D9E75'},
 };
@@ -888,7 +887,7 @@ function calcAssetStats(asset){
   return{totalInvested,totalQty,avgPrice,currentPrice,currentValue,pnlEur,pnlPct,md};
 }
 
-// ── Get chart data for any asset (market data OR buy history fallback) ──
+// ── Get chart data for any asset ──
 function getChartData(asset,tf){
   const cgId=asset.coingecko||null;
   if(cgId){
@@ -898,11 +897,17 @@ function getChartData(asset,tf){
     }
     return null;
   }
-  // No CoinGecko → use buy history as chart
+  // No CoinGecko → use buy history (price over time)
   const buys=(asset.buys||[]).filter(b=>b.pricePerUnit>0).sort((a,b)=>new Date(a.date)-new Date(b.date));
-  if(buys.length<1)return null;
-  const prices=buys.map(b=>b.pricePerUnit);
-  const labels=buys.map(b=>{const d=new Date(b.date);return ('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2);});
+  if(buys.length===0)return null;
+  // Single buy → duplicate point to draw a flat line
+  const src=buys.length===1?[buys[0],buys[0]]:buys;
+  const prices=src.map(b=>b.pricePerUnit);
+  const labels=src.map((b,i)=>{
+    if(buys.length===1)return i===0?'Achat':'Auj.';
+    const d=new Date(b.date);
+    return ('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2);
+  });
   return{prices,labels};
 }
 
@@ -1082,7 +1087,10 @@ function renderInvestPage(){
           <button class="ac-add" onclick="event.stopPropagation();openBuyModal('${asset.id}')">+</button>
         </div>
       </div>
-      <div class="ac-chart" id="wrap-${chartId}"><canvas id="${chartId}" width="400" height="110"></canvas></div>
+      <div class="ac-chart" id="wrap-${chartId}">
+        <canvas id="${chartId}" width="400" height="110"></canvas>
+        ${!asset.coingecko&&(asset.buys||[]).length===0?`<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;color:rgba(238,238,245,0.25);pointer-events:none">Ajoute un achat pour voir le graphique</div>`:''}
+      </div>
       <div class="ac-footer">
         <div style="margin-bottom:2px">
           <div style="font-size:22px;font-weight:700;letter-spacing:-.04em">${valStr}</div>
@@ -1098,18 +1106,17 @@ function renderInvestPage(){
     container.appendChild(card);
   });
 
-  // Draw charts AFTER all cards are in DOM
-  // Use requestAnimationFrame to ensure layout is complete
-  requestAnimationFrame(()=>{
-    requestAnimationFrame(()=>{
-      Object.values(assetMap).forEach(asset=>{
-        const chartId='mc-'+asset.id;
-        const hist=getChartData(asset,'1M');
-        if(hist&&hist.prices.length>1){
-          drawChart(chartId,hist.prices,hist.labels,asset.color||'#7F77DD');
-        }
+  // Draw charts for assets that already have data (e.g. after refresh)
+  // This runs synchronously after cards are built
+  Object.values(assetMap).forEach(asset=>{
+    const chartId='mc-'+asset.id;
+    const hist=getChartData(asset,'1M');
+    if(hist&&hist.prices.length>1){
+      // Use rAF to ensure canvas is in DOM
+      requestAnimationFrame(()=>{
+        drawChart(chartId,hist.prices,hist.labels,asset.color||'#7F77DD');
       });
-    });
+    }
   });
 
   if(!pricesLoaded)refreshPrices();
