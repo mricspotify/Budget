@@ -932,10 +932,8 @@ async function fetchCryptoPrices(){
         }
       }
     });
-    // Fetch 30j pour mini cartes (1M) — en parallèle, sans bloquer
-    Promise.allSettled(cgIds.map(id=>fetchCoinHistory(id,'1M'))).then(()=>{
-      renderInvestPage(); // re-render une fois le 1M chargé
-    });
+    // Fetch 1M AWAITÉ correctement
+    await Promise.allSettled(cgIds.map(id=>fetchCoinHistory(id,'1M')));
   }catch(e){console.warn('CoinGecko fetch failed',e);}
 }
 
@@ -996,17 +994,16 @@ async function refreshPrices(){
 }
 
 // ── Draw a chart into a canvas ──
-function drawChart(canvasId,prices,color,fill=true,destroyKey=null){
+function drawChart(canvasId,prices,color,fill=true,destroyKey=null,labels=null){
   const canvas=document.getElementById(canvasId);
   if(!canvas||typeof Chart==='undefined'||!prices||prices.length<2)return null;
   const ctx=canvas.getContext('2d');
   const key=destroyKey||canvasId;
   if(invMiniCharts[key]){try{invMiniCharts[key].destroy();}catch(e){}}
-  // Always use asset color — no red for bearish
   const ch=new Chart(ctx,{
     type:'line',
     data:{
-      labels:prices.map((_,i)=>i),
+      labels:labels||prices.map((_,i)=>i),
       datasets:[{
         data:prices,
         borderColor:color,
@@ -1143,7 +1140,7 @@ function renderInvestPage(){
       if(!md)return;
       const hist=md.history&&(md.history['1M']||md.history['1S']);
       if(hist&&hist.prices&&hist.prices.length>1){
-        drawChart(chartId,hist.prices,color,true,chartId);
+        drawChart(chartId,hist.prices,color,true,chartId,hist.labels||null);
       }
     },80);
   });
