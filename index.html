@@ -856,33 +856,31 @@ let userInvestments = {};
 let marketData = {};
 let pricesLoaded = false;
 let invMiniCharts = {};
-let invDetailChart = null;
 
 function saveInvestments(){try{localStorage.setItem('bg11_inv',JSON.stringify(userInvestments));}catch(e){}}
 function loadInvestments(){try{const s=localStorage.getItem('bg11_inv');if(s)userInvestments=JSON.parse(s);}catch(e){}}
 
 function hexToRgba(hex,alpha){
   if(hex&&hex.startsWith('#')){const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);return `rgba(${r},${g},${b},${alpha})`;}
-  return hex||'rgba(127,119,221,'+alpha+')';
+  return 'rgba(127,119,221,'+alpha+')';
 }
 
-// ── Build merged asset list ──
 function buildAssetMap(){
   const map={};
   Object.entries(ASSET_CATALOGUE).forEach(([id,cat])=>{map[id]={id,...cat,buys:[]};});
   Object.entries(userInvestments).forEach(([id,inv])=>{
-    map[id]={...(map[id]||{}), ...inv, buys:inv.buys||[]};
+    map[id]={...(map[id]||{}),...inv,buys:inv.buys||[]};
   });
   return map;
 }
 
-// ── Calc stats for one asset ──
 function calcAssetStats(asset){
   const buys=asset.buys||[];
   const totalInvested=buys.reduce((s,b)=>s+b.amountEur,0);
   const totalQty=buys.reduce((s,b)=>s+(b.qty||0),0);
   const avgPrice=totalQty>0?buys.reduce((s,b)=>s+(b.pricePerUnit*(b.qty||0)),0)/totalQty:0;
-  const md=marketData[asset.coingecko||asset.id]||null;
+  const cgId=asset.coingecko||null;
+  const md=cgId?marketData[cgId]||null:null;
   const currentPrice=md?md.price:null;
   const currentValue=(currentPrice&&totalQty>0)?currentPrice*totalQty:totalInvested;
   const pnlEur=currentValue-totalInvested;
@@ -890,7 +888,25 @@ function calcAssetStats(asset){
   return{totalInvested,totalQty,avgPrice,currentPrice,currentValue,pnlEur,pnlPct,md};
 }
 
-// ── Fetch CoinGecko: current price + sparkline 30d pour les cartes ──
+// ── Get chart data for any asset (market data OR buy history fallback) ──
+function getChartData(asset,tf){
+  const cgId=asset.coingecko||null;
+  if(cgId){
+    const md=marketData[cgId];
+    if(md&&md.history){
+      return md.history[tf]||md.history['1M']||md.history['1S']||null;
+    }
+    return null;
+  }
+  // No CoinGecko → use buy history as chart
+  const buys=(asset.buys||[]).filter(b=>b.pricePerUnit>0).sort((a,b)=>new Date(a.date)-new Date(b.date));
+  if(buys.length<1)return null;
+  const prices=buys.map(b=>b.pricePerUnit);
+  const labels=buys.map(b=>{const d=new Date(b.date);return ('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2);});
+  return{prices,labels};
+}
+
+// ── Fetch CoinGecko prices + 1M history ──
 async function fetchCryptoPrices(){
   const cgIds=[...new Set([
     ...Object.values(ASSET_CATALOGUE).map(a=>a.coingecko).filter(Boolean),
@@ -898,86 +914,56 @@ async function fetchCryptoPrices(){
   ])];
   if(!cgIds.length)return;
   try{
-    // sparkline=true donne 7j — on l'utilise quand même pour la mini carte
-    // puis on fetch 30j séparément pour chaque coin
     const url=`https://api.coingecko.com/api/v3/coins/markets?vs_currency=eur&ids=${cgIds.join(',')}&sparkline=true&price_change_percentage=24h&per_page=20`;
-    const r=await fetch(url);if(!r.ok)return;
+    const r=await fetch(url);
+    if(!r.ok)return;
     const data=await r.json();
+    const JOURS=['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
     data.forEach(coin=>{
       if(!marketData[coin.id])marketData[coin.id]={history:{}};
       marketData[coin.id].price=coin.current_price;
       marketData[coin.id].changePct24h=coin.price_change_percentage_24h||0;
-      marketData[coin.id].change24h=coin.price_change_24h||0;
-      // Stocker 7j comme base (1S) avec vrais labels horaires
+      // Build 1S from sparkline with real labels
       const sp=(coin.sparkline_in_7d&&coin.sparkline_in_7d.price)||[];
       if(sp.length>1){
-        // Sparkline CoinGecko = ~168 points sur 7j (1 par heure)
-        // Générer labels horaires depuis maintenant - 7j
         const now=Date.now();
-        const step=7*24*60*60*1000/sp.length;
-        const jours=['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
-        const spLabels=sp.map((_,i)=>{
+        const step=7*24*3600*1000/sp.length;
+        const stride=Math.max(1,Math.floor(sp.length/50));
+        const prices=[],labels=[];
+        for(let i=0;i<sp.length;i+=stride){
+          prices.push(sp[i]);
           const d=new Date(now-(sp.length-i)*step);
-          return jours[d.getDay()]+' '+d.getHours()+'h';
-        });
-        // Sous-échantillonner à 60 points max
-        const maxP=60;
-        if(sp.length>maxP){
-          const s=Math.floor(sp.length/maxP);
-          marketData[coin.id].history['1S']={
-            prices:sp.filter((_,i)=>i%s===0),
-            labels:spLabels.filter((_,i)=>i%s===0)
-          };
-        } else {
-          marketData[coin.id].history['1S']={prices:sp,labels:spLabels};
+          labels.push(JOURS[d.getDay()]+' '+d.getHours()+'h');
         }
+        marketData[coin.id].history['1S']={prices,labels};
       }
     });
-    // Fetch 1M AWAITÉ correctement
+    // Fetch 1M for all coins — AWAITED
     await Promise.allSettled(cgIds.map(id=>fetchCoinHistory(id,'1M')));
-  }catch(e){console.warn('CoinGecko fetch failed',e);}
+  }catch(e){console.warn('CoinGecko failed',e);}
 }
 
-// ── Fetch historical data for a specific timeframe ──
 async function fetchCoinHistory(cgId,tf){
   if(!cgId)return;
   const days={'1S':7,'1M':30,'1A':365,'Global':1825}[tf]||30;
-  // CoinGecko auto-selects interval based on days
-  const interval=days<=90?'hourly':'daily';
   try{
     const url=`https://api.coingecko.com/api/v3/coins/${cgId}/market_chart?vs_currency=eur&days=${days}`;
-    const r=await fetch(url);if(!r.ok)return;
+    const r=await fetch(url);
+    if(!r.ok)return;
     const data=await r.json();
-    const prices=data.prices.map(p=>p[1]);
-    const labels=data.prices.map(p=>{
-      const d=new Date(p[0]);
-      if(days<=7){
-        // Heures lisibles ex: "Lun 14h"
-        const jours=['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
-        return jours[d.getDay()]+' '+d.getHours()+'h';
-      }
-      if(days<=30){
-        // Jours ex: "03/05"
-        return ('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2);
-      }
-      if(days<=365){
-        // Mois ex: "Jan 25"
-        return MS[d.getMonth()]+' '+d.getFullYear().toString().slice(-2);
-      }
-      // Années longues : "Jan 23"
-      return MS[d.getMonth()]+' '+d.getFullYear().toString().slice(-2);
-    });
-    // Sous-échantillonner pour ne pas surcharger le graphique
-    const maxPoints=60;
-    let finalPrices=prices;
-    let finalLabels=labels;
-    if(prices.length>maxPoints){
-      const step=Math.floor(prices.length/maxPoints);
-      finalPrices=prices.filter((_,i)=>i%step===0);
-      finalLabels=labels.filter((_,i)=>i%step===0);
+    const raw=data.prices||[];
+    const JOURS=['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
+    const stride=Math.max(1,Math.floor(raw.length/60));
+    const prices=[],labels=[];
+    for(let i=0;i<raw.length;i+=stride){
+      prices.push(raw[i][1]);
+      const d=new Date(raw[i][0]);
+      if(days<=7)labels.push(JOURS[d.getDay()]+' '+d.getHours()+'h');
+      else if(days<=30)labels.push(('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2));
+      else labels.push(MS[d.getMonth()]+' '+d.getFullYear().toString().slice(-2));
     }
     if(!marketData[cgId])marketData[cgId]={history:{}};
-    marketData[cgId].history[tf]={prices:finalPrices,labels:finalLabels};
+    marketData[cgId].history[tf]={prices,labels};
   }catch(e){console.warn('history fetch failed',cgId,tf,e);}
 }
 
@@ -994,36 +980,34 @@ async function refreshPrices(){
   showToast('Prix actualisés ✓');
 }
 
-// ── Draw a chart into a canvas ──
-function drawChart(canvasId,prices,color,fill=true,destroyKey=null,labels=null){
+// ── Draw chart ──
+function drawChart(canvasId,prices,labels,color){
   const canvas=document.getElementById(canvasId);
-  if(!canvas||typeof Chart==='undefined'||!prices||prices.length<2)return null;
+  if(!canvas||typeof Chart==='undefined'||!prices||prices.length<2)return;
   const ctx=canvas.getContext('2d');
-  const key=destroyKey||canvasId;
-  if(invMiniCharts[key]){try{invMiniCharts[key].destroy();}catch(e){}}
-  const ch=new Chart(ctx,{
+  if(invMiniCharts[canvasId]){try{invMiniCharts[canvasId].destroy();}catch(e){}delete invMiniCharts[canvasId];}
+  invMiniCharts[canvasId]=new Chart(ctx,{
     type:'line',
     data:{
       labels:labels||prices.map((_,i)=>i),
       datasets:[{
         data:prices,
         borderColor:color,
-        borderWidth:1.8,
-        fill,
-        backgroundColor:fill?hexToRgba(color,0.12):'transparent',
+        borderWidth:2,
+        fill:true,
+        backgroundColor:hexToRgba(color,0.12),
         tension:0.4,
         pointRadius:0,
       }]
     },
     options:{
-      responsive:true,maintainAspectRatio:false,
+      responsive:false,
+      maintainAspectRatio:false,
       plugins:{legend:{display:false},tooltip:{enabled:false}},
       scales:{x:{display:false},y:{display:false}},
-      animation:{duration:300}
+      animation:false
     }
   });
-  invMiniCharts[key]=ch;
-  return ch;
 }
 
 // ── Render invest page ──
@@ -1031,7 +1015,7 @@ function renderInvestPage(){
   const assetMap=buildAssetMap();
   const assets=Object.values(assetMap);
 
-  // Totals (only assets with buys)
+  // Totals
   let totalValue=0,totalInvested=0;
   assets.forEach(a=>{
     const s=calcAssetStats(a);
@@ -1039,29 +1023,21 @@ function renderInvestPage(){
   });
   const globalPnl=totalValue-totalInvested;
   const globalPct=totalInvested>0?(globalPnl/totalInvested)*100:0;
-
   const tvEl=document.getElementById('inv-total-val');
   const tiEl=document.getElementById('inv-total-invested');
   const tpEl=document.getElementById('inv-total-pnl');
   const tpctEl=document.getElementById('inv-total-pct');
   if(tvEl)tvEl.textContent=totalInvested>0?fa(totalValue):'—';
   if(tiEl)tiEl.textContent=totalInvested>0?fa(totalInvested):'—';
-  if(tpEl){
-    tpEl.textContent=totalInvested>0?(globalPnl>=0?'+':'')+fa(globalPnl):'Aucun achat';
-    tpEl.style.color=totalInvested>0?(globalPnl>=0?'var(--te)':'var(--re)'):'var(--mu)';
-  }
-  if(tpctEl){
-    tpctEl.textContent=totalInvested>0?(globalPct>=0?'+':'')+globalPct.toFixed(1)+'%':'—';
-    tpctEl.style.color=totalInvested>0?(globalPct>=0?'var(--te)':'var(--re)'):'var(--mu)';
-  }
+  if(tpEl){tpEl.textContent=totalInvested>0?(globalPnl>=0?'+':'')+fa(globalPnl):'Aucun achat';tpEl.style.color=totalInvested>0?(globalPnl>=0?'var(--te)':'var(--re)'):'var(--mu)';}
+  if(tpctEl){tpctEl.textContent=totalInvested>0?(globalPct>=0?'+':'')+globalPct.toFixed(1)+'%':'—';tpctEl.style.color=totalInvested>0?(globalPct>=0?'var(--te)':'var(--re)'):'var(--mu)';}
 
-  // Cards — destroy old chart instances first
+  // Destroy existing mini charts
+  Object.keys(invMiniCharts).forEach(k=>{try{invMiniCharts[k].destroy();}catch(e){}});
+  invMiniCharts={};
+
   const container=document.getElementById('asset-cards-list');
   if(!container)return;
-  Object.keys(invMiniCharts).filter(k=>k.startsWith('mc-')).forEach(k=>{
-    try{invMiniCharts[k].destroy();}catch(e){}
-    delete invMiniCharts[k];
-  });
   container.innerHTML='';
   window._assetMap=assetMap;
 
@@ -1071,38 +1047,32 @@ function renderInvestPage(){
     const color=asset.color||'#7F77DD';
     const isPos=s.pnlEur>=0;
     const pricePos=s.md?(s.md.changePct24h>=0):true;
+    const isManual=!asset.coingecko;
 
-    // Price block (top right)
     const priceStr=s.currentPrice
       ?s.currentPrice.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:s.currentPrice>100?2:6})+' €'
-      :'<span class="price-loading"></span>';
+      :isManual
+        ?(hasBuys?s.avgPrice.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €':'<span style="color:var(--mu)">Manuel</span>')
+        :'<span class="price-loading"></span>';
     const priceChgStr=s.md
       ?`<span style="color:${pricePos?'var(--te)':'var(--re)'}">${pricePos?'▲':'▼'} ${Math.abs(s.md.changePct24h).toFixed(2)}%</span>`
-      :'<span style="color:var(--mu)">—</span>';
-
-    // Value block (main)
+      :isManual?'<span style="color:var(--mu);font-size:10px">prix manuel</span>':'<span style="color:var(--mu)">—</span>';
     const valStr=hasBuys
       ?`<span style="color:${isPos?'var(--te)':'var(--re)'}">${fa(s.currentValue)}</span>`
       :`<span style="color:var(--mu)">Aucun achat</span>`;
     const varStr=hasBuys&&s.md
-      ?`<span style="color:${isPos?'var(--te)':'var(--re)'}">${isPos?'+':''}${fa(s.pnlEur)} (${isPos?'+':''}${s.pnlPct.toFixed(1)}%)</span>`
-      :'';
+      ?`<span style="color:${isPos?'var(--te)':'var(--re)'}">${isPos?'+':''}${fa(s.pnlEur)} (${isPos?'+':''}${s.pnlPct.toFixed(1)}%)</span>`:'';
 
-    const chartId=`mc-${asset.id}`;
-
+    const chartId='mc-'+asset.id;
     const card=document.createElement('div');
     card.className='asset-card';
     card.style.setProperty('--asset-color',color);
     card.onclick=()=>openAssetDetail(asset.id);
-
     card.innerHTML=`
       <div class="ac-top">
         <div class="ac-left">
           <div class="ac-icon" style="background:${hexToRgba(color,0.15)};color:${color}">${asset.icon}</div>
-          <div>
-            <div class="ac-name">${asset.name}</div>
-            <div class="ac-ticker">${asset.ticker}</div>
-          </div>
+          <div><div class="ac-name">${asset.name}</div><div class="ac-ticker">${asset.ticker}</div></div>
         </div>
         <div class="ac-right">
           <div class="ac-price-block">
@@ -1112,47 +1082,34 @@ function renderInvestPage(){
           <button class="ac-add" onclick="event.stopPropagation();openBuyModal('${asset.id}')">+</button>
         </div>
       </div>
-      <div class="ac-chart"><canvas id="${chartId}"></canvas></div>
+      <div class="ac-chart" id="wrap-${chartId}"><canvas id="${chartId}" width="400" height="110"></canvas></div>
       <div class="ac-footer">
         <div style="margin-bottom:2px">
           <div style="font-size:22px;font-weight:700;letter-spacing:-.04em">${valStr}</div>
           <div style="font-size:12px;min-height:16px;margin-top:2px">${varStr}</div>
         </div>
         <div class="ac-stats">
-          <div class="ac-stat">
-            <div class="ac-stat-lbl">Investi</div>
-            <div class="ac-stat-val" style="color:${color}">${hasBuys?fa(s.totalInvested):'—'}</div>
-          </div>
-          <div class="ac-stat">
-            <div class="ac-stat-lbl">Prix moyen</div>
-            <div class="ac-stat-val">${s.avgPrice>0?s.avgPrice.toLocaleString('fr-FR',{maximumFractionDigits:s.avgPrice>100?2:6})+' €':'—'}</div>
-          </div>
-          <div class="ac-stat">
-            <div class="ac-stat-lbl">Quantité</div>
-            <div class="ac-stat-val">${s.totalQty>0?s.totalQty.toLocaleString('fr-FR',{maximumFractionDigits:6}):'—'}</div>
-          </div>
-          <div class="ac-stat">
-            <div class="ac-stat-lbl">PnL</div>
-            <div class="ac-stat-val" style="color:${isPos?'var(--te)':'var(--re)'}">${hasBuys?(isPos?'+':'')+fa(s.pnlEur):'—'}</div>
-          </div>
+          <div class="ac-stat"><div class="ac-stat-lbl">Investi</div><div class="ac-stat-val" style="color:${color}">${hasBuys?fa(s.totalInvested):'—'}</div></div>
+          <div class="ac-stat"><div class="ac-stat-lbl">Prix moyen</div><div class="ac-stat-val">${s.avgPrice>0?s.avgPrice.toLocaleString('fr-FR',{maximumFractionDigits:s.avgPrice>100?2:6})+' €':'—'}</div></div>
+          <div class="ac-stat"><div class="ac-stat-lbl">Quantité</div><div class="ac-stat-val">${s.totalQty>0?s.totalQty.toLocaleString('fr-FR',{maximumFractionDigits:6}):'—'}</div></div>
+          <div class="ac-stat"><div class="ac-stat-lbl">PnL</div><div class="ac-stat-val" style="color:${hasBuys?(isPos?'var(--te)':'var(--re)'):'var(--mu)'}">${hasBuys?(isPos?'+':'')+fa(s.pnlEur):'—'}</div></div>
         </div>
       </div>`;
     container.appendChild(card);
+  });
 
-    // Draw mini sparkline — lookup FRESH marketData (not captured s.md)
-    const _assetId=asset.id;
-    const _cgId=asset.coingecko||null;
-    const _color=color;
-    const _chartId=chartId;
-    setTimeout(()=>{
-      if(!_cgId)return;
-      const md=marketData[_cgId];
-      if(!md||!md.history)return;
-      const hist=md.history['1M']||md.history['1S'];
-      if(hist&&hist.prices&&hist.prices.length>1){
-        drawChart(_chartId,hist.prices,_color,true,_chartId,hist.labels||null);
-      }
-    },200);
+  // Draw charts AFTER all cards are in DOM
+  // Use requestAnimationFrame to ensure layout is complete
+  requestAnimationFrame(()=>{
+    requestAnimationFrame(()=>{
+      Object.values(assetMap).forEach(asset=>{
+        const chartId='mc-'+asset.id;
+        const hist=getChartData(asset,'1M');
+        if(hist&&hist.prices.length>1){
+          drawChart(chartId,hist.prices,hist.labels,asset.color||'#7F77DD');
+        }
+      });
+    });
   });
 
   if(!pricesLoaded)refreshPrices();
@@ -1162,7 +1119,8 @@ function renderInvestPage(){
 function openBuyModal(assetId){
   const assetMap=window._assetMap||buildAssetMap();
   const asset=assetMap[assetId]||ASSET_CATALOGUE[assetId]||{name:assetId,ticker:assetId,icon:'📈',color:'#7F77DD'};
-  const md=marketData[asset.coingecko||assetId]||null;
+  const cgId=asset.coingecko||null;
+  const md=cgId?marketData[cgId]||null:null;
   const curPrice=md?md.price:'';
   document.body.insertAdjacentHTML('beforeend',
     `<div class="overlay" id="buypop" onclick="if(event.target.id==='buypop')this.remove()">
@@ -1174,7 +1132,7 @@ function openBuyModal(assetId){
       </div>
       <div class="fsec" style="margin-bottom:10px">
         <label class="fl">Prix unitaire à l'achat (€)</label>
-        <input class="fi" type="number" id="buy-price" placeholder="${curPrice||'Ex: 95000'}" inputmode="decimal" value="${curPrice||''}" oninput="calcBuyQty()">
+        <input class="fi" type="number" id="buy-price" placeholder="${curPrice||'Ex: 500'}" inputmode="decimal" value="${curPrice||''}" oninput="calcBuyQty()">
         ${md?`<div style="font-size:11px;color:var(--mu);margin-top:5px">Prix actuel : ${md.price.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})} €</div>`:''}
       </div>
       <div class="fsec" style="margin-bottom:10px">
@@ -1213,7 +1171,7 @@ function saveBuy(assetId){
   showToast('Achat enregistré ✓');
 }
 
-// ── Asset detail modal with timeframes ──
+// ── Asset detail modal ──
 function openAssetDetail(assetId){
   const assetMap=window._assetMap||buildAssetMap();
   const asset=assetMap[assetId]||{name:assetId,icon:'📈',color:'#7F77DD',buys:[]};
@@ -1221,6 +1179,7 @@ function openAssetDetail(assetId){
   const color=asset.color||'#7F77DD';
   const hasBuys=(asset.buys||[]).length>0;
   const isPos=s.pnlEur>=0;
+  const isManual=!asset.coingecko;
 
   const buysHtml=hasBuys
     ?[...(asset.buys||[])].sort((a,b)=>new Date(b.date)-new Date(a.date)).map(buy=>{
@@ -1244,12 +1203,9 @@ function openAssetDetail(assetId){
       }).join('')
     :'<div style="text-align:center;color:var(--mu);padding:40px 0;font-size:13px">Aucun achat enregistré<br><span style="font-size:11px;opacity:.7">Clique sur + pour commencer</span></div>';
 
-  const did='inv-detail';
-  // Remove existing if any
-  document.getElementById(did)?.remove();
-
+  document.getElementById('inv-detail')?.remove();
   document.body.insertAdjacentHTML('beforeend',
-    `<div class="inv-detail-overlay" id="${did}" onclick="if(event.target.id==='${did}')this.remove()">
+    `<div class="inv-detail-overlay" id="inv-detail" onclick="if(event.target.id==='inv-detail')this.remove()">
     <div class="inv-detail-modal">
       <div class="idm-header">
         <div style="display:flex;align-items:center;gap:10px">
@@ -1259,53 +1215,25 @@ function openAssetDetail(assetId){
             <div style="font-size:12px;color:var(--mu)">${asset.ticker}${s.currentPrice?' · '+s.currentPrice.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €':''}</div>
           </div>
         </div>
-        <button class="idm-close" onclick="document.getElementById('${did}').remove()">✕</button>
+        <button class="idm-close" onclick="document.getElementById('inv-detail').remove()">✕</button>
       </div>
       <div class="idm-body">
-        <!-- KPI row -->
         <div class="idm-kpi">
-          <div class="idm-kpi-card">
-            <div class="idm-kpi-lbl">Valeur</div>
-            <div class="idm-kpi-val" style="color:var(--te)">${hasBuys?fa(s.currentValue):'—'}</div>
-          </div>
-          <div class="idm-kpi-card">
-            <div class="idm-kpi-lbl">Investi</div>
-            <div class="idm-kpi-val" style="color:var(--am)">${hasBuys?fa(s.totalInvested):'—'}</div>
-          </div>
-          <div class="idm-kpi-card">
-            <div class="idm-kpi-lbl">PnL</div>
-            <div class="idm-kpi-val" style="color:${isPos?'var(--te)':'var(--re)'}">${hasBuys?(isPos?'+':'')+fa(s.pnlEur):'—'}</div>
-          </div>
+          <div class="idm-kpi-card"><div class="idm-kpi-lbl">Valeur</div><div class="idm-kpi-val" style="color:var(--te)">${hasBuys?fa(s.currentValue):'—'}</div></div>
+          <div class="idm-kpi-card"><div class="idm-kpi-lbl">Investi</div><div class="idm-kpi-val" style="color:${color}">${hasBuys?fa(s.totalInvested):'—'}</div></div>
+          <div class="idm-kpi-card"><div class="idm-kpi-lbl">PnL</div><div class="idm-kpi-val" style="color:${isPos?'var(--te)':'var(--re)'}">${hasBuys?(isPos?'+':'')+fa(s.pnlEur):'—'}</div></div>
         </div>
-        <div class="idm-kpi">
-          <div class="idm-kpi-card">
-            <div class="idm-kpi-lbl">Prix moyen</div>
-            <div class="idm-kpi-val">${s.avgPrice>0?s.avgPrice.toLocaleString('fr-FR',{maximumFractionDigits:s.avgPrice>100?2:6})+' €':'—'}</div>
-          </div>
-          <div class="idm-kpi-card">
-            <div class="idm-kpi-lbl">Quantité</div>
-            <div class="idm-kpi-val">${s.totalQty>0?s.totalQty.toLocaleString('fr-FR',{maximumFractionDigits:6}):'—'}</div>
-          </div>
-          <div class="idm-kpi-card">
-            <div class="idm-kpi-lbl">Perf.</div>
-            <div class="idm-kpi-val" style="color:${isPos?'var(--te)':'var(--re)'}">${hasBuys?(isPos?'+':'')+s.pnlPct.toFixed(1)+'%':'—'}</div>
-          </div>
+        <div class="idm-kpi" style="margin-top:8px">
+          <div class="idm-kpi-card"><div class="idm-kpi-lbl">Prix moyen</div><div class="idm-kpi-val">${s.avgPrice>0?s.avgPrice.toLocaleString('fr-FR',{maximumFractionDigits:s.avgPrice>100?2:6})+' €':'—'}</div></div>
+          <div class="idm-kpi-card"><div class="idm-kpi-lbl">Quantité</div><div class="idm-kpi-val">${s.totalQty>0?s.totalQty.toLocaleString('fr-FR',{maximumFractionDigits:6}):'—'}</div></div>
+          <div class="idm-kpi-card"><div class="idm-kpi-lbl">Perf.</div><div class="idm-kpi-val" style="color:${isPos?'var(--te)':'var(--re)'}">${hasBuys?(isPos?'+':'')+s.pnlPct.toFixed(1)+'%':'—'}</div></div>
         </div>
-
-        <!-- Timeframe buttons -->
+        ${isManual?'<div style="font-size:11px;color:var(--mu);text-align:center;margin:10px 0;padding:8px;background:var(--s3);border-radius:8px">📊 Prix marché non disponible — graphique basé sur vos achats</div>':''}
         <div class="tf-bar" id="tf-bar-${assetId}">
-          ${['1S','1M','1A','Global'].map(tf=>`<button class="tf-btn${tf==='1S'?' active':''}" onclick="switchTF('${assetId}','${tf}',this)">${tf}</button>`).join('')}
+          ${isManual?'<div style="font-size:11px;color:var(--mu);padding:4px 0">Historique de vos prix d\'achat</div>':['1S','1M','1A','Global'].map(tf=>`<button class="tf-btn${tf==='1M'?' active':''}" onclick="switchTF('${assetId}','${tf}',this)">${tf}</button>`).join('')}
         </div>
-
-        <!-- Chart -->
-        <div class="idm-chart-wrap" id="detail-chart-wrap-${assetId}">
-          <canvas id="detail-chart-${assetId}"></canvas>
-        </div>
-        <div style="font-size:10px;color:var(--mu);text-align:center;margin-bottom:14px" id="detail-chart-lbl-${assetId}">
-          ${asset.coingecko?'Évolution 7 jours (marché)':'Prix non disponible'}
-        </div>
-
-        <!-- Buy history -->
+        <div class="idm-chart-wrap"><canvas id="detail-chart-${assetId}" width="400" height="140"></canvas></div>
+        <div style="font-size:10px;color:var(--mu);text-align:center;margin-bottom:14px" id="detail-chart-lbl-${assetId}"></div>
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
           <div style="font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.06em;font-weight:500">Historique DCA</div>
           <button class="sh-btn" onclick="openBuyModal('${assetId}')">+ Ajouter</button>
@@ -1314,152 +1242,112 @@ function openAssetDetail(assetId){
       </div>
     </div></div>`);
 
-  // Draw initial 1S chart
-  setTimeout(()=>switchTF(assetId,'1S',document.querySelector(`#tf-bar-${assetId} .tf-btn`)),80);
+  // Draw detail chart
+  requestAnimationFrame(()=>{
+    requestAnimationFrame(()=>{
+      const tf=isManual?'manual':'1M';
+      if(isManual){
+        const hist=getChartData(asset,'1M');
+        if(hist&&hist.prices.length>1){
+          drawDetailChart(assetId,hist.prices,hist.labels,color);
+          document.getElementById('detail-chart-lbl-'+assetId).textContent='Prix de vos achats';
+        }
+      } else {
+        switchTF(assetId,'1M',document.querySelector('#tf-bar-'+assetId+' .tf-btn.active'));
+      }
+    });
+  });
+}
+
+function drawDetailChart(assetId,prices,labels,color){
+  const canvasId='detail-chart-'+assetId;
+  const canvas=document.getElementById(canvasId);
+  if(!canvas||typeof Chart==='undefined'||!prices||prices.length<2)return;
+  const ctx=canvas.getContext('2d');
+  if(invMiniCharts[canvasId]){try{invMiniCharts[canvasId].destroy();}catch(e){}delete invMiniCharts[canvasId];}
+  invMiniCharts[canvasId]=new Chart(ctx,{
+    type:'line',
+    data:{
+      labels:labels||prices.map((_,i)=>i),
+      datasets:[{
+        data:prices,
+        borderColor:color,
+        borderWidth:2,
+        fill:true,
+        backgroundColor:hexToRgba(color,0.10),
+        tension:0.4,
+        pointRadius:0,
+      }]
+    },
+    options:{
+      responsive:false,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{
+        enabled:true,mode:'index',intersect:false,
+        callbacks:{label:c=>'  '+c.parsed.y.toLocaleString('fr-FR',{minimumFractionDigits:0,maximumFractionDigits:0})+' €'}
+      }},
+      scales:{
+        x:{display:true,ticks:{color:'rgba(238,238,245,0.35)',font:{size:10},maxTicksLimit:5,maxRotation:0},grid:{display:false},border:{display:false}},
+        y:{display:true,position:'right',ticks:{color:'rgba(238,238,245,0.35)',font:{size:10},maxTicksLimit:4,callback:v=>v>=1000?Math.round(v/1000)+'k€':Math.round(v)+'€'},grid:{color:'rgba(255,255,255,0.03)'},border:{display:false}}
+      },
+      animation:false
+    }
+  });
 }
 
 async function switchTF(assetId,tf,btn){
-  // Update active button
-  const bar=document.getElementById(`tf-bar-${assetId}`);
+  const bar=document.getElementById('tf-bar-'+assetId);
   if(bar)bar.querySelectorAll('.tf-btn').forEach(b=>b.classList.remove('active'));
   if(btn)btn.classList.add('active');
-
   const asset=(window._assetMap||buildAssetMap())[assetId]||{};
   const cgId=asset.coingecko||null;
   const color=asset.color||'#7F77DD';
-  const canvasId=`detail-chart-${assetId}`;
-  const lbl=document.getElementById(`detail-chart-lbl-${assetId}`);
-
-  // Actif sans CoinGecko (ex: S&P 500) → pas de données marché
+  const lbl=document.getElementById('detail-chart-lbl-'+assetId);
   if(!cgId){
-    if(lbl)lbl.textContent='Prix marché non disponible — entre tes achats manuellement';
-    // Dessiner un graphique vide / placeholder
-    const canvas=document.getElementById(canvasId);
-    if(canvas&&typeof Chart!=='undefined'){
-      if(invMiniCharts[canvasId]){try{invMiniCharts[canvasId].destroy();}catch(e){}}
+    const hist=getChartData(asset,tf);
+    if(hist&&hist.prices.length>1){
+      drawDetailChart(assetId,hist.prices,hist.labels,color);
+      if(lbl)lbl.textContent='Prix de vos achats';
     }
     return;
   }
-
   if(lbl)lbl.textContent='Chargement…';
-
-  // Fetch si pas en cache
   if(!marketData[cgId]||!marketData[cgId].history||!marketData[cgId].history[tf]){
     await fetchCoinHistory(cgId,tf);
   }
-
   const hist=marketData[cgId]&&marketData[cgId].history&&marketData[cgId].history[tf];
   const tfLabels={'1S':'7 jours','1M':'1 mois','1A':'1 an','Global':'Depuis le début'};
-
   if(hist&&hist.prices&&hist.prices.length>1){
-    const canvas=document.getElementById(canvasId);
-    if(canvas&&typeof Chart!=='undefined'){
-      if(invMiniCharts[canvasId]){try{invMiniCharts[canvasId].destroy();}catch(e){}}
-      const ctx=canvas.getContext('2d');
-      invMiniCharts[canvasId]=new Chart(ctx,{
-        type:'line',
-        data:{
-          labels:hist.labels,
-          datasets:[{
-            data:hist.prices,
-            borderColor:color,
-            borderWidth:2,
-            fill:true,
-            backgroundColor:hexToRgba(color,0.10),
-            tension:0.4,
-            pointRadius:0,
-          }]
-        },
-        options:{
-          responsive:true,maintainAspectRatio:false,
-          plugins:{
-            legend:{display:false},
-            tooltip:{
-              enabled:true,mode:'index',intersect:false,
-              callbacks:{
-                label:ctx=>'  '+ctx.parsed.y.toLocaleString('fr-FR',{minimumFractionDigits:0,maximumFractionDigits:0})+' €'
-              }
-            }
-          },
-          scales:{
-            x:{
-              display:true,
-              ticks:{
-                color:'rgba(238,238,245,0.35)',
-                font:{size:10},
-                maxTicksLimit:5,
-                maxRotation:0,
-              },
-              grid:{display:false},
-              border:{display:false}
-            },
-            y:{
-              display:true,
-              position:'right',
-              ticks:{
-                color:'rgba(238,238,245,0.35)',
-                font:{size:10},
-                maxTicksLimit:4,
-                callback:v=>{
-                  if(v>=1000)return Math.round(v/1000)+'k€';
-                  return Math.round(v)+'€';
-                }
-              },
-              grid:{color:'rgba(255,255,255,0.03)'},
-              border:{display:false}
-            }
-          }
-        }
-      });
-    }
+    drawDetailChart(assetId,hist.prices,hist.labels,color);
     if(lbl)lbl.textContent='Évolution · '+tfLabels[tf];
   } else {
     if(lbl)lbl.textContent='Données non disponibles';
   }
 }
 
-// ── Buy action sheet (···) ──
+// ── Buy action sheet ──
 function openBuyAS(assetId,buyId){
   document.body.insertAdjacentHTML('beforeend',
     `<div class="as" id="xbas" onclick="if(event.target.classList.contains('as-bg'))document.getElementById('xbas').remove()">
     <div class="as-bg"></div>
     <div class="as-box">
-      <div class="as-item" onclick="document.getElementById('xbas').remove();openEditBuyModal('${assetId}','${buyId}')">
-        <span style="font-size:18px">✏️</span><span>Modifier</span>
-      </div>
-      <div class="as-item" style="color:var(--re)" onclick="document.getElementById('xbas').remove();deleteBuy('${assetId}','${buyId}')">
-        <span style="font-size:18px">🗑️</span><span>Supprimer</span>
-      </div>
+      <div class="as-item" onclick="document.getElementById('xbas').remove();openEditBuyModal('${assetId}','${buyId}')"><span style="font-size:18px">✏️</span><span>Modifier</span></div>
+      <div class="as-item" style="color:var(--re)" onclick="document.getElementById('xbas').remove();deleteBuy('${assetId}','${buyId}')"><span style="font-size:18px">🗑️</span><span>Supprimer</span></div>
       <button class="as-cancel" onclick="document.getElementById('xbas').remove()">Annuler</button>
     </div></div>`);
 }
 
 function openEditBuyModal(assetId,buyId){
-  const inv=userInvestments[assetId];
-  if(!inv)return;
-  const buy=inv.buys.find(b=>b.id===buyId);
-  if(!buy)return;
+  const inv=userInvestments[assetId];if(!inv)return;
+  const buy=inv.buys.find(b=>b.id===buyId);if(!buy)return;
   const asset=(window._assetMap||buildAssetMap())[assetId]||{name:assetId,icon:'📈'};
   document.body.insertAdjacentHTML('beforeend',
     `<div class="overlay" id="editbuypop" onclick="if(event.target.id==='editbuypop')this.remove()">
     <div class="modal">
       <div class="modal-title">${asset.icon} Modifier l'achat</div>
-      <div class="fsec" style="margin-bottom:10px">
-        <label class="fl">Montant investi (€)</label>
-        <input class="fi" type="number" id="ebuy-amt" inputmode="decimal" value="${buy.amountEur}">
-      </div>
-      <div class="fsec" style="margin-bottom:10px">
-        <label class="fl">Prix unitaire (€)</label>
-        <input class="fi" type="number" id="ebuy-price" inputmode="decimal" value="${buy.pricePerUnit||''}">
-      </div>
-      <div class="fsec" style="margin-bottom:10px">
-        <label class="fl">Quantité</label>
-        <input class="fi" type="number" id="ebuy-qty" inputmode="decimal" step="any" value="${buy.qty||''}">
-      </div>
-      <div class="fsec" style="margin-bottom:10px">
-        <label class="fl">Date</label>
-        <input class="fi" type="date" id="ebuy-date" value="${buy.date}">
-      </div>
+      <div class="fsec" style="margin-bottom:10px"><label class="fl">Montant (€)</label><input class="fi" type="number" id="ebuy-amt" inputmode="decimal" value="${buy.amountEur}"></div>
+      <div class="fsec" style="margin-bottom:10px"><label class="fl">Prix unitaire (€)</label><input class="fi" type="number" id="ebuy-price" inputmode="decimal" value="${buy.pricePerUnit||''}"></div>
+      <div class="fsec" style="margin-bottom:10px"><label class="fl">Quantité</label><input class="fi" type="number" id="ebuy-qty" inputmode="decimal" step="any" value="${buy.qty||''}"></div>
+      <div class="fsec" style="margin-bottom:10px"><label class="fl">Date</label><input class="fi" type="date" id="ebuy-date" value="${buy.date}"></div>
       <button class="btnp" onclick="saveEditBuy('${assetId}','${buyId}')">Enregistrer</button>
       <button onclick="document.getElementById('editbuypop').remove()" style="width:100%;background:none;border:none;color:var(--mu);padding:12px;cursor:pointer;font-family:inherit;font-size:14px;margin-top:4px">Annuler</button>
     </div></div>`);
@@ -1483,8 +1371,7 @@ function saveEditBuy(assetId,buyId){
 
 function deleteBuy(assetId,buyId){
   if(!confirm('Supprimer cet achat ?'))return;
-  if(userInvestments[assetId])
-    userInvestments[assetId].buys=userInvestments[assetId].buys.filter(b=>b.id!==buyId);
+  if(userInvestments[assetId])userInvestments[assetId].buys=userInvestments[assetId].buys.filter(b=>b.id!==buyId);
   saveInvestments();supaSave();
   document.getElementById('inv-detail')?.remove();
   renderInvestPage();
@@ -1525,6 +1412,7 @@ function saveCustomAsset(){
   renderInvestPage();
   showToast(name+' ajouté ✓');
 }
+
 
 // INIT
 async function init(){
