@@ -176,8 +176,8 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:-apple-sy
 .ac-add{width:28px;height:28px;border-radius:8px;background:var(--s3);border:0.5px solid var(--b2);color:var(--mu2);font-size:20px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:inherit}
 
 /* Mini sparkline — the red-circled zone */
-.ac-chart{height:80px;margin:8px 0 0;position:relative}
-.ac-chart canvas{position:absolute;inset:0;width:100%!important;height:100%!important}
+.ac-chart{height:80px;margin:8px 0 0;position:relative;display:block}
+.ac-chart canvas{display:block;width:100%!important;height:80px!important}
 
 /* Footer: value + stats bar */
 .ac-footer{padding:8px 14px 13px}
@@ -211,8 +211,8 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:-apple-sy
 .tf-btn.active{background:var(--pudim);border-color:var(--pu);color:var(--pu)}
 
 /* Large chart in detail */
-.idm-chart-wrap{height:140px;margin-bottom:6px;position:relative}
-.idm-chart-wrap canvas{position:absolute;inset:0;width:100%!important;height:100%!important}
+.idm-chart-wrap{height:140px;margin-bottom:6px;position:relative;display:block}
+.idm-chart-wrap canvas{display:block;width:100%!important;height:140px!important}
 
 /* Buy history rows */
 .idm-buy-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:0.5px solid var(--b)}
@@ -889,7 +889,7 @@ function calcAssetStats(asset){
   return{totalInvested,totalQty,avgPrice,currentPrice,currentValue,pnlEur,pnlPct,md};
 }
 
-// ── Fetch CoinGecko: current price + 1M sparkline for cards ──
+// ── Fetch CoinGecko: current price + sparkline 30d pour les cartes ──
 async function fetchCryptoPrices(){
   const cgIds=[...new Set([
     ...Object.values(ASSET_CATALOGUE).map(a=>a.coingecko).filter(Boolean),
@@ -897,8 +897,9 @@ async function fetchCryptoPrices(){
   ])];
   if(!cgIds.length)return;
   try{
-    // Get current prices + 24h change
-    const url=`https://api.coingecko.com/api/v3/coins/markets?vs_currency=eur&ids=${cgIds.join(',')}&sparkline=false&price_change_percentage=24h&per_page=20`;
+    // sparkline=true donne 7j — on l'utilise quand même pour la mini carte
+    // puis on fetch 30j séparément pour chaque coin
+    const url=`https://api.coingecko.com/api/v3/coins/markets?vs_currency=eur&ids=${cgIds.join(',')}&sparkline=true&price_change_percentage=24h&per_page=20`;
     const r=await fetch(url);if(!r.ok)return;
     const data=await r.json();
     data.forEach(coin=>{
@@ -906,9 +907,14 @@ async function fetchCryptoPrices(){
       marketData[coin.id].price=coin.current_price;
       marketData[coin.id].changePct24h=coin.price_change_percentage_24h||0;
       marketData[coin.id].change24h=coin.price_change_24h||0;
+      // Stocker 7j comme base (1S)
+      const sp=(coin.sparkline_in_7d&&coin.sparkline_in_7d.price)||[];
+      if(sp.length>1)marketData[coin.id].history['1S']={prices:sp,labels:sp.map((_,i)=>i)};
     });
-    // Fetch 1M history for each coin (used in mini cards)
-    await Promise.allSettled(cgIds.map(id=>fetchCoinHistory(id,'1M')));
+    // Fetch 30j pour mini cartes (1M) — en parallèle, sans bloquer
+    Promise.allSettled(cgIds.map(id=>fetchCoinHistory(id,'1M'))).then(()=>{
+      renderInvestPage(); // re-render une fois le 1M chargé
+    });
   }catch(e){console.warn('CoinGecko fetch failed',e);}
 }
 
@@ -1087,13 +1093,15 @@ function renderInvestPage(){
       </div>`;
     container.appendChild(card);
 
-    // Draw mini sparkline after DOM paint — 1M timeframe
+    // Draw mini sparkline — 1M si dispo, sinon 1S en fallback
     setTimeout(()=>{
-      const hist=s.md&&s.md.history&&s.md.history['1M'];
-      if(hist&&hist.prices.length>1){
+      const md=s.md;
+      if(!md)return;
+      const hist=md.history&&(md.history['1M']||md.history['1S']);
+      if(hist&&hist.prices&&hist.prices.length>1){
         drawChart(chartId,hist.prices,color,true,chartId);
       }
-    },60);
+    },80);
   });
 
   if(!pricesLoaded)refreshPrices();
