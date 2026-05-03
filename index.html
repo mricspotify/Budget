@@ -259,7 +259,7 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:-apple-sy
     <div class="page" id="page-add">
       <div class="inner">
         <div class="ptitle" id="add-title">Nouvelle dépense</div>
-        <div class="fsec"><label class="fl">Description</label><input class="fi" type="text" id="f-desc" placeholder="Ex : Courses Lidl"></div>
+        <div class="fsec"><label class="fl">Description</label><input class="fi" type="text" id="f-desc" placeholder="Ex : Courses"></div>
         <div class="fsec"><label class="fl">Montant (€)</label><input class="fi" type="number" id="f-amount" placeholder="0.00" step="0.01" min="0" inputmode="decimal"></div>
         <div class="fsec"><label class="fl">Catégorie</label><div class="catg" id="cat-grid"></div></div>
         <div class="fsec"><label class="fl">Date</label><input class="fi" type="date" id="f-date"></div>
@@ -399,13 +399,14 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:-apple-sy
 const MONTHS=['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
 const MS=['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
 const CAT={
-  fixes:  {label:'Fixes',   icon:'🏠',color:'#7F77DD'},
-  courses:{label:'Courses', icon:'🛒',color:'#1D9E75'},
-  extras: {label:'Extras',  icon:'✨',color:'#EF9F27'},
-  invest: {label:'Invest.', icon:'📈',color:'#378ADD'},
-  epargne:{label:'Épargne', icon:'💰',color:'#D85A30'},
-  autre:  {label:'Autre',   icon:'📌',color:'#888780'},
-  rentree:{label:'Rentrée',  icon:'💸',color:'#1D9E75'},
+  fixes:    {label:'Fixes',     icon:'🏠',color:'#7F77DD'},
+  courses:  {label:'Courses',   icon:'🛒',color:'#1D9E75'},
+  transport:{label:'Transport', icon:'🚗',color:'#378ADD'},
+  extras:   {label:'Extras',    icon:'✨',color:'#EF9F27'},
+  invest:   {label:'Invest',    icon:'📈',color:'#378ADD'},
+  epargne:  {label:'Épargne',   icon:'💰',color:'#D85A30'},
+  autre:    {label:'Autre',     icon:'📌',color:'#888780'},
+  rentree:  {label:'Rentrée',   icon:'💸',color:'#1D9E75'},
 };
 const SAVINGS=0;
 const RECUR_DEF=[];
@@ -1054,9 +1055,13 @@ function renderInvestPage(){
     tpctEl.style.color=totalInvested>0?(globalPct>=0?'var(--te)':'var(--re)'):'var(--mu)';
   }
 
-  // Cards
+  // Cards — destroy old chart instances first
   const container=document.getElementById('asset-cards-list');
   if(!container)return;
+  Object.keys(invMiniCharts).filter(k=>k.startsWith('mc-')).forEach(k=>{
+    try{invMiniCharts[k].destroy();}catch(e){}
+    delete invMiniCharts[k];
+  });
   container.innerHTML='';
   window._assetMap=assetMap;
 
@@ -1116,7 +1121,7 @@ function renderInvestPage(){
         <div class="ac-stats">
           <div class="ac-stat">
             <div class="ac-stat-lbl">Investi</div>
-            <div class="ac-stat-val" style="color:var(--am)">${hasBuys?fa(s.totalInvested):'—'}</div>
+            <div class="ac-stat-val" style="color:${color}">${hasBuys?fa(s.totalInvested):'—'}</div>
           </div>
           <div class="ac-stat">
             <div class="ac-stat-lbl">Prix moyen</div>
@@ -1134,15 +1139,20 @@ function renderInvestPage(){
       </div>`;
     container.appendChild(card);
 
-    // Draw mini sparkline — 1M si dispo, sinon 1S en fallback
+    // Draw mini sparkline — lookup FRESH marketData (not captured s.md)
+    const _assetId=asset.id;
+    const _cgId=asset.coingecko||null;
+    const _color=color;
+    const _chartId=chartId;
     setTimeout(()=>{
-      const md=s.md;
-      if(!md)return;
-      const hist=md.history&&(md.history['1M']||md.history['1S']);
+      if(!_cgId)return;
+      const md=marketData[_cgId];
+      if(!md||!md.history)return;
+      const hist=md.history['1M']||md.history['1S'];
       if(hist&&hist.prices&&hist.prices.length>1){
-        drawChart(chartId,hist.prices,color,true,chartId,hist.labels||null);
+        drawChart(_chartId,hist.prices,_color,true,_chartId,hist.labels||null);
       }
-    },80);
+    },200);
   });
 
   if(!pricesLoaded)refreshPrices();
