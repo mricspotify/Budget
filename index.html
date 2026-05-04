@@ -856,6 +856,8 @@ let marketData = {};
 let pricesLoaded = false;
 let invMiniCharts = {};
 
+const AV_KEY = 'WREUUDBZ2CFB44AI';
+
 function saveInvestments(){try{localStorage.setItem('bg11_inv',JSON.stringify(userInvestments));}catch(e){}}
 function loadInvestments(){try{const s=localStorage.getItem('bg11_inv');if(s)userInvestments=JSON.parse(s);}catch(e){}}
 
@@ -878,8 +880,9 @@ function calcAssetStats(asset){
   const totalInvested=buys.reduce((s,b)=>s+b.amountEur,0);
   const totalQty=buys.reduce((s,b)=>s+(b.qty||0),0);
   const avgPrice=totalQty>0?buys.reduce((s,b)=>s+(b.pricePerUnit*(b.qty||0)),0)/totalQty:0;
-  const cgId=asset.coingecko||null;
-  const md=cgId?marketData[cgId]||null:null;
+  // Use coingecko id for crypto, asset id for others (sp500)
+  const mdKey=asset.coingecko||asset.id;
+  const md=marketData[mdKey]||null;
   const currentPrice=md?md.price:null;
   const currentValue=(currentPrice&&totalQty>0)?currentPrice*totalQty:totalInvested;
   const pnlEur=currentValue-totalInvested;
@@ -889,24 +892,21 @@ function calcAssetStats(asset){
 
 // ── Get chart data for any asset ──
 function getChartData(asset,tf){
-  const cgId=asset.coingecko||null;
-  if(cgId){
-    const md=marketData[cgId];
-    if(md&&md.history){
-      return md.history[tf]||md.history['1M']||md.history['1S']||null;
-    }
-    return null;
+  const mdKey=asset.coingecko||asset.id;
+  const md=marketData[mdKey];
+  if(md&&md.history){
+    const hist=md.history[tf]||md.history['1M']||md.history['1S']||null;
+    if(hist&&hist.prices&&hist.prices.length>1)return hist;
   }
-  // No CoinGecko → use buy history (price over time)
+  // Fallback → buy history (for manual assets or when API not loaded)
   const buys=(asset.buys||[]).filter(b=>b.pricePerUnit>0).sort((a,b)=>new Date(a.date)-new Date(b.date));
   if(buys.length===0)return null;
-  // Single buy → duplicate point to draw a flat line
   const src=buys.length===1?[buys[0],buys[0]]:buys;
   const prices=src.map(b=>b.pricePerUnit);
   const labels=src.map((b,i)=>{
     if(buys.length===1)return i===0?'Achat':'Auj.';
     const d=new Date(b.date);
-    return ('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2);
+    return('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2);
   });
   return{prices,labels};
 }
@@ -977,12 +977,48 @@ async function refreshPrices(){
   const icon=document.getElementById('refresh-icon');
   if(btn)btn.disabled=true;
   if(icon)icon.style.animation='spin 1s linear infinite';
-  await fetchCryptoPrices();
+  await Promise.allSettled([fetchCryptoPrices(), fetchSP500()]);
   pricesLoaded=true;
   if(btn)btn.disabled=false;
   if(icon)icon.style.animation='';
   renderInvestPage();
   showToast('Prix actualisés ✓');
+}
+
+// ── Fetch S&P 500 via Alpha Vantage ──
+async function fetchSP500(){
+  try{
+    // Current price
+    const qUrl=`https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=SPY&apikey=${AV_KEY}`;
+    const qr=await fetch(qUrl);
+    if(!qr.ok)return;
+    const qd=await qr.json();
+    const q=qd['Global Quote'];
+    if(q&&q['05. price']){
+      if(!marketData['sp500'])marketData['sp500']={history:{}};
+      const price=parseFloat(q['05. price']);
+      const prev=parseFloat(q['08. previous close']||price);
+      marketData['sp500'].price=price;
+      marketData['sp500'].changePct24h=((price-prev)/prev)*100;
+    }
+    // Monthly history (last 30 trading days)
+    const hUrl=`https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=SPY&outputsize=compact&apikey=${AV_KEY}`;
+    const hr=await fetch(hUrl);
+    if(!hr.ok)return;
+    const hd=await hr.json();
+    const ts=hd['Time Series (Daily)'];
+    if(ts){
+      const days=Object.keys(ts).sort().slice(-30);
+      const prices=days.map(d=>parseFloat(ts[d]['4. close']));
+      const labels=days.map(d=>{const dt=new Date(d);return ('0'+dt.getDate()).slice(-2)+'/'+('0'+(dt.getMonth()+1)).slice(-2);});
+      if(!marketData['sp500'])marketData['sp500']={history:{}};
+      marketData['sp500'].history['1M']={prices,labels};
+      // 1S = last 7 trading days
+      marketData['sp500'].history['1S']={prices:prices.slice(-7),labels:labels.slice(-7)};
+      // 1A = last 252 trading days (need full output)
+      marketData['sp500'].history['1A']={prices,labels}; // compact = 100 days, close enough
+    }
+  }catch(e){console.warn('SP500 fetch failed',e);}
 }
 
 // ── Draw chart ──
@@ -1235,9 +1271,9 @@ function openAssetDetail(assetId){
           <div class="idm-kpi-card"><div class="idm-kpi-lbl">Quantité</div><div class="idm-kpi-val">${s.totalQty>0?s.totalQty.toLocaleString('fr-FR',{maximumFractionDigits:6}):'—'}</div></div>
           <div class="idm-kpi-card"><div class="idm-kpi-lbl">Perf.</div><div class="idm-kpi-val" style="color:${isPos?'var(--te)':'var(--re)'}">${hasBuys?(isPos?'+':'')+s.pnlPct.toFixed(1)+'%':'—'}</div></div>
         </div>
-        ${isManual?'<div style="font-size:11px;color:var(--mu);text-align:center;margin:10px 0;padding:8px;background:var(--s3);border-radius:8px">📊 Prix marché non disponible — graphique basé sur vos achats</div>':''}
+        ${isManual?'<div style="font-size:11px;color:var(--mu);text-align:center;margin:10px 0;padding:8px;background:var(--s3);border-radius:8px">📊 Données via Alpha Vantage (SPY ETF)</div>':''}
         <div class="tf-bar" id="tf-bar-${assetId}">
-          ${isManual?'<div style="font-size:11px;color:var(--mu);padding:4px 0">Historique de vos prix d\'achat</div>':['1S','1M','1A','Global'].map(tf=>`<button class="tf-btn${tf==='1M'?' active':''}" onclick="switchTF('${assetId}','${tf}',this)">${tf}</button>`).join('')}
+          ${['1S','1M','1A','Global'].map(tf=>`<button class="tf-btn${tf==='1M'?' active':''}" onclick="switchTF('${assetId}','${tf}',this)">${tf}</button>`).join('')}
         </div>
         <div class="idm-chart-wrap"><canvas id="detail-chart-${assetId}" width="400" height="140"></canvas></div>
         <div style="font-size:10px;color:var(--mu);text-align:center;margin-bottom:14px" id="detail-chart-lbl-${assetId}"></div>
@@ -1306,26 +1342,44 @@ async function switchTF(assetId,tf,btn){
   if(bar)bar.querySelectorAll('.tf-btn').forEach(b=>b.classList.remove('active'));
   if(btn)btn.classList.add('active');
   const asset=(window._assetMap||buildAssetMap())[assetId]||{};
-  const cgId=asset.coingecko||null;
   const color=asset.color||'#7F77DD';
   const lbl=document.getElementById('detail-chart-lbl-'+assetId);
-  if(!cgId){
-    const hist=getChartData(asset,tf);
-    if(hist&&hist.prices.length>1){
-      drawDetailChart(assetId,hist.prices,hist.labels,color);
-      if(lbl)lbl.textContent='Prix de vos achats';
-    }
-    return;
+  const tfLabels={'1S':'7 jours','1M':'1 mois','1A':'1 an','Global':'Depuis le début'};
+
+  // SP500 — fetch extended history if needed
+  if(assetId==='sp500'&&(tf==='1A'||tf==='Global')){
+    if(lbl)lbl.textContent='Chargement…';
+    try{
+      const size=tf==='Global'?'full':'compact';
+      const url=`https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=SPY&outputsize=${size}&apikey=${AV_KEY}`;
+      const r=await fetch(url);
+      if(r.ok){
+        const d=await r.json();
+        const ts=d['Time Series (Daily)'];
+        if(ts){
+          const days=Object.keys(ts).sort();
+          const limit=tf==='1A'?252:days.length;
+          const slice=days.slice(-limit);
+          const prices=slice.map(k=>parseFloat(ts[k]['4. close']));
+          const labels=slice.map(k=>{const dt=new Date(k);return MS[dt.getMonth()]+' '+dt.getFullYear().toString().slice(-2);});
+          if(!marketData['sp500'])marketData['sp500']={history:{}};
+          marketData['sp500'].history[tf]={prices,labels};
+        }
+      }
+    }catch(e){console.warn('SP500 history failed',e);}
   }
-  if(lbl)lbl.textContent='Chargement…';
-  if(!marketData[cgId]||!marketData[cgId].history||!marketData[cgId].history[tf]){
+
+  // For crypto — fetch if not cached
+  const cgId=asset.coingecko||null;
+  if(cgId&&(!marketData[cgId]||!marketData[cgId].history||!marketData[cgId].history[tf])){
+    if(lbl)lbl.textContent='Chargement…';
     await fetchCoinHistory(cgId,tf);
   }
-  const hist=marketData[cgId]&&marketData[cgId].history&&marketData[cgId].history[tf];
-  const tfLabels={'1S':'7 jours','1M':'1 mois','1A':'1 an','Global':'Depuis le début'};
+
+  const hist=getChartData(asset,tf);
   if(hist&&hist.prices&&hist.prices.length>1){
     drawDetailChart(assetId,hist.prices,hist.labels,color);
-    if(lbl)lbl.textContent='Évolution · '+tfLabels[tf];
+    if(lbl)lbl.textContent='Évolution · '+(tfLabels[tf]||tf);
   } else {
     if(lbl)lbl.textContent='Données non disponibles';
   }
