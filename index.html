@@ -857,6 +857,7 @@ let pricesLoaded = false;
 let invMiniCharts = {};
 
 const AV_KEY = 'WREUUDBZ2CFB44AI';
+const TD_KEY = 'b8bc391f45a8448eaf9c091824218310';
 
 function saveInvestments(){try{localStorage.setItem('bg11_inv',JSON.stringify(userInvestments));}catch(e){}}
 function loadInvestments(){try{const s=localStorage.getItem('bg11_inv');if(s)userInvestments=JSON.parse(s);}catch(e){}}
@@ -988,40 +989,48 @@ async function refreshPrices(){
 // ── Fetch S&P 500 via Alpha Vantage ──
 async function fetchSP500(){
   try{
-    // SXR8.DEX = iShares Core S&P 500 UCITS ETF (EUR Acc) — Trade Republic
-    const SYM='SXR8.DEX';
-    const qUrl=`https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${SYM}&apikey=${AV_KEY}`;
-    const qr=await fetch(qUrl);
+    // SXR8 = iShares Core S&P 500 UCITS ETF sur XETRA en EUR (Trade Republic)
+    // Via Twelve Data - CORS OK, gratuit 800 appels/jour
+    const BASE='https://api.twelvedata.com';
+
+    // Prix actuel
+    const qr=await fetch(`${BASE}/price?symbol=SXR8&exchange=XETRA&apikey=${TD_KEY}`);
     if(!qr.ok)return;
     const qd=await qr.json();
-    const q=qd['Global Quote'];
-    if(q&&q['05. price']){
+    if(qd.price){
       if(!marketData['sp500'])marketData['sp500']={history:{}};
-      const price=parseFloat(q['05. price']);
-      const prev=parseFloat(q['08. previous close']||price);
-      marketData['sp500'].price=price;
-      marketData['sp500'].changePct24h=((price-prev)/prev)*100;
+      marketData['sp500'].price=parseFloat(qd.price);
     }
-    // Daily history (compact = ~100 jours de bourse)
-    const hUrl=`https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${SYM}&outputsize=compact&apikey=${AV_KEY}`;
-    const hr=await fetch(hUrl);
+
+    // Variation 24h
+    const cr=await fetch(`${BASE}/quote?symbol=SXR8&exchange=XETRA&apikey=${TD_KEY}`);
+    if(cr.ok){
+      const cd=await cr.json();
+      if(cd.percent_change){
+        if(!marketData['sp500'])marketData['sp500']={history:{}};
+        marketData['sp500'].changePct24h=parseFloat(cd.percent_change);
+      }
+    }
+
+    // Historique 1 an (données journalières)
+    const hr=await fetch(`${BASE}/time_series?symbol=SXR8&exchange=XETRA&interval=1day&outputsize=365&apikey=${TD_KEY}`);
     if(!hr.ok)return;
     const hd=await hr.json();
-    const ts=hd['Time Series (Daily)'];
-    if(ts){
-      const days=Object.keys(ts).sort();
-      const allPrices=days.map(d=>parseFloat(ts[d]['4. close']));
-      const allLabels=days.map(d=>{
-        const dt=new Date(d);
+    if(hd.values&&hd.values.length>1){
+      // Twelve Data renvoie du plus récent au plus ancien → on inverse
+      const sorted=[...hd.values].reverse();
+      const allPrices=sorted.map(v=>parseFloat(v.close));
+      const allLabels=sorted.map(v=>{
+        const dt=new Date(v.datetime);
         return('0'+dt.getDate()).slice(-2)+'/'+('0'+(dt.getMonth()+1)).slice(-2);
       });
       if(!marketData['sp500'])marketData['sp500']={history:{}};
-      marketData['sp500'].history['1S']={prices:allPrices.slice(-7),  labels:allLabels.slice(-7)};
-      marketData['sp500'].history['1M']={prices:allPrices.slice(-22),  labels:allLabels.slice(-22)};
-      marketData['sp500'].history['1A']={prices:allPrices,             labels:allLabels};
-      marketData['sp500'].history['Global']={prices:allPrices,         labels:allLabels};
+      marketData['sp500'].history['1S']    ={prices:allPrices.slice(-7),  labels:allLabels.slice(-7)};
+      marketData['sp500'].history['1M']    ={prices:allPrices.slice(-22), labels:allLabels.slice(-22)};
+      marketData['sp500'].history['1A']    ={prices:allPrices,            labels:allLabels};
+      marketData['sp500'].history['Global']={prices:allPrices,            labels:allLabels};
     }
-  }catch(e){console.warn('SP500 fetch failed',e);}
+  }catch(e){console.warn('SP500 Twelve Data failed',e);}
 }
 
 // ── Draw chart ──
@@ -1149,7 +1158,7 @@ function renderInvestPage(){
   // This runs synchronously after cards are built
   Object.values(assetMap).forEach(asset=>{
     const chartId='mc-'+asset.id;
-    const hist=getChartData(asset,'1A');
+    const hist=getChartData(asset,'1M');
     if(hist&&hist.prices.length>1){
       // Use rAF to ensure canvas is in DOM
       requestAnimationFrame(()=>{
@@ -1274,7 +1283,7 @@ function openAssetDetail(assetId){
           <div class="idm-kpi-card"><div class="idm-kpi-lbl">Quantité</div><div class="idm-kpi-val">${s.totalQty>0?s.totalQty.toLocaleString('fr-FR',{maximumFractionDigits:6}):'—'}</div></div>
           <div class="idm-kpi-card"><div class="idm-kpi-lbl">Perf.</div><div class="idm-kpi-val" style="color:${isPos?'var(--te)':'var(--re)'}">${hasBuys?(isPos?'+':'')+s.pnlPct.toFixed(1)+'%':'—'}</div></div>
         </div>
-        ${isManual?'<div style="font-size:11px;color:var(--mu);text-align:center;margin:10px 0;padding:8px;background:var(--s3);border-radius:8px">📊 Données via Alpha Vantage (SPY ETF)</div>':''}
+        ${isManual?'<div style="font-size:11px;color:var(--mu);text-align:center;margin:10px 0;padding:8px;background:var(--s3);border-radius:8px">📊 SXR8 · iShares S&P 500 UCITS ETF (EUR)</div>':''}
         <div class="tf-bar" id="tf-bar-${assetId}">
           ${['1S','1M','1A','Global'].map(tf=>`<button class="tf-btn${tf==='1A'?' active':''}" onclick="switchTF('${assetId}','${tf}',this)">${tf}</button>`).join('')}
         </div>
@@ -1293,7 +1302,7 @@ function openAssetDetail(assetId){
     requestAnimationFrame(()=>{
       const tf=isManual?'manual':'1M';
       if(isManual){
-        const hist=getChartData(asset,'1A');
+        const hist=getChartData(asset,'1M');
         if(hist&&hist.prices.length>1){
           drawDetailChart(assetId,hist.prices,hist.labels,color);
           document.getElementById('detail-chart-lbl-'+assetId).textContent='Prix de vos achats';
@@ -1349,27 +1358,24 @@ async function switchTF(assetId,tf,btn){
   const lbl=document.getElementById('detail-chart-lbl-'+assetId);
   const tfLabels={'1S':'7 jours','1M':'1 mois','1A':'1 an','Global':'Depuis le début'};
 
-  // SP500 — fetch extended history if needed
+  // SP500 — fetch extended history via Twelve Data si besoin
   if(assetId==='sp500'&&(tf==='1A'||tf==='Global')){
     if(lbl)lbl.textContent='Chargement…';
     try{
-      const size=tf==='Global'?'full':'compact';
-      const url=`https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=SXR8.DEX&outputsize=${size}&apikey=${AV_KEY}`;
+      const size=tf==='Global'?5000:365;
+      const url=`https://api.twelvedata.com/time_series?symbol=SXR8&exchange=XETRA&interval=1day&outputsize=${size}&apikey=${TD_KEY}`;
       const r=await fetch(url);
       if(r.ok){
         const d=await r.json();
-        const ts=d['Time Series (Daily)'];
-        if(ts){
-          const days=Object.keys(ts).sort();
-          const limit=tf==='1A'?252:days.length;
-          const slice=days.slice(-limit);
-          const prices=slice.map(k=>parseFloat(ts[k]['4. close']));
-          const labels=slice.map(k=>{const dt=new Date(k);return MS[dt.getMonth()]+' '+dt.getFullYear().toString().slice(-2);});
+        if(d.values&&d.values.length>1){
+          const sorted=[...d.values].reverse();
+          const prices=sorted.map(v=>parseFloat(v.close));
+          const labels=sorted.map(v=>{const dt=new Date(v.datetime);return MS[dt.getMonth()]+' '+dt.getFullYear().toString().slice(-2);});
           if(!marketData['sp500'])marketData['sp500']={history:{}};
           marketData['sp500'].history[tf]={prices,labels};
         }
       }
-    }catch(e){console.warn('SP500 history failed',e);}
+    }catch(e){console.warn('SP500 extended failed',e);}
   }
 
   // For crypto — fetch if not cached
