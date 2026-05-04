@@ -988,8 +988,9 @@ async function refreshPrices(){
 // ── Fetch S&P 500 via Alpha Vantage ──
 async function fetchSP500(){
   try{
-    // Current price
-    const qUrl=`https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=SPY&apikey=${AV_KEY}`;
+    // SXR8.DEX = iShares Core S&P 500 UCITS ETF (EUR Acc) — Trade Republic
+    const SYM='SXR8.DEX';
+    const qUrl=`https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${SYM}&apikey=${AV_KEY}`;
     const qr=await fetch(qUrl);
     if(!qr.ok)return;
     const qd=await qr.json();
@@ -1001,22 +1002,24 @@ async function fetchSP500(){
       marketData['sp500'].price=price;
       marketData['sp500'].changePct24h=((price-prev)/prev)*100;
     }
-    // Monthly history (last 30 trading days)
-    const hUrl=`https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=SPY&outputsize=compact&apikey=${AV_KEY}`;
+    // Daily history (compact = ~100 jours de bourse)
+    const hUrl=`https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${SYM}&outputsize=compact&apikey=${AV_KEY}`;
     const hr=await fetch(hUrl);
     if(!hr.ok)return;
     const hd=await hr.json();
     const ts=hd['Time Series (Daily)'];
     if(ts){
-      const days=Object.keys(ts).sort().slice(-30);
-      const prices=days.map(d=>parseFloat(ts[d]['4. close']));
-      const labels=days.map(d=>{const dt=new Date(d);return ('0'+dt.getDate()).slice(-2)+'/'+('0'+(dt.getMonth()+1)).slice(-2);});
+      const days=Object.keys(ts).sort();
+      const allPrices=days.map(d=>parseFloat(ts[d]['4. close']));
+      const allLabels=days.map(d=>{
+        const dt=new Date(d);
+        return('0'+dt.getDate()).slice(-2)+'/'+('0'+(dt.getMonth()+1)).slice(-2);
+      });
       if(!marketData['sp500'])marketData['sp500']={history:{}};
-      marketData['sp500'].history['1M']={prices,labels};
-      // 1S = last 7 trading days
-      marketData['sp500'].history['1S']={prices:prices.slice(-7),labels:labels.slice(-7)};
-      // 1A = last 252 trading days (need full output)
-      marketData['sp500'].history['1A']={prices,labels}; // compact = 100 days, close enough
+      marketData['sp500'].history['1S']={prices:allPrices.slice(-7),  labels:allLabels.slice(-7)};
+      marketData['sp500'].history['1M']={prices:allPrices.slice(-22),  labels:allLabels.slice(-22)};
+      marketData['sp500'].history['1A']={prices:allPrices,             labels:allLabels};
+      marketData['sp500'].history['Global']={prices:allPrices,         labels:allLabels};
     }
   }catch(e){console.warn('SP500 fetch failed',e);}
 }
@@ -1146,7 +1149,7 @@ function renderInvestPage(){
   // This runs synchronously after cards are built
   Object.values(assetMap).forEach(asset=>{
     const chartId='mc-'+asset.id;
-    const hist=getChartData(asset,'1M');
+    const hist=getChartData(asset,'1A');
     if(hist&&hist.prices.length>1){
       // Use rAF to ensure canvas is in DOM
       requestAnimationFrame(()=>{
@@ -1273,7 +1276,7 @@ function openAssetDetail(assetId){
         </div>
         ${isManual?'<div style="font-size:11px;color:var(--mu);text-align:center;margin:10px 0;padding:8px;background:var(--s3);border-radius:8px">📊 Données via Alpha Vantage (SPY ETF)</div>':''}
         <div class="tf-bar" id="tf-bar-${assetId}">
-          ${['1S','1M','1A','Global'].map(tf=>`<button class="tf-btn${tf==='1M'?' active':''}" onclick="switchTF('${assetId}','${tf}',this)">${tf}</button>`).join('')}
+          ${['1S','1M','1A','Global'].map(tf=>`<button class="tf-btn${tf==='1A'?' active':''}" onclick="switchTF('${assetId}','${tf}',this)">${tf}</button>`).join('')}
         </div>
         <div class="idm-chart-wrap"><canvas id="detail-chart-${assetId}" width="400" height="140"></canvas></div>
         <div style="font-size:10px;color:var(--mu);text-align:center;margin-bottom:14px" id="detail-chart-lbl-${assetId}"></div>
@@ -1290,13 +1293,13 @@ function openAssetDetail(assetId){
     requestAnimationFrame(()=>{
       const tf=isManual?'manual':'1M';
       if(isManual){
-        const hist=getChartData(asset,'1M');
+        const hist=getChartData(asset,'1A');
         if(hist&&hist.prices.length>1){
           drawDetailChart(assetId,hist.prices,hist.labels,color);
           document.getElementById('detail-chart-lbl-'+assetId).textContent='Prix de vos achats';
         }
       } else {
-        switchTF(assetId,'1M',document.querySelector('#tf-bar-'+assetId+' .tf-btn.active'));
+        switchTF(assetId,'1A',document.querySelector('#tf-bar-'+assetId+' .tf-btn.active'));
       }
     });
   });
@@ -1351,7 +1354,7 @@ async function switchTF(assetId,tf,btn){
     if(lbl)lbl.textContent='Chargement…';
     try{
       const size=tf==='Global'?'full':'compact';
-      const url=`https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=SPY&outputsize=${size}&apikey=${AV_KEY}`;
+      const url=`https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=SXR8.DEX&outputsize=${size}&apikey=${AV_KEY}`;
       const r=await fetch(url);
       if(r.ok){
         const d=await r.json();
