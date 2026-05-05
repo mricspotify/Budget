@@ -871,7 +871,7 @@ function buildAssetMap(){
   const map={};
   Object.entries(ASSET_CATALOGUE).forEach(([id,cat])=>{map[id]={id,...cat,buys:[]};});
   Object.entries(userInvestments).forEach(([id,inv])=>{
-    map[id]={...(map[id]||{}),...inv,buys:inv.buys||[]};
+    map[id]={...(map[id]||{}),...inv,buys:inv.buys||[],yahoo:(map[id]||{}).yahoo||inv.yahoo||null};
   });
   return map;
 }
