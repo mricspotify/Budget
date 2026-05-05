@@ -845,7 +845,7 @@ async function supaLoad(){
 
 const ASSET_CATALOGUE = {
   btc:  {name:'Bitcoin', ticker:'BTC', icon:'₿',  color:'#F7931A',coingecko:'bitcoin'},
-  sp500:{name:'S&P 500', ticker:'SPY', icon:'📊',color:'#E24B4A',coingecko:null},
+  sp500:{name:'S&P 500', ticker:'VUAA', icon:'📊',color:'#E24B4A',coingecko:null,yahoo:'VUAA.DE'},
   eth:  {name:'Ethereum',ticker:'ETH', icon:'⟠',  color:'#627EEA',coingecko:'ethereum'},
   sol:  {name:'Solana',  ticker:'SOL', icon:'◎',  color:'#9945FF',coingecko:'solana'},
 };
@@ -989,48 +989,66 @@ async function refreshPrices(){
 // ── Fetch S&P 500 via Alpha Vantage ──
 async function fetchSP500(){
   try{
-    // SXR8 = iShares Core S&P 500 UCITS ETF sur XETRA en EUR (Trade Republic)
-    // Via Twelve Data - CORS OK, gratuit 800 appels/jour
-    const BASE='https://api.twelvedata.com';
+    const BASE='https://query1.finance.yahoo.com/v8/finance/chart/VUAA.DE';
+    const RANGES={
+      '1S': {range:'5d',  interval:'1d'},
+      '1M': {range:'1mo', interval:'1d'},
+      '1A': {range:'1y',  interval:'1d'},
+      'Global':{range:'max',interval:'1wk'},
+    };
+    // On charge 1M en premier pour avoir le prix actuel rapidement
+    const r=await fetch(`${BASE}?interval=1d&range=1mo`);
+    if(!r.ok)return;
+    const d=await r.json();
+    const meta=d?.chart?.result?.[0]?.meta;
+    const result=d?.chart?.result?.[0];
+    if(!meta||!result)return;
+    if(!marketData['sp500'])marketData['sp500']={history:{}};
+    // Prix actuel + variation 24h
+    marketData['sp500'].price=meta.regularMarketPrice;
+    const prev=meta.chartPreviousClose;
+    marketData['sp500'].changePct24h=prev?((meta.regularMarketPrice-prev)/prev)*100:0;
+    // Construire l'historique 1M depuis ce premier appel
+    const timestamps=result.timestamp||[];
+    const closes=result.indicators?.quote?.[0]?.close||[];
+    const prices1M=[],labels1M=[];
+    timestamps.forEach((ts,i)=>{
+      if(closes[i]==null)return;
+      prices1M.push(closes[i]);
+      const dt=new Date(ts*1000);
+      labels1M.push(('0'+dt.getDate()).slice(-2)+'/'+('0'+(dt.getMonth()+1)).slice(-2));
+    });
+    if(prices1M.length>1)marketData['sp500'].history['1M']={prices:prices1M,labels:labels1M};
+    // Charger les autres ranges en parallèle
+    await Promise.allSettled(
+      Object.entries(RANGES).filter(([k])=>k!=='1M').map(([tf,cfg])=>fetchYahooHistory('sp500','VUAA.DE',tf,cfg.range,cfg.interval))
+    );
+  }catch(e){console.warn('fetchSP500 failed',e);}
+}
 
-    // Prix actuel
-    const qr=await fetch(`${BASE}/price?symbol=SXR8&exchange=XETRA&apikey=${TD_KEY}`);
-    if(!qr.ok)return;
-    const qd=await qr.json();
-    if(qd.price){
-      if(!marketData['sp500'])marketData['sp500']={history:{}};
-      marketData['sp500'].price=parseFloat(qd.price);
+async function fetchYahooHistory(assetKey,symbol,tf,range,interval){
+  try{
+    const r=await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=${interval}&range=${range}`);
+    if(!r.ok)return;
+    const d=await r.json();
+    const result=d?.chart?.result?.[0];
+    if(!result)return;
+    const timestamps=result.timestamp||[];
+    const closes=result.indicators?.quote?.[0]?.close||[];
+    const prices=[],labels=[];
+    timestamps.forEach((ts,i)=>{
+      if(closes[i]==null)return;
+      prices.push(closes[i]);
+      const dt=new Date(ts*1000);
+      if(range==='5d')labels.push(('0'+dt.getDate()).slice(-2)+'/'+('0'+(dt.getMonth()+1)).slice(-2));
+      else if(range==='1mo'||range==='3mo')labels.push(('0'+dt.getDate()).slice(-2)+'/'+('0'+(dt.getMonth()+1)).slice(-2));
+      else labels.push(MS[dt.getMonth()]+' '+dt.getFullYear().toString().slice(-2));
+    });
+    if(prices.length>1){
+      if(!marketData[assetKey])marketData[assetKey]={history:{}};
+      marketData[assetKey].history[tf]={prices,labels};
     }
-
-    // Variation 24h
-    const cr=await fetch(`${BASE}/quote?symbol=SXR8&exchange=XETRA&apikey=${TD_KEY}`);
-    if(cr.ok){
-      const cd=await cr.json();
-      if(cd.percent_change){
-        if(!marketData['sp500'])marketData['sp500']={history:{}};
-        marketData['sp500'].changePct24h=parseFloat(cd.percent_change);
-      }
-    }
-
-    // Historique 1 an (données journalières)
-    const hr=await fetch(`${BASE}/time_series?symbol=SXR8&exchange=XETRA&interval=1day&outputsize=365&apikey=${TD_KEY}`);
-    if(!hr.ok)return;
-    const hd=await hr.json();
-    if(hd.values&&hd.values.length>1){
-      // Twelve Data renvoie du plus récent au plus ancien → on inverse
-      const sorted=[...hd.values].reverse();
-      const allPrices=sorted.map(v=>parseFloat(v.close));
-      const allLabels=sorted.map(v=>{
-        const dt=new Date(v.datetime);
-        return('0'+dt.getDate()).slice(-2)+'/'+('0'+(dt.getMonth()+1)).slice(-2);
-      });
-      if(!marketData['sp500'])marketData['sp500']={history:{}};
-      marketData['sp500'].history['1S']    ={prices:allPrices.slice(-7),  labels:allLabels.slice(-7)};
-      marketData['sp500'].history['1M']    ={prices:allPrices.slice(-22), labels:allLabels.slice(-22)};
-      marketData['sp500'].history['1A']    ={prices:allPrices,            labels:allLabels};
-      marketData['sp500'].history['Global']={prices:allPrices,            labels:allLabels};
-    }
-  }catch(e){console.warn('SP500 Twelve Data failed',e);}
+  }catch(e){console.warn('fetchYahooHistory failed',symbol,tf,e);}
 }
 
 // ── Draw chart ──
@@ -1359,23 +1377,14 @@ async function switchTF(assetId,tf,btn){
   const tfLabels={'1S':'7 jours','1M':'1 mois','1A':'1 an','Global':'Depuis le début'};
 
   // SP500 — fetch extended history via Twelve Data si besoin
-  if(assetId==='sp500'&&(tf==='1A'||tf==='Global')){
-    if(lbl)lbl.textContent='Chargement…';
-    try{
-      const size=tf==='Global'?5000:365;
-      const url=`https://api.twelvedata.com/time_series?symbol=SXR8&exchange=XETRA&interval=1day&outputsize=${size}&apikey=${TD_KEY}`;
-      const r=await fetch(url);
-      if(r.ok){
-        const d=await r.json();
-        if(d.values&&d.values.length>1){
-          const sorted=[...d.values].reverse();
-          const prices=sorted.map(v=>parseFloat(v.close));
-          const labels=sorted.map(v=>{const dt=new Date(v.datetime);return MS[dt.getMonth()]+' '+dt.getFullYear().toString().slice(-2);});
-          if(!marketData['sp500'])marketData['sp500']={history:{}};
-          marketData['sp500'].history[tf]={prices,labels};
-        }
-      }
-    }catch(e){console.warn('SP500 extended failed',e);}
+  // SP500 — fetch via Yahoo Finance si pas encore en cache
+  if(assetId==='sp500'){
+    const cfgMap={'1S':{range:'5d',interval:'1d'},'1M':{range:'1mo',interval:'1d'},'1A':{range:'1y',interval:'1d'},'Global':{range:'max',interval:'1wk'}};
+    const cfg=cfgMap[tf];
+    if(cfg&&(!marketData['sp500']?.history?.[tf])){
+      if(lbl)lbl.textContent='Chargement…';
+      await fetchYahooHistory('sp500','VUAA.DE',tf,cfg.range,cfg.interval);
+    }
   }
 
   // For crypto — fetch if not cached
