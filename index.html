@@ -871,7 +871,19 @@ function buildAssetMap(){
   const map={};
   Object.entries(ASSET_CATALOGUE).forEach(([id,cat])=>{map[id]={id,...cat,buys:[]};});
   Object.entries(userInvestments).forEach(([id,inv])=>{
-    map[id]={...(map[id]||{}),...inv,buys:inv.buys||[],yahoo:(map[id]||{}).yahoo||inv.yahoo||null};
+    const catalogue=ASSET_CATALOGUE[id]||{};
+    map[id]={
+      ...(map[id]||{}),
+      ...inv,
+      // Le catalogue a toujours priorité sur ces champs
+      name:catalogue.name||inv.name||id,
+      ticker:catalogue.ticker||inv.ticker||id,
+      icon:catalogue.icon||inv.icon||'📈',
+      color:catalogue.color||inv.color||'#7F77DD',
+      coingecko:catalogue.coingecko||inv.coingecko||null,
+      yahoo:catalogue.yahoo||inv.yahoo||null,
+      buys:inv.buys||[],
+    };
   });
   return map;
 }
