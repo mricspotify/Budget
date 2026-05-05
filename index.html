@@ -783,6 +783,7 @@ function buildAssetMap(){
   const map={};
   Object.entries(ASSET_CATALOGUE).forEach(([id,cat])=>{map[id]={id,...cat,buys:[]};});
   Object.entries(userInvestments).forEach(([id,inv])=>{
+    if(id==='sp500')return;
     if(ASSET_CATALOGUE[id]){
       map[id].buys=inv.buys||[];
     } else {
