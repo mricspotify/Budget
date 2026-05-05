@@ -147,23 +147,13 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:-apple-sy
 .smb{background:var(--pudim);border:0.5px solid var(--pubor);color:var(--pu);border-radius:7px;padding:5px 10px;font-size:12px;cursor:pointer;font-family:inherit}
 .incrow{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:0.5px solid var(--b)}
 .incrow:last-child{border-bottom:none}
-
-/* ═══════════════════════════════════════
-   INVESTMENT PAGE STYLES
-═══════════════════════════════════════ */
-
-/* Summary */
 .inv-summary{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
 .inv-sum-card{background:var(--s2);border:0.5px solid var(--b);border-radius:12px;padding:12px 14px}
 .inv-sum-lbl{font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.06em;font-weight:500;margin-bottom:4px}
 .inv-sum-val{font-size:18px;font-weight:700;letter-spacing:-.03em}
 .inv-sum-sub{font-size:11px;margin-top:2px}
-
-/* Asset card — full redesign */
 .asset-card{background:var(--s2);border:0.5px solid var(--b);border-radius:16px;margin-bottom:12px;overflow:hidden;cursor:pointer;transition:background .15s;border-left:3px solid var(--asset-color,var(--pu))}
 .asset-card:active{background:var(--s3)}
-
-/* Card top row: icon+name LEFT, price+change+btn RIGHT */
 .ac-top{display:flex;align-items:center;justify-content:space-between;padding:13px 14px 0}
 .ac-left{display:flex;align-items:center;gap:10px}
 .ac-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
@@ -174,55 +164,35 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:-apple-sy
 .ac-price{font-size:13px;font-weight:600}
 .ac-price-chg{font-size:11px;margin-top:1px}
 .ac-add{width:28px;height:28px;border-radius:8px;background:var(--s3);border:0.5px solid var(--b2);color:var(--mu2);font-size:20px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:inherit}
-
-/* Mini sparkline — the red-circled zone */
 .ac-chart{height:110px;margin:8px 0 0;position:relative;display:block}
 .ac-chart canvas{display:block;width:100%!important;height:110px!important}
-
-/* Footer: value + stats bar */
 .ac-footer{padding:8px 14px 13px}
-.ac-value{font-size:22px;font-weight:700;letter-spacing:-.04em;margin-bottom:2px}
-.ac-variation{font-size:12px;margin-bottom:10px;min-height:16px}
 .ac-stats{display:flex;justify-content:space-between;padding-top:9px;border-top:0.5px solid var(--b)}
 .ac-stat-lbl{font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px}
 .ac-stat-val{font-size:12px;font-weight:600}
-
-/* Loading skeleton */
 .price-loading{display:inline-block;width:56px;height:11px;background:var(--s3);border-radius:3px;animation:pulse 1.4s ease-in-out infinite;vertical-align:middle}
 @keyframes pulse{0%,100%{opacity:.35}50%{opacity:.8}}
-
-/* Detail overlay — slides up like category pop */
 .inv-detail-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:100;display:flex;align-items:flex-end;justify-content:center}
 .inv-detail-modal{background:var(--s1);border-radius:20px 20px 0 0;width:100%;max-width:480px;border-top:0.5px solid var(--b2);max-height:92vh;display:flex;flex-direction:column;padding-bottom:max(20px,env(safe-area-inset-bottom))}
 .idm-header{padding:18px 18px 12px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;border-bottom:0.5px solid var(--b)}
 .idm-icon{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:21px;flex-shrink:0}
 .idm-close{width:30px;height:30px;border-radius:8px;background:var(--s3);border:0.5px solid var(--b2);color:var(--mu2);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .idm-body{flex:1;overflow-y:auto;padding:14px 18px}
-
-/* KPI grid inside detail */
 .idm-kpi{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:14px}
 .idm-kpi-card{background:var(--s2);border:0.5px solid var(--b);border-radius:10px;padding:9px 10px 8px}
 .idm-kpi-lbl{font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}
 .idm-kpi-val{font-size:13px;font-weight:700;letter-spacing:-.02em}
-
-/* Timeframe selector */
 .tf-bar{display:flex;gap:6px;margin-bottom:12px}
 .tf-btn{flex:1;background:var(--s3);border:0.5px solid var(--b2);color:var(--mu2);border-radius:8px;padding:6px 4px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .15s;text-align:center}
 .tf-btn.active{background:var(--pudim);border-color:var(--pu);color:var(--pu)}
-
-/* Large chart in detail */
 .idm-chart-wrap{height:160px;margin-bottom:6px;position:relative;display:block}
 .idm-chart-wrap canvas{display:block;width:100%!important;height:160px!important}
-
-/* Buy history rows */
 .idm-buy-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:0.5px solid var(--b)}
 .idm-buy-row:last-child{border-bottom:none}
 .idm-buy-date{font-size:13px;font-weight:500}
 .idm-buy-sub{font-size:11px;color:var(--mu);margin-top:1px}
 .idm-buy-amt{font-size:13px;font-weight:600}
 .idm-buy-pnl{font-size:11px;margin-top:1px}
-
-/* Page */
 #page-inv .inner{padding-bottom:40px}
 .inv-page-title-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
 .inv-refresh-btn{background:var(--s2);border:0.5px solid var(--b2);color:var(--mu2);border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:5px}
@@ -236,7 +206,6 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:-apple-sy
     <div class="topbar-icon">🏦</div>
   </div>
   <div class="pages">
-    <!-- DASHBOARD -->
     <div class="page active" id="page-dash">
       <div class="inner">
         <div class="mnav-row">
@@ -251,11 +220,10 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:-apple-sy
         </div>
         <div id="cat-cards" style="margin-bottom:12px"></div>
         <div class="sec"><div class="sh">Répartition</div><div id="breakdown"></div></div>
-        <div class="sec"><div class="sh">Dépenses — 6 derniers mois</div><div class="chart-wrap"><canvas id="trendChart" role="img" aria-label="Graphique dépenses 6 mois"></canvas></div></div>
-        <div class="sec"><div class="sh">Épargne (reste) — 6 derniers mois</div><div class="chart-wrap"><canvas id="saveChart" role="img" aria-label="Graphique épargne 6 mois"></canvas></div></div>
+        <div class="sec"><div class="sh">Dépenses — 6 derniers mois</div><div class="chart-wrap"><canvas id="trendChart"></canvas></div></div>
+        <div class="sec"><div class="sh">Épargne (reste) — 6 derniers mois</div><div class="chart-wrap"><canvas id="saveChart"></canvas></div></div>
       </div>
     </div>
-    <!-- ADD -->
     <div class="page" id="page-add">
       <div class="inner">
         <div class="ptitle" id="add-title">Nouvelle dépense</div>
@@ -267,7 +235,6 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:-apple-sy
         <button class="btnd" id="cancel-btn" style="display:none" onclick="cancelEdit()">Annuler la modification</button>
       </div>
     </div>
-    <!-- HISTORY -->
     <div class="page" id="page-hist">
       <div class="inner">
         <div class="ptitle">Historique</div>
@@ -275,7 +242,6 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:-apple-sy
         <div id="hist-list"></div>
       </div>
     </div>
-    <!-- SAVINGS -->
     <div class="page" id="page-save">
       <div class="inner">
         <div class="ptitle">Épargne & investissements</div>
@@ -290,10 +256,6 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:-apple-sy
         <button class="btnp" style="margin-top:4px" onclick="openAccountModal()">+ Ajouter un compte</button>
       </div>
     </div>
-
-    <!-- ═══════════════════════════════════
-         INVESTMENTS PAGE
-    ══════════════════════════════════════ -->
     <div class="page" id="page-inv">
       <div class="inner">
         <div class="inv-page-title-row">
@@ -302,8 +264,6 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:-apple-sy
             <span id="refresh-icon">↻</span> Actualiser
           </button>
         </div>
-
-        <!-- KPI SUMMARY -->
         <div class="inv-summary" id="inv-summary">
           <div class="inv-sum-card" style="border-left:2.5px solid var(--te)">
             <div class="inv-sum-lbl">Valeur totale</div>
@@ -316,15 +276,10 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:-apple-sy
             <div class="inv-sum-sub" id="inv-total-pct" style="color:var(--mu)">—</div>
           </div>
         </div>
-
-        <!-- ASSET CARDS -->
         <div id="asset-cards-list"></div>
-
         <button class="btnp" style="margin-top:4px;background:var(--s2);border:0.5px solid var(--b2);color:var(--mu2);font-size:13px;font-weight:500" onclick="openAddAssetModal()">+ Ajouter un actif</button>
       </div>
     </div>
-
-    <!-- SETTINGS -->
     <div class="page" id="page-set">
       <div class="inner">
         <div class="ptitle">Paramètres</div>
@@ -379,8 +334,6 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:-apple-sy
       </div>
     </div>
   </div>
-
-  <!-- NAVIGATION — 6 tabs -->
   <nav class="nav">
     <button class="nb active" onclick="showPage('dash',this)"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Accueil</button>
     <button class="nb" onclick="showPage('add',this)"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>Ajouter</button>
@@ -393,9 +346,6 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:-apple-sy
 <div class="toast" id="toast"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
-// ═══════════════════════════════════════════════
-// EXISTING APP CODE (unchanged)
-// ═══════════════════════════════════════════════
 const MONTHS=['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
 const MS=['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
 const CAT={
@@ -407,12 +357,7 @@ const CAT={
   autre:    {label:'Autre',     icon:'📌',color:'#888780'},
   rentree:  {label:'Rentrée',   icon:'💸',color:'#1D9E75'},
 };
-const SAVINGS=0;
-const RECUR_DEF=[];
-const INC_DEF={};
-const BON_DEF={};
-const EXP_DEF=[];
-
+const RECUR_DEF=[];const INC_DEF={};const BON_DEF={};const EXP_DEF=[];
 let expenses=[],recurItems=[],monthInc={},monthBon={},lastMonth='',offset=0;
 let editId=null,selCatVal=null,histFilt='all',tChart=null,selRecurCat=null;
 const SK='bg11',SR='br10',SI='bi10',SB='bb10',SL='bl10';
@@ -421,7 +366,6 @@ function save(){try{localStorage.setItem(SK,JSON.stringify(expenses));localStora
 function load(){try{expenses=JSON.parse(localStorage.getItem(SK))||EXP_DEF;recurItems=JSON.parse(localStorage.getItem(SR))||RECUR_DEF;monthInc=JSON.parse(localStorage.getItem(SI))||INC_DEF;monthBon=JSON.parse(localStorage.getItem(SB))||BON_DEF;lastMonth=localStorage.getItem(SL)||'';userAccounts=JSON.parse(localStorage.getItem('bg11_acc'))||[];}catch(e){expenses=EXP_DEF;recurItems=RECUR_DEF;monthInc=INC_DEF;monthBon=BON_DEF;userAccounts=[];}}
 function mk(y,m){return y+'-'+String(m+1).padStart(2,'0');}
 function getInc(y,m){return parseFloat(monthInc[mk(y,m)])||0;}
-function getBon(y,m){return (monthBon[mk(y,m)]||[]).reduce((s,b)=>s+b.amount,0);}
 function getBonRemb(y,m){return (monthBon[mk(y,m)]||[]).filter(b=>b.desc.toLowerCase().includes('rembours')).reduce((s,b)=>s+b.amount,0);}
 function getExp(y,m){return expenses.filter(e=>{const d=new Date(e.date);return d.getFullYear()===y&&d.getMonth()===m;});}
 function sumCat(txs){const b={};Object.keys(CAT).forEach(k=>b[k]=0);txs.forEach(e=>{if(b[e.cat]!==undefined)b[e.cat]+=e.amount;else b.autre+=e.amount;});return b;}
@@ -503,8 +447,7 @@ function renderDash(){
   const re=document.getElementById('d-rest');
   re.textContent=fa(rest);re.style.color=rest>=0?'var(--te)':'var(--re)';
   document.getElementById('d-save').textContent=fr(calcSaveTotal());
-  const rentreeTxsAll=txs.filter(e=>e.cat==='rentree');
-  document.getElementById('d-bonuses').innerHTML=rentreeTxsAll.map(b=>`<div style="font-size:11px;color:var(--te);margin-top:3px">+${fa(b.amount)} ${b.desc}</div>`).join('');
+  document.getElementById('d-bonuses').innerHTML=rentreeTxs.map(b=>`<div style="font-size:11px;color:var(--te);margin-top:3px">+${fa(b.amount)} ${b.desc}</div>`).join('');
   const cats=Object.entries(by).filter(([k,v])=>v>0&&k!=='rentree').sort((a,b)=>b[1]-a[1]);
   const cc=document.getElementById('cat-cards');
   if(cats.length===0){cc.innerHTML='';}else{
@@ -523,9 +466,7 @@ function openCatPop(cat,y,m){
   const txs=getExp(y,m).filter(e=>e.cat===cat).sort((a,b)=>new Date(b.date)-new Date(a.date));
   const depTxs=txs.filter(e=>e.cat!=='rentree');
   const total=depTxs.reduce((s,e)=>s+e.amount,0);
-  const html='<div class="overlay" id="catpop" onclick="if(event.target.id===\'catpop\')this.remove()"><div class="modal"><div style="display:flex;align-items:center;gap:10px;margin-bottom:16px"><span style="font-size:24px">'+c.icon+'</span><div><div style="font-size:17px;font-weight:600">'+c.label+' — '+MONTHS[m]+' '+y+'</div><div style="font-size:12px;color:var(--mu)">Total : '+fa(total)+'</div></div></div><div style="max-height:55vh;overflow-y:auto">'+
-    (txs.length===0?'<div style="text-align:center;color:var(--mu);padding:20px">Aucune dépense</div>':txs.map(e=>{const d=new Date(e.date);return '<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:0.5px solid var(--b)"><div><div style="font-size:13px">'+e.desc+'</div><div style="font-size:11px;color:var(--mu)">'+d.getDate().toString().padStart(2,'0')+' '+MS[d.getMonth()]+'</div></div><div style="font-size:13px;font-weight:600;color:var(--co)">'+fa(e.amount)+'</div></div>';}).join(''))+
-  '</div><button onclick="document.getElementById(\'catpop\').remove()" style="width:100%;background:var(--s3);border:none;color:var(--mu2);border-radius:12px;padding:13px;font-size:15px;cursor:pointer;font-family:inherit;margin-top:12px">Fermer</button></div></div>';
+  const html='<div class="overlay" id="catpop" onclick="if(event.target.id===\'catpop\')this.remove()"><div class="modal"><div style="display:flex;align-items:center;gap:10px;margin-bottom:16px"><span style="font-size:24px">'+c.icon+'</span><div><div style="font-size:17px;font-weight:600">'+c.label+' — '+MONTHS[m]+' '+y+'</div><div style="font-size:12px;color:var(--mu)">Total : '+fa(total)+'</div></div></div><div style="max-height:55vh;overflow-y:auto">'+(txs.length===0?'<div style="text-align:center;color:var(--mu);padding:20px">Aucune dépense</div>':txs.map(e=>{const d=new Date(e.date);return '<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:0.5px solid var(--b)"><div><div style="font-size:13px">'+e.desc+'</div><div style="font-size:11px;color:var(--mu)">'+d.getDate().toString().padStart(2,'0')+' '+MS[d.getMonth()]+'</div></div><div style="font-size:13px;font-weight:600;color:var(--co)">'+fa(e.amount)+'</div></div>';}).join(''))+'</div><button onclick="document.getElementById(\'catpop\').remove()" style="width:100%;background:var(--s3);border:none;color:var(--mu2);border-radius:12px;padding:13px;font-size:15px;cursor:pointer;font-family:inherit;margin-top:12px">Fermer</button></div></div>';
   document.body.insertAdjacentHTML('beforeend',html);
 }
 
@@ -546,18 +487,12 @@ function renderTrend(cy,cm){
     depData.push(parseFloat(dep.toFixed(2)));
     saveData.push(parseFloat(rest.toFixed(2)));
   }
-  const chartOpts=(data,color,negColor)=>({
-    type:'bar',
-    data:{labels,datasets:[{data,backgroundColor:data.map(v=>v>=0?color:(negColor||'rgba(226,75,74,0.7)')),borderRadius:6,borderSkipped:false}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:'rgba(238,238,245,0.38)',font:{size:11}},border:{display:false}},y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'rgba(238,238,245,0.38)',font:{size:10},callback:v=>v+'€'},border:{display:false}}}}
-  });
+  const chartOpts=(data,color,negColor)=>({type:'bar',data:{labels,datasets:[{data,backgroundColor:data.map(v=>v>=0?color:(negColor||'rgba(226,75,74,0.7)')),borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:'rgba(238,238,245,0.38)',font:{size:11}},border:{display:false}},y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'rgba(238,238,245,0.38)',font:{size:10},callback:v=>v+'€'},border:{display:false}}}}});
   try{if(tChart)tChart.destroy();tChart=new Chart(canvas.getContext('2d'),chartOpts(depData,'rgba(127,119,221,0.75)'));}catch(e){}
   try{if(window.sChart)window.sChart.destroy();window.sChart=new Chart(canvas2.getContext('2d'),chartOpts(saveData,'rgba(29,158,117,0.75)','rgba(226,75,74,0.7)'));}catch(e){}
 }
 
-function buildCatGrid(){
-  document.getElementById('cat-grid').innerHTML=Object.entries(CAT).map(([k,c])=>'<button class="catb" onclick="pickCat(this,\''+k+'\')"><span class="catic">'+c.icon+'</span>'+c.label+'</button>').join('');
-}
+function buildCatGrid(){document.getElementById('cat-grid').innerHTML=Object.entries(CAT).map(([k,c])=>'<button class="catb" onclick="pickCat(this,\''+k+'\')"><span class="catic">'+c.icon+'</span>'+c.label+'</button>').join('');}
 function pickCat(btn,cat){document.querySelectorAll('#cat-grid .catb').forEach(b=>b.classList.remove('sel'));btn.classList.add('sel');selCatVal=cat;}
 function resetForm(){
   editId=null;selCatVal=null;
@@ -614,17 +549,14 @@ function renderHist(){
     const inc=getInc(g.y,g.m);
     const eco=inc>0?Math.max(0,inc+sortedRentreeAmt-total):null;
     const borderColor=eco!==null&&eco>0?'var(--te)':'var(--co)';
-    return '<div style="margin-bottom:18px"><div class="mhrow"><span class="mhtitle">'+g.lbl+'</span><span class="mhmeta">'+fa(total)+(eco!==null?' · <span style="color:var(--te)">'+fa(eco)+' épargnés</span>':'')+'</span></div><div class="txlist" style="border-left:2.5px solid '+borderColor+'">'+
-      sorted.map(e=>{const cfg=CAT[e.cat]||CAT.autre;const d=new Date(e.date);return '<div class="txrow"><div class="txic" style="background:'+cfg.color+'22">'+cfg.icon+'</div><div class="txinfo"><div class="txname">'+e.desc+'</div><div class="txdate">'+d.getDate().toString().padStart(2,'0')+' '+MS[d.getMonth()]+'</div></div><div style="display:flex;align-items:center;gap:6px"><span class="txamt">'+fa(e.amount)+'</span><button class="txmenu" onclick="openAS(\''+e.id+'\',event)">···</button></div></div>';}).join('')+
-      '<div style="display:flex;justify-content:space-between;padding:8px 13px;font-size:11px;color:var(--mu);border-top:0.5px solid var(--b)"><span>'+sorted.length+' transaction'+(sorted.length>1?'s':'')+'</span><span>'+fa(total)+'</span></div></div></div>';
+    return '<div style="margin-bottom:18px"><div class="mhrow"><span class="mhtitle">'+g.lbl+'</span><span class="mhmeta">'+fa(total)+(eco!==null?' · <span style="color:var(--te)">'+fa(eco)+' épargnés</span>':'')+'</span></div><div class="txlist" style="border-left:2.5px solid '+borderColor+'">'+sorted.map(e=>{const cfg=CAT[e.cat]||CAT.autre;const d=new Date(e.date);return '<div class="txrow"><div class="txic" style="background:'+cfg.color+'22">'+cfg.icon+'</div><div class="txinfo"><div class="txname">'+e.desc+'</div><div class="txdate">'+d.getDate().toString().padStart(2,'0')+' '+MS[d.getMonth()]+'</div></div><div style="display:flex;align-items:center;gap:6px"><span class="txamt">'+fa(e.amount)+'</span><button class="txmenu" onclick="openAS(\''+e.id+'\',event)">···</button></div></div>';}).join('')+'<div style="display:flex;justify-content:space-between;padding:8px 13px;font-size:11px;color:var(--mu);border-top:0.5px solid var(--b)"><span>'+sorted.length+' transaction'+(sorted.length>1?'s':'')+'</span><span>'+fa(total)+'</span></div></div></div>';
   }).join('');
 }
 
 function renderSave(){
   const typeIcons={banque:'🏦',invest:'📈',crypto:'₿',epargne:'💳',cash:'💵',autre:'🔮'};
   const typeColors={banque:'var(--bl)',invest:'var(--am)',crypto:'#F7931A',epargne:'var(--te)',cash:'var(--te)',autre:'var(--mu2)'};
-  let resteTotal=0;
-  const resteParMois=[];
+  let resteTotal=0;const resteParMois=[];
   getAllMonths().forEach(key=>{
     const[y,m]=key.split('-').map(Number);const mo=m-1;
     const txs=getExp(y,mo);
@@ -654,16 +586,13 @@ function renderSave(){
   document.getElementById('save-next').textContent=fr(goal);
   window._saveData={resteParMois,rentreesMap};
   function makeCard(icon,name,sub,amount,color,onclickStr,menuStr=''){
-    return '<div class="sav-card" onclick="'+onclickStr+'" style="--card-color:'+color+'">'+
-      '<div class="sav-left"><div class="sav-icon" style="background:'+color+'22;color:'+color+'">'+icon+'</div>'+
-      '<div class="sav-info"><div class="sav-name">'+name+'</div><div class="sav-sub">'+sub+'</div></div></div>'+
-      '<div class="sav-right"><div class="sav-amt" style="color:'+color+'">'+fa(amount)+'</div>'+menuStr+'</div></div>';
+    return '<div class="sav-card" onclick="'+onclickStr+'" style="--card-color:'+color+'"><div class="sav-left"><div class="sav-icon" style="background:'+color+'22;color:'+color+'">'+icon+'</div><div class="sav-info"><div class="sav-name">'+name+'</div><div class="sav-sub">'+sub+'</div></div></div><div class="sav-right"><div class="sav-amt" style="color:'+color+'">'+fa(amount)+'</div>'+menuStr+'</div></div>';
   }
   let html='';
   html+=makeCard('💵','Reste accumulé','Cumul mensuel · '+resteParMois.length+' mois',resteTotal,'var(--te)',"openSavePop('reste')");
   Object.entries(rentreesMap).sort((a,b)=>b[1].total-a[1].total).forEach(([desc,data])=>{
     const safe=desc.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-    const icon=desc.toLowerCase().includes('héritage')||desc.toLowerCase().includes('heritage')?'🏛️':desc.toLowerCase().includes('intér')||desc.toLowerCase().includes('inter')?'💹':desc.toLowerCase().includes('rembours')?'🔄':'💸';
+    const icon=desc.toLowerCase().includes('héritage')||desc.toLowerCase().includes('heritage')?'🏛️':desc.toLowerCase().includes('intér')||desc.toLowerCase().includes('inter')?'💹':'💸';
     html+=makeCard(icon,desc,'Rentrée exceptionnelle · '+data.items.length+' entrée'+(data.items.length>1?'s':''),data.total,'var(--bl)',"openSavePop('rentree','"+safe+"')");
   });
   userAccounts.forEach((a,i)=>{
@@ -683,7 +612,7 @@ function openSavePop(type,desc){
   const d=window._saveData||{};
   let title='',sub='',items=[],total=0,color='var(--pu)';
   if(type==='reste'){title='💵 Reste accumulé';sub='Salaire − dépenses de chaque mois';color='var(--te)';const sorted=(d.resteParMois||[]).slice().reverse();total=sorted.reduce((s,r)=>s+r.reste,0);items=sorted.map(({y,m,reste})=>({label:MONTHS[m]+' '+y,sub:'Salaire − dépenses fixes/courantes',amt:'+'+fa(reste),color:'var(--te)'}));}
-  else if(type==='rentree'){const data=(d.rentreesMap||{})[desc]||{total:0,items:[]};const icon=desc.toLowerCase().includes('héritage')||desc.toLowerCase().includes('heritage')?'🏛️':desc.toLowerCase().includes('intér')||desc.toLowerCase().includes('inter')?'💹':desc.toLowerCase().includes('rembours')?'🔄':'💸';title=icon+' '+desc;sub='Rentrée exceptionnelle';color='var(--bl)';total=data.total;items=[...data.items].sort((a,b)=>b.date.localeCompare(a.date)).map(it=>({label:it.label,sub:desc,amt:'+'+fa(it.amount),color:'var(--bl)'}));}
+  else if(type==='rentree'){const data=(d.rentreesMap||{})[desc]||{total:0,items:[]};const icon=desc.toLowerCase().includes('héritage')||desc.toLowerCase().includes('heritage')?'🏛️':desc.toLowerCase().includes('intér')||desc.toLowerCase().includes('inter')?'💹':'💸';title=icon+' '+desc;sub='Rentrée exceptionnelle';color='var(--bl)';total=data.total;items=[...data.items].sort((a,b)=>b.date.localeCompare(a.date)).map(it=>({label:it.label,sub:desc,amt:'+'+fa(it.amount),color:'var(--bl)'}));}
   else if(type==='compte'){const a=userAccounts[desc];if(!a)return;const typeIcons2={banque:'🏦',invest:'📈',crypto:'₿',epargne:'💳',cash:'💵',autre:'🔮'};const typeColors2={banque:'var(--bl)',invest:'var(--am)',crypto:'#F7931A',epargne:'var(--te)',cash:'var(--te)',autre:'var(--mu2)'};title=(typeIcons2[a.type]||'🔮')+' '+a.name;sub='Compte '+a.type;color=typeColors2[a.type]||'var(--pu)';total=a.balance;items=[{label:'Solde actuel',sub:'Saisi manuellement',amt:fa(a.balance),color}];}
   const rows=items.length===0?'<div style="text-align:center;color:var(--mu);padding:32px 0;font-size:13px">Aucune entrée</div>':items.map(it=>'<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:0.5px solid var(--b)"><div><div style="font-size:13px;font-weight:500;color:var(--tx)">'+it.label+'</div><div style="font-size:11px;color:var(--mu);margin-top:2px">'+it.sub+'</div></div><span style="font-size:13px;font-weight:600;color:'+it.color+'">'+it.amt+'</span></div>').join('');
   document.body.insertAdjacentHTML('beforeend','<div class="overlay" id="savepop" onclick="if(event.target.id===\'savepop\')this.remove()"><div class="modal" style="max-height:82vh;display:flex;flex-direction:column;padding-bottom:max(20px,env(safe-area-inset-bottom))"><div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:2px"><div style="font-size:18px;font-weight:700;letter-spacing:-.02em">'+title+'</div><span style="font-size:17px;font-weight:700;color:'+color+'">'+fa(total)+'</span></div><div style="font-size:12px;color:var(--mu);margin-bottom:14px">'+sub+' · '+items.length+' entrée'+(items.length>1?'s':'')+'</div><div style="overflow-y:auto;flex:1;margin:0 -2px;padding:0 2px">'+rows+'</div><button onclick="document.getElementById(\'savepop\').remove()" style="width:100%;background:var(--s3);border:none;color:var(--mu2);border-radius:12px;padding:13px;font-size:15px;cursor:pointer;font-family:inherit;margin-top:14px;flex-shrink:0">Fermer</button></div></div>');
@@ -708,14 +637,12 @@ function editInc(key,cur){
   setTimeout(()=>document.getElementById('salin').focus(),100);
 }
 function saveInc(key){const v=parseFloat(document.getElementById('salin').value);if(!v||v<=0){showToast('Montant invalide');return;}monthInc[key]=v;save();document.getElementById('salover').remove();renderSet();renderDash();showToast('Revenu modifié ✓');}
-
 function openSalModal(fromSet){
   const now=new Date();const y=now.getFullYear(),m=now.getMonth();const ex=getInc(y,m);
   document.body.insertAdjacentHTML('beforeend','<div class="saloverlay" id="salover" onclick="if(event.target.id===\'salover\')this.remove()"><div class="salmodal"><div class="salemoji">💰</div><div class="saltitle">'+(fromSet?'Ajouter un revenu':'Nouveau mois !')+'</div><div class="salsub">'+MONTHS[m]+' '+y+' — Quel est ton salaire ?</div><input class="salinput" type="number" id="salin" placeholder="1500" inputmode="decimal" value="'+(ex||'')+'"><div class="salhint">Modifiable à tout moment dans Réglages</div><button class="btnp" onclick="saveSal('+y+','+m+')">Confirmer</button>'+(fromSet?'<button onclick="document.getElementById(\'salover\').remove()" style="width:100%;background:none;border:none;color:var(--mu);padding:12px;cursor:pointer;font-family:inherit;font-size:14px;margin-top:4px">Annuler</button>':'')+'</div></div>');
   setTimeout(()=>document.getElementById('salin').focus(),100);
 }
 function saveSal(y,m){const v=parseFloat(document.getElementById('salin').value);if(!v||v<=0){showToast('Montant invalide');return;}monthInc[mk(y,m)]=v;save();document.getElementById('salover').remove();renderDash();renderSet();showToast('Revenu enregistré ✓');}
-
 function openBonusModal(){
   const now=new Date();
   document.body.insertAdjacentHTML('beforeend','<div class="overlay" id="bonpop" onclick="if(event.target.id===\'bonpop\')this.remove()"><div class="modal"><div class="modal-title">Nouvelle rentrée d\'argent</div><div class="fsec" style="margin-bottom:10px"><label class="fl">Description</label><input class="fi" type="text" id="bon-desc" placeholder="Ex: Remboursement"></div><div class="fsec" style="margin-bottom:10px"><label class="fl">Montant (€)</label><input class="fi" type="number" id="bon-amt" placeholder="0.00" inputmode="decimal"></div><div class="fsec" style="margin-bottom:10px"><label class="fl">Mois (AAAA-MM)</label><input class="fi" type="text" id="bon-month" placeholder="'+(now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0'))+'" value="'+(now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0'))+'"></div><button class="btnp" onclick="saveBonus()">Ajouter</button><button onclick="document.getElementById(\'bonpop\').remove()" style="width:100%;background:none;border:none;color:var(--mu);padding:12px;cursor:pointer;font-family:inherit;font-size:14px;margin-top:4px">Annuler</button></div></div>');
@@ -729,7 +656,6 @@ function saveBonus(){
   monthBon[month].push({desc,amount:amt});
   save();document.getElementById('bonpop').remove();renderSet();renderDash();showToast('Rentrée ajoutée ✓');
 }
-
 function openRecurModal(){
   selRecurCat=null;
   document.body.insertAdjacentHTML('beforeend','<div class="overlay" id="recpop" onclick="if(event.target.id===\'recpop\')this.remove()"><div class="modal"><div class="modal-title">Nouvelle récurrence</div><div class="fsec" style="margin-bottom:10px"><label class="fl">Description</label><input class="fi" type="text" id="rec-desc" placeholder="Ex: Netflix"></div><div class="fsec" style="margin-bottom:10px"><label class="fl">Montant (€)</label><input class="fi" type="number" id="rec-amt" placeholder="0.00" inputmode="decimal"></div><div class="fsec" style="margin-bottom:10px"><label class="fl">Catégorie</label><div class="catg">'+Object.entries(CAT).map(([k,c])=>'<button class="catb" onclick="pickRCat(this,\''+k+'\')"><span class="catic">'+c.icon+'</span>'+c.label+'</button>').join('')+'</div></div><button class="btnp" onclick="saveRecur()">Ajouter</button><button onclick="document.getElementById(\'recpop\').remove()" style="width:100%;background:none;border:none;color:var(--mu);padding:12px;cursor:pointer;font-family:inherit;font-size:14px;margin-top:4px">Annuler</button></div></div>');
@@ -739,20 +665,16 @@ function saveRecur(){const desc=document.getElementById('rec-desc').value.trim()
 function openRecurAS(id,ev){ev.stopPropagation();document.body.insertAdjacentHTML('beforeend','<div class="as" id="xras" onclick="if(event.target.classList.contains(\'as-bg\'))document.getElementById(\'xras\').remove()"><div class="as-bg"></div><div class="as-box"><div class="as-item" style="color:var(--re)" onclick="document.getElementById(\'xras\').remove();delRecur(\''+id+'\')"><span style="font-size:18px">🗑️</span><span>Supprimer</span></div><button class="as-cancel" onclick="document.getElementById(\'xras\').remove()">Annuler</button></div></div>');}
 function delRecur(id){if(!confirm('Supprimer ?'))return;recurItems=recurItems.filter(r=>r.id!==id);save();renderSet();}
 function toggleRecur(id){const r=recurItems.find(x=>x.id===id);if(r)r.active=!r.active;save();renderSet();}
-
 function resetAll(){if(!confirm('Supprimer TOUTES les données ?'))return;expenses=EXP_DEF;monthInc=INC_DEF;monthBon=BON_DEF;lastMonth='';recurItems=RECUR_DEF;userAccounts=[];save();saveAccounts();renderDash();renderSet();renderSave();showToast('Réinitialisé');}
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
-
 function openInvAS(idx){
   const a=userAccounts[idx];
   document.body.insertAdjacentHTML('beforeend','<div class="as" id="xias" onclick="if(event.target.classList.contains(\'as-bg\'))document.getElementById(\'xias\').remove()"><div class="as-bg"></div><div class="as-box"><div style="text-align:center;padding:6px 8px 12px;font-size:13px;color:var(--mu);border-bottom:0.5px solid var(--b);margin-bottom:4px">'+a.name+'</div><div class="as-item" onclick="document.getElementById(\'xias\').remove();openAccountModal('+idx+')"><span style="font-size:18px">✏️</span><span>Modifier</span></div><div class="as-item" style="color:var(--re)" onclick="document.getElementById(\'xias\').remove();deleteAccount('+idx+')"><span style="font-size:18px">🗑️</span><span>Supprimer</span></div><button class="as-cancel" onclick="document.getElementById(\'xias\').remove()">Annuler</button></div></div>');
 }
-
 function toggleSection(id){
   const el=document.getElementById(id);const arrow=document.getElementById(id.replace('body','arrow'));
   if(!el)return;const open=el.style.display!=='none';el.style.display=open?'none':'block';if(arrow)arrow.textContent=open?'▸':'▾';
 }
-
 function exportData(){
   const data={expenses,monthInc,monthBon,recurItems,accounts:userAccounts,investments:userInvestments};
   const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
@@ -779,10 +701,8 @@ function importData(input){
   };
   reader.readAsText(file);input.value='';
 }
-
 let userAccounts=[];
 function saveAccounts(){try{localStorage.setItem('bg11_acc',JSON.stringify(userAccounts));}catch(e){}}
-
 function openAccountModal(editIdx){
   const acc=editIdx!==undefined?userAccounts[editIdx]:null;
   document.body.insertAdjacentHTML('beforeend','<div class="overlay" id="accpop" onclick="if(event.target.id===\'accpop\')this.remove()"><div class="modal"><div class="modal-title">'+(acc?'Modifier le compte':'Nouveau compte')+'</div><div class="fsec" style="margin-bottom:10px"><label class="fl">Nom du compte</label><input class="fi" type="text" id="acc-name" placeholder="Ex: BNP, Binance, Livret A" value="'+(acc?acc.name:'')+'"></div><div class="fsec" style="margin-bottom:10px"><label class="fl">Solde actuel (€)</label><input class="fi" type="number" id="acc-bal" placeholder="0.00" inputmode="decimal" value="'+(acc?acc.balance:'')+'"></div><div class="fsec" style="margin-bottom:10px"><label class="fl">Type</label><div class="catg" style="grid-template-columns:repeat(3,1fr)">'+['🏦 Banque','📈 Invest.','₿ Crypto','💳 Épargne','💵 Cash','🔮 Autre'].map((t,i)=>{const types=['banque','invest','crypto','epargne','cash','autre'];const sel=acc&&acc.type===types[i]?' sel':'';return '<button class="catb'+sel+'" onclick="pickAccType(this,\''+types[i]+'\')"><span class="catic">'+t.split(' ')[0]+'</span>'+t.split(' ')[1]+'</button>';}).join('')+'</div></div><button class="btnp" onclick="saveAccount('+(editIdx!==undefined?editIdx:'undefined')+')">Enregistrer</button>'+(acc?'<button class="btnd" onclick="deleteAccount('+editIdx+')">Supprimer ce compte</button>':'')+'<button onclick="document.getElementById(\'accpop\').remove()" style="width:100%;background:none;border:none;color:var(--mu);padding:12px;cursor:pointer;font-family:inherit;font-size:14px;margin-top:4px">Annuler</button></div></div>');
@@ -801,7 +721,6 @@ function deleteAccount(idx){
   if(!confirm('Supprimer ce compte ?'))return;userAccounts.splice(idx,1);saveAccounts();
   try{document.getElementById('accpop').remove();}catch(e){}renderSave();showToast('Compte supprimé');
 }
-
 function editBonus(key,idx){
   const b=monthBon[key][idx];const[y,m]=key.split('-');const lbl=MONTHS[parseInt(m)-1]+' '+y;
   document.body.insertAdjacentHTML('beforeend','<div class="saloverlay" id="bonover" onclick="if(event.target.id===\'bonover\')this.remove()"><div class="salmodal"><div class="salemoji">💸</div><div class="saltitle">Modifier la rentrée</div><div class="salsub">'+lbl+'</div><div class="fsec" style="margin-bottom:10px"><label class="fl">Description</label><input class="fi" type="text" id="bedit-desc" value="'+b.desc+'"></div><div class="fsec" style="margin-bottom:10px"><label class="fl">Montant (€)</label><input class="fi" type="number" id="bedit-amt" inputmode="decimal" value="'+b.amount+'"></div><button class="btnp" onclick="saveBonusEdit(\''+key+'\','+idx+')">Confirmer</button><button class="btnd" onclick="deleteBonusEdit(\''+key+'\','+idx+')">Supprimer</button><button onclick="document.getElementById(\'bonover\').remove()" style="width:100%;background:none;border:none;color:var(--mu);padding:12px;cursor:pointer;font-family:inherit;font-size:14px;margin-top:4px">Annuler</button></div></div>');
@@ -813,7 +732,6 @@ function deleteBonusEdit(key,idx){if(!confirm('Supprimer cette rentrée ?'))retu
 const SUPA_URL='https://wkpdvqlnolnaqsukziez.supabase.co';
 const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndrcGR2cWxub2xuYXFzdWt6aWV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwNDAwMTAsImV4cCI6MjA5MTYxNjAxMH0.fPxl96RJbj0UyZ1Zf_1djZJ7xRTt69u02082_AwhS6Q';
 const SUPA_ROW_ID=1;
-
 async function supaSave(){
   try{
     const payload={id:SUPA_ROW_ID,expenses:JSON.stringify(expenses),month_inc:JSON.stringify(monthInc),month_bon:JSON.stringify(monthBon),recur_items:JSON.stringify(recurItems),accounts:JSON.stringify(userAccounts),last_month:lastMonth,investments:JSON.stringify(userInvestments)};
@@ -821,7 +739,6 @@ async function supaSave(){
     if(!r.ok)console.warn('supaSave error',r.status);
   }catch(e){console.warn('supaSave failed',e);}
 }
-
 async function supaLoad(){
   try{
     const r=await fetch(SUPA_URL+'/rest/v1/budget_data?id=eq.'+SUPA_ROW_ID,{headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});
@@ -844,20 +761,15 @@ async function supaLoad(){
 // ═══════════════════════════════════════════════
 
 const ASSET_CATALOGUE = {
-  btc:  {name:'Bitcoin', ticker:'BTC', icon:'₿',  color:'#F7931A',coingecko:'bitcoin'},
-  sp500:{name:'S&P 500', ticker:'VUAA', icon:'📊',color:'#E24B4A',coingecko:null,yahoo:'VUAA.DE'},
-  eth:  {name:'Ethereum',ticker:'ETH', icon:'⟠',  color:'#627EEA',coingecko:'ethereum'},
-  sol:  {name:'Solana',  ticker:'SOL', icon:'◎',  color:'#9945FF',coingecko:'solana'},
+  btc: {name:'Bitcoin', ticker:'BTC', icon:'₿',  color:'#F7931A', coingecko:'bitcoin'},
+  eth: {name:'Ethereum',ticker:'ETH', icon:'⟠',  color:'#627EEA', coingecko:'ethereum'},
+  sol: {name:'Solana',  ticker:'SOL', icon:'◎',  color:'#9945FF', coingecko:'solana'},
 };
 
-let userInvestments = {};
-// marketData[coingeckoId] = { price, changePct24h, history:{tf:{prices,labels}} }
-let marketData = {};
-let pricesLoaded = false;
-let invMiniCharts = {};
-
-const AV_KEY = 'WREUUDBZ2CFB44AI';
-const TD_KEY = 'b8bc391f45a8448eaf9c091824218310';
+let userInvestments={};
+let marketData={};
+let pricesLoaded=false;
+let invMiniCharts={};
 
 function saveInvestments(){try{localStorage.setItem('bg11_inv',JSON.stringify(userInvestments));}catch(e){}}
 function loadInvestments(){try{const s=localStorage.getItem('bg11_inv');if(s)userInvestments=JSON.parse(s);}catch(e){}}
@@ -871,19 +783,11 @@ function buildAssetMap(){
   const map={};
   Object.entries(ASSET_CATALOGUE).forEach(([id,cat])=>{map[id]={id,...cat,buys:[]};});
   Object.entries(userInvestments).forEach(([id,inv])=>{
-    const catalogue=ASSET_CATALOGUE[id]||{};
-    map[id]={
-      ...(map[id]||{}),
-      ...inv,
-      // Le catalogue a toujours priorité sur ces champs
-      name:catalogue.name||inv.name||id,
-      ticker:catalogue.ticker||inv.ticker||id,
-      icon:catalogue.icon||inv.icon||'📈',
-      color:catalogue.color||inv.color||'#7F77DD',
-      coingecko:catalogue.coingecko||inv.coingecko||null,
-      yahoo:catalogue.yahoo||inv.yahoo||null,
-      buys:inv.buys||[],
-    };
+    if(ASSET_CATALOGUE[id]){
+      map[id].buys=inv.buys||[];
+    } else {
+      map[id]={id,...inv,buys:inv.buys||[]};
+    }
   });
   return map;
 }
@@ -893,7 +797,6 @@ function calcAssetStats(asset){
   const totalInvested=buys.reduce((s,b)=>s+b.amountEur,0);
   const totalQty=buys.reduce((s,b)=>s+(b.qty||0),0);
   const avgPrice=totalQty>0?buys.reduce((s,b)=>s+(b.pricePerUnit*(b.qty||0)),0)/totalQty:0;
-  // Use coingecko id for crypto, asset id for others (sp500)
   const mdKey=asset.coingecko||asset.id;
   const md=marketData[mdKey]||null;
   const currentPrice=md?md.price:null;
@@ -903,7 +806,6 @@ function calcAssetStats(asset){
   return{totalInvested,totalQty,avgPrice,currentPrice,currentValue,pnlEur,pnlPct,md};
 }
 
-// ── Get chart data for any asset ──
 function getChartData(asset,tf){
   const mdKey=asset.coingecko||asset.id;
   const md=marketData[mdKey];
@@ -911,20 +813,19 @@ function getChartData(asset,tf){
     const hist=md.history[tf]||md.history['1M']||md.history['1S']||null;
     if(hist&&hist.prices&&hist.prices.length>1)return hist;
   }
-  // Fallback → buy history (for manual assets or when API not loaded)
   const buys=(asset.buys||[]).filter(b=>b.pricePerUnit>0).sort((a,b)=>new Date(a.date)-new Date(b.date));
   if(buys.length===0)return null;
   const src=buys.length===1?[buys[0],buys[0]]:buys;
-  const prices=src.map(b=>b.pricePerUnit);
-  const labels=src.map((b,i)=>{
-    if(buys.length===1)return i===0?'Achat':'Auj.';
-    const d=new Date(b.date);
-    return('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2);
-  });
-  return{prices,labels};
+  return{
+    prices:src.map(b=>b.pricePerUnit),
+    labels:src.map((b,i)=>{
+      if(buys.length===1)return i===0?'Achat':'Auj.';
+      const d=new Date(b.date);
+      return('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2);
+    })
+  };
 }
 
-// ── Fetch CoinGecko prices + 1M history ──
 async function fetchCryptoPrices(){
   const cgIds=[...new Set([
     ...Object.values(ASSET_CATALOGUE).map(a=>a.coingecko).filter(Boolean),
@@ -941,11 +842,9 @@ async function fetchCryptoPrices(){
       if(!marketData[coin.id])marketData[coin.id]={history:{}};
       marketData[coin.id].price=coin.current_price;
       marketData[coin.id].changePct24h=coin.price_change_percentage_24h||0;
-      // Build 1S from sparkline with real labels
       const sp=(coin.sparkline_in_7d&&coin.sparkline_in_7d.price)||[];
       if(sp.length>1){
-        const now=Date.now();
-        const step=7*24*3600*1000/sp.length;
+        const now=Date.now();const step=7*24*3600*1000/sp.length;
         const stride=Math.max(1,Math.floor(sp.length/50));
         const prices=[],labels=[];
         for(let i=0;i<sp.length;i+=stride){
@@ -956,7 +855,6 @@ async function fetchCryptoPrices(){
         marketData[coin.id].history['1S']={prices,labels};
       }
     });
-    // Fetch 1M for all coins — AWAITED
     await Promise.allSettled(cgIds.map(id=>fetchCoinHistory(id,'1M')));
   }catch(e){console.warn('CoinGecko failed',e);}
 }
@@ -966,8 +864,7 @@ async function fetchCoinHistory(cgId,tf){
   const days={'1S':7,'1M':30,'1A':365,'Global':1825}[tf]||30;
   try{
     const url=`https://api.coingecko.com/api/v3/coins/${cgId}/market_chart?vs_currency=eur&days=${days}`;
-    const r=await fetch(url);
-    if(!r.ok)return;
+    const r=await fetch(url);if(!r.ok)return;
     const data=await r.json();
     const raw=data.prices||[];
     const JOURS=['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
@@ -982,7 +879,7 @@ async function fetchCoinHistory(cgId,tf){
     }
     if(!marketData[cgId])marketData[cgId]={history:{}};
     marketData[cgId].history[tf]={prices,labels};
-  }catch(e){console.warn('history fetch failed',cgId,tf,e);}
+  }catch(e){console.warn('fetchCoinHistory failed',cgId,tf,e);}
 }
 
 async function refreshPrices(){
@@ -990,7 +887,7 @@ async function refreshPrices(){
   const icon=document.getElementById('refresh-icon');
   if(btn)btn.disabled=true;
   if(icon)icon.style.animation='spin 1s linear infinite';
-  await Promise.allSettled([fetchCryptoPrices(), fetchSP500()]);
+  await fetchCryptoPrices();
   pricesLoaded=true;
   if(btn)btn.disabled=false;
   if(icon)icon.style.animation='';
@@ -998,72 +895,6 @@ async function refreshPrices(){
   showToast('Prix actualisés ✓');
 }
 
-// ── Fetch S&P 500 via Alpha Vantage ──
-async function fetchSP500(){
-  try{
-    const BASE='https://query1.finance.yahoo.com/v8/finance/chart/VUAA.DE';
-    const RANGES={
-      '1S': {range:'5d',  interval:'1d'},
-      '1M': {range:'1mo', interval:'1d'},
-      '1A': {range:'1y',  interval:'1d'},
-      'Global':{range:'max',interval:'1wk'},
-    };
-    // On charge 1M en premier pour avoir le prix actuel rapidement
-    const r=await fetch(`${BASE}?interval=1d&range=1mo`);
-    if(!r.ok)return;
-    const d=await r.json();
-    const meta=d?.chart?.result?.[0]?.meta;
-    const result=d?.chart?.result?.[0];
-    if(!meta||!result)return;
-    if(!marketData['sp500'])marketData['sp500']={history:{}};
-    // Prix actuel + variation 24h
-    marketData['sp500'].price=meta.regularMarketPrice;
-    const prev=meta.chartPreviousClose;
-    marketData['sp500'].changePct24h=prev?((meta.regularMarketPrice-prev)/prev)*100:0;
-    // Construire l'historique 1M depuis ce premier appel
-    const timestamps=result.timestamp||[];
-    const closes=result.indicators?.quote?.[0]?.close||[];
-    const prices1M=[],labels1M=[];
-    timestamps.forEach((ts,i)=>{
-      if(closes[i]==null)return;
-      prices1M.push(closes[i]);
-      const dt=new Date(ts*1000);
-      labels1M.push(('0'+dt.getDate()).slice(-2)+'/'+('0'+(dt.getMonth()+1)).slice(-2));
-    });
-    if(prices1M.length>1)marketData['sp500'].history['1M']={prices:prices1M,labels:labels1M};
-    // Charger les autres ranges en parallèle
-    await Promise.allSettled(
-      Object.entries(RANGES).filter(([k])=>k!=='1M').map(([tf,cfg])=>fetchYahooHistory('sp500','VUAA.DE',tf,cfg.range,cfg.interval))
-    );
-  }catch(e){console.warn('fetchSP500 failed',e);}
-}
-
-async function fetchYahooHistory(assetKey,symbol,tf,range,interval){
-  try{
-    const r=await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=${interval}&range=${range}`);
-    if(!r.ok)return;
-    const d=await r.json();
-    const result=d?.chart?.result?.[0];
-    if(!result)return;
-    const timestamps=result.timestamp||[];
-    const closes=result.indicators?.quote?.[0]?.close||[];
-    const prices=[],labels=[];
-    timestamps.forEach((ts,i)=>{
-      if(closes[i]==null)return;
-      prices.push(closes[i]);
-      const dt=new Date(ts*1000);
-      if(range==='5d')labels.push(('0'+dt.getDate()).slice(-2)+'/'+('0'+(dt.getMonth()+1)).slice(-2));
-      else if(range==='1mo'||range==='3mo')labels.push(('0'+dt.getDate()).slice(-2)+'/'+('0'+(dt.getMonth()+1)).slice(-2));
-      else labels.push(MS[dt.getMonth()]+' '+dt.getFullYear().toString().slice(-2));
-    });
-    if(prices.length>1){
-      if(!marketData[assetKey])marketData[assetKey]={history:{}};
-      marketData[assetKey].history[tf]={prices,labels};
-    }
-  }catch(e){console.warn('fetchYahooHistory failed',symbol,tf,e);}
-}
-
-// ── Draw chart ──
 function drawChart(canvasId,prices,labels,color){
   const canvas=document.getElementById(canvasId);
   if(!canvas||typeof Chart==='undefined'||!prices||prices.length<2)return;
@@ -1071,39 +902,16 @@ function drawChart(canvasId,prices,labels,color){
   if(invMiniCharts[canvasId]){try{invMiniCharts[canvasId].destroy();}catch(e){}delete invMiniCharts[canvasId];}
   invMiniCharts[canvasId]=new Chart(ctx,{
     type:'line',
-    data:{
-      labels:labels||prices.map((_,i)=>i),
-      datasets:[{
-        data:prices,
-        borderColor:color,
-        borderWidth:2,
-        fill:true,
-        backgroundColor:hexToRgba(color,0.12),
-        tension:0.4,
-        pointRadius:0,
-      }]
-    },
-    options:{
-      responsive:false,
-      maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{enabled:false}},
-      scales:{x:{display:false},y:{display:false}},
-      animation:false
-    }
+    data:{labels:labels||prices.map((_,i)=>i),datasets:[{data:prices,borderColor:color,borderWidth:2,fill:true,backgroundColor:hexToRgba(color,0.12),tension:0.4,pointRadius:0}]},
+    options:{responsive:false,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{x:{display:false},y:{display:false}},animation:false}
   });
 }
 
-// ── Render invest page ──
 function renderInvestPage(){
   const assetMap=buildAssetMap();
   const assets=Object.values(assetMap);
-
-  // Totals
   let totalValue=0,totalInvested=0;
-  assets.forEach(a=>{
-    const s=calcAssetStats(a);
-    if(s.totalInvested>0){totalValue+=s.currentValue;totalInvested+=s.totalInvested;}
-  });
+  assets.forEach(a=>{const s=calcAssetStats(a);if(s.totalInvested>0){totalValue+=s.currentValue;totalInvested+=s.totalInvested;}});
   const globalPnl=totalValue-totalInvested;
   const globalPct=totalInvested>0?(globalPnl/totalInvested)*100:0;
   const tvEl=document.getElementById('inv-total-val');
@@ -1114,24 +922,19 @@ function renderInvestPage(){
   if(tiEl)tiEl.textContent=totalInvested>0?fa(totalInvested):'—';
   if(tpEl){tpEl.textContent=totalInvested>0?(globalPnl>=0?'+':'')+fa(globalPnl):'Aucun achat';tpEl.style.color=totalInvested>0?(globalPnl>=0?'var(--te)':'var(--re)'):'var(--mu)';}
   if(tpctEl){tpctEl.textContent=totalInvested>0?(globalPct>=0?'+':'')+globalPct.toFixed(1)+'%':'—';tpctEl.style.color=totalInvested>0?(globalPct>=0?'var(--te)':'var(--re)'):'var(--mu)';}
-
-  // Destroy existing mini charts
   Object.keys(invMiniCharts).forEach(k=>{try{invMiniCharts[k].destroy();}catch(e){}});
   invMiniCharts={};
-
   const container=document.getElementById('asset-cards-list');
   if(!container)return;
   container.innerHTML='';
   window._assetMap=assetMap;
-
   assets.forEach(asset=>{
     const s=calcAssetStats(asset);
     const hasBuys=(asset.buys||[]).length>0;
     const color=asset.color||'#7F77DD';
     const isPos=s.pnlEur>=0;
     const pricePos=s.md?(s.md.changePct24h>=0):true;
-    const isManual=!asset.coingecko&&!asset.yahoo;
-
+    const isManual=!asset.coingecko;
     const priceStr=s.currentPrice
       ?s.currentPrice.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:s.currentPrice>100?2:6})+' €'
       :isManual
@@ -1140,12 +943,8 @@ function renderInvestPage(){
     const priceChgStr=s.md
       ?`<span style="color:${pricePos?'var(--te)':'var(--re)'}">${pricePos?'▲':'▼'} ${Math.abs(s.md.changePct24h).toFixed(2)}%</span>`
       :isManual?'<span style="color:var(--mu);font-size:10px">prix manuel</span>':'<span style="color:var(--mu)">—</span>';
-    const valStr=hasBuys
-      ?`<span style="color:${isPos?'var(--te)':'var(--re)'}">${fa(s.currentValue)}</span>`
-      :`<span style="color:var(--mu)">Aucun achat</span>`;
-    const varStr=hasBuys&&s.md
-      ?`<span style="color:${isPos?'var(--te)':'var(--re)'}">${isPos?'+':''}${fa(s.pnlEur)} (${isPos?'+':''}${s.pnlPct.toFixed(1)}%)</span>`:'';
-
+    const valStr=hasBuys?`<span style="color:${isPos?'var(--te)':'var(--re)'}">${fa(s.currentValue)}</span>`:`<span style="color:var(--mu)">Aucun achat</span>`;
+    const varStr=hasBuys&&s.md?`<span style="color:${isPos?'var(--te)':'var(--re)'}">${isPos?'+':''}${fa(s.pnlEur)} (${isPos?'+':''}${s.pnlPct.toFixed(1)}%)</span>`:'';
     const chartId='mc-'+asset.id;
     const card=document.createElement('div');
     card.className='asset-card';
@@ -1167,7 +966,7 @@ function renderInvestPage(){
       </div>
       <div class="ac-chart" id="wrap-${chartId}">
         <canvas id="${chartId}" width="400" height="110"></canvas>
-        ${!asset.coingecko&&(asset.buys||[]).length===0?`<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;color:rgba(238,238,245,0.25);pointer-events:none">Ajoute un achat pour voir le graphique</div>`:''}
+        ${isManual&&(asset.buys||[]).length===0?`<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;color:rgba(238,238,245,0.25);pointer-events:none">Ajoute un achat pour voir le graphique</div>`:''}
       </div>
       <div class="ac-footer">
         <div style="margin-bottom:2px">
@@ -1183,24 +982,16 @@ function renderInvestPage(){
       </div>`;
     container.appendChild(card);
   });
-
-  // Draw charts for assets that already have data (e.g. after refresh)
-  // This runs synchronously after cards are built
   Object.values(assetMap).forEach(asset=>{
     const chartId='mc-'+asset.id;
     const hist=getChartData(asset,'1M');
     if(hist&&hist.prices.length>1){
-      // Use rAF to ensure canvas is in DOM
-      requestAnimationFrame(()=>{
-        drawChart(chartId,hist.prices,hist.labels,asset.color||'#7F77DD');
-      });
+      requestAnimationFrame(()=>{drawChart(chartId,hist.prices,hist.labels,asset.color||'#7F77DD');});
     }
   });
-
   if(!pricesLoaded)refreshPrices();
 }
 
-// ── Buy modal ──
 function openBuyModal(assetId){
   const assetMap=window._assetMap||buildAssetMap();
   const asset=assetMap[assetId]||ASSET_CATALOGUE[assetId]||{name:assetId,ticker:assetId,icon:'📈',color:'#7F77DD'};
@@ -1211,34 +1002,23 @@ function openBuyModal(assetId){
     `<div class="overlay" id="buypop" onclick="if(event.target.id==='buypop')this.remove()">
     <div class="modal">
       <div class="modal-title">${asset.icon} Ajouter un achat — ${asset.name}</div>
-      <div class="fsec" style="margin-bottom:10px">
-        <label class="fl">Montant investi (€)</label>
-        <input class="fi" type="number" id="buy-amt" placeholder="100.00" inputmode="decimal" oninput="calcBuyQty()">
-      </div>
+      <div class="fsec" style="margin-bottom:10px"><label class="fl">Montant investi (€)</label><input class="fi" type="number" id="buy-amt" placeholder="100.00" inputmode="decimal" oninput="calcBuyQty()"></div>
       <div class="fsec" style="margin-bottom:10px">
         <label class="fl">Prix unitaire à l'achat (€)</label>
         <input class="fi" type="number" id="buy-price" placeholder="${curPrice||'Ex: 500'}" inputmode="decimal" value="${curPrice||''}" oninput="calcBuyQty()">
         ${md?`<div style="font-size:11px;color:var(--mu);margin-top:5px">Prix actuel : ${md.price.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})} €</div>`:''}
       </div>
-      <div class="fsec" style="margin-bottom:10px">
-        <label class="fl">Quantité <span style="color:var(--mu)">(auto)</span></label>
-        <input class="fi" type="number" id="buy-qty" placeholder="0.001" inputmode="decimal" step="any">
-      </div>
-      <div class="fsec" style="margin-bottom:10px">
-        <label class="fl">Date</label>
-        <input class="fi" type="date" id="buy-date" value="${new Date().toISOString().split('T')[0]}">
-      </div>
+      <div class="fsec" style="margin-bottom:10px"><label class="fl">Quantité <span style="color:var(--mu)">(auto)</span></label><input class="fi" type="number" id="buy-qty" placeholder="0.001" inputmode="decimal" step="any"></div>
+      <div class="fsec" style="margin-bottom:10px"><label class="fl">Date</label><input class="fi" type="date" id="buy-date" value="${new Date().toISOString().split('T')[0]}"></div>
       <button class="btnp" onclick="saveBuy('${assetId}')">Enregistrer</button>
       <button onclick="document.getElementById('buypop').remove()" style="width:100%;background:none;border:none;color:var(--mu);padding:12px;cursor:pointer;font-family:inherit;font-size:14px;margin-top:4px">Annuler</button>
     </div></div>`);
 }
-
 function calcBuyQty(){
   const amt=parseFloat(document.getElementById('buy-amt').value)||0;
   const price=parseFloat(document.getElementById('buy-price').value)||0;
   if(amt>0&&price>0)document.getElementById('buy-qty').value=(amt/price).toFixed(8).replace(/\.?0+$/,'');
 }
-
 function saveBuy(assetId){
   const amt=parseFloat(document.getElementById('buy-amt').value.replace(',','.'));
   const price=parseFloat(document.getElementById('buy-price').value.replace(',','.'));
@@ -1256,7 +1036,6 @@ function saveBuy(assetId){
   showToast('Achat enregistré ✓');
 }
 
-// ── Asset detail modal ──
 function openAssetDetail(assetId){
   const assetMap=window._assetMap||buildAssetMap();
   const asset=assetMap[assetId]||{name:assetId,icon:'📈',color:'#7F77DD',buys:[]};
@@ -1264,13 +1043,11 @@ function openAssetDetail(assetId){
   const color=asset.color||'#7F77DD';
   const hasBuys=(asset.buys||[]).length>0;
   const isPos=s.pnlEur>=0;
-  const isManual=!asset.coingecko&&!asset.yahoo;
-
+  const isManual=!asset.coingecko;
   const buysHtml=hasBuys
     ?[...(asset.buys||[])].sort((a,b)=>new Date(b.date)-new Date(a.date)).map(buy=>{
         const curVal=s.currentPrice&&buy.qty?s.currentPrice*buy.qty:buy.amountEur;
-        const bPnl=curVal-buy.amountEur;
-        const bPos=bPnl>=0;
+        const bPnl=curVal-buy.amountEur;const bPos=bPnl>=0;
         const d=new Date(buy.date);
         return `<div class="idm-buy-row">
           <div>
@@ -1287,7 +1064,6 @@ function openAssetDetail(assetId){
         </div>`;
       }).join('')
     :'<div style="text-align:center;color:var(--mu);padding:40px 0;font-size:13px">Aucun achat enregistré<br><span style="font-size:11px;opacity:.7">Clique sur + pour commencer</span></div>';
-
   document.getElementById('inv-detail')?.remove();
   document.body.insertAdjacentHTML('beforeend',
     `<div class="inv-detail-overlay" id="inv-detail" onclick="if(event.target.id==='inv-detail')this.remove()">
@@ -1313,9 +1089,8 @@ function openAssetDetail(assetId){
           <div class="idm-kpi-card"><div class="idm-kpi-lbl">Quantité</div><div class="idm-kpi-val">${s.totalQty>0?s.totalQty.toLocaleString('fr-FR',{maximumFractionDigits:6}):'—'}</div></div>
           <div class="idm-kpi-card"><div class="idm-kpi-lbl">Perf.</div><div class="idm-kpi-val" style="color:${isPos?'var(--te)':'var(--re)'}">${hasBuys?(isPos?'+':'')+s.pnlPct.toFixed(1)+'%':'—'}</div></div>
         </div>
-        ${isManual?'<div style="font-size:11px;color:var(--mu);text-align:center;margin:10px 0;padding:8px;background:var(--s3);border-radius:8px">📊 SXR8 · iShares S&P 500 UCITS ETF (EUR)</div>':''}
         <div class="tf-bar" id="tf-bar-${assetId}">
-          ${['1S','1M','1A','Global'].map(tf=>`<button class="tf-btn${tf==='1A'?' active':''}" onclick="switchTF('${assetId}','${tf}',this)">${tf}</button>`).join('')}
+          ${['1S','1M','1A','Global'].map(tf=>`<button class="tf-btn${tf==='1M'?' active':''}" onclick="switchTF('${assetId}','${tf}',this)">${tf}</button>`).join('')}
         </div>
         <div class="idm-chart-wrap"><canvas id="detail-chart-${assetId}" width="400" height="140"></canvas></div>
         <div style="font-size:10px;color:var(--mu);text-align:center;margin-bottom:14px" id="detail-chart-lbl-${assetId}"></div>
@@ -1326,20 +1101,9 @@ function openAssetDetail(assetId){
         ${buysHtml}
       </div>
     </div></div>`);
-
-  // Draw detail chart
   requestAnimationFrame(()=>{
     requestAnimationFrame(()=>{
-      const tf=isManual?'manual':'1M';
-      if(isManual){
-        const hist=getChartData(asset,'1M');
-        if(hist&&hist.prices.length>1){
-          drawDetailChart(assetId,hist.prices,hist.labels,color);
-          document.getElementById('detail-chart-lbl-'+assetId).textContent='Prix de vos achats';
-        }
-      } else {
-        switchTF(assetId,'1A',document.querySelector('#tf-bar-'+assetId+' .tf-btn.active'));
-      }
+      switchTF(assetId,'1M',document.querySelector('#tf-bar-'+assetId+' .tf-btn.active'));
     });
   });
 }
@@ -1352,24 +1116,10 @@ function drawDetailChart(assetId,prices,labels,color){
   if(invMiniCharts[canvasId]){try{invMiniCharts[canvasId].destroy();}catch(e){}delete invMiniCharts[canvasId];}
   invMiniCharts[canvasId]=new Chart(ctx,{
     type:'line',
-    data:{
-      labels:labels||prices.map((_,i)=>i),
-      datasets:[{
-        data:prices,
-        borderColor:color,
-        borderWidth:2,
-        fill:true,
-        backgroundColor:hexToRgba(color,0.10),
-        tension:0.4,
-        pointRadius:0,
-      }]
-    },
+    data:{labels:labels||prices.map((_,i)=>i),datasets:[{data:prices,borderColor:color,borderWidth:2,fill:true,backgroundColor:hexToRgba(color,0.10),tension:0.4,pointRadius:0}]},
     options:{
       responsive:false,maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{
-        enabled:true,mode:'index',intersect:false,
-        callbacks:{label:c=>'  '+c.parsed.y.toLocaleString('fr-FR',{minimumFractionDigits:0,maximumFractionDigits:0})+' €'}
-      }},
+      plugins:{legend:{display:false},tooltip:{enabled:true,mode:'index',intersect:false,callbacks:{label:c=>'  '+c.parsed.y.toLocaleString('fr-FR',{minimumFractionDigits:0,maximumFractionDigits:0})+' €'}}},
       scales:{
         x:{display:true,ticks:{color:'rgba(238,238,245,0.35)',font:{size:10},maxTicksLimit:5,maxRotation:0},grid:{display:false},border:{display:false}},
         y:{display:true,position:'right',ticks:{color:'rgba(238,238,245,0.35)',font:{size:10},maxTicksLimit:4,callback:v=>v>=1000?Math.round(v/1000)+'k€':Math.round(v)+'€'},grid:{color:'rgba(255,255,255,0.03)'},border:{display:false}}
@@ -1387,25 +1137,11 @@ async function switchTF(assetId,tf,btn){
   const color=asset.color||'#7F77DD';
   const lbl=document.getElementById('detail-chart-lbl-'+assetId);
   const tfLabels={'1S':'7 jours','1M':'1 mois','1A':'1 an','Global':'Depuis le début'};
-
-  // SP500 — fetch extended history via Twelve Data si besoin
-  // SP500 — fetch via Yahoo Finance si pas encore en cache
-  if(assetId==='sp500'){
-    const cfgMap={'1S':{range:'5d',interval:'1d'},'1M':{range:'1mo',interval:'1d'},'1A':{range:'1y',interval:'1d'},'Global':{range:'max',interval:'1wk'}};
-    const cfg=cfgMap[tf];
-    if(cfg&&(!marketData['sp500']?.history?.[tf])){
-      if(lbl)lbl.textContent='Chargement…';
-      await fetchYahooHistory('sp500','VUAA.DE',tf,cfg.range,cfg.interval);
-    }
-  }
-
-  // For crypto — fetch if not cached
   const cgId=asset.coingecko||null;
   if(cgId&&(!marketData[cgId]||!marketData[cgId].history||!marketData[cgId].history[tf])){
     if(lbl)lbl.textContent='Chargement…';
     await fetchCoinHistory(cgId,tf);
   }
-
   const hist=getChartData(asset,tf);
   if(hist&&hist.prices&&hist.prices.length>1){
     drawDetailChart(assetId,hist.prices,hist.labels,color);
@@ -1415,7 +1151,6 @@ async function switchTF(assetId,tf,btn){
   }
 }
 
-// ── Buy action sheet ──
 function openBuyAS(assetId,buyId){
   document.body.insertAdjacentHTML('beforeend',
     `<div class="as" id="xbas" onclick="if(event.target.classList.contains('as-bg'))document.getElementById('xbas').remove()">
@@ -1426,7 +1161,6 @@ function openBuyAS(assetId,buyId){
       <button class="as-cancel" onclick="document.getElementById('xbas').remove()">Annuler</button>
     </div></div>`);
 }
-
 function openEditBuyModal(assetId,buyId){
   const inv=userInvestments[assetId];if(!inv)return;
   const buy=inv.buys.find(b=>b.id===buyId);if(!buy)return;
@@ -1443,7 +1177,6 @@ function openEditBuyModal(assetId,buyId){
       <button onclick="document.getElementById('editbuypop').remove()" style="width:100%;background:none;border:none;color:var(--mu);padding:12px;cursor:pointer;font-family:inherit;font-size:14px;margin-top:4px">Annuler</button>
     </div></div>`);
 }
-
 function saveEditBuy(assetId,buyId){
   const inv=userInvestments[assetId];if(!inv)return;
   const i=inv.buys.findIndex(b=>b.id===buyId);if(i<0)return;
@@ -1459,7 +1192,6 @@ function saveEditBuy(assetId,buyId){
   renderInvestPage();
   showToast('Achat modifié ✓');
 }
-
 function deleteBuy(assetId,buyId){
   if(!confirm('Supprimer cet achat ?'))return;
   if(userInvestments[assetId])userInvestments[assetId].buys=userInvestments[assetId].buys.filter(b=>b.id!==buyId);
@@ -1469,7 +1201,6 @@ function deleteBuy(assetId,buyId){
   showToast('Achat supprimé');
 }
 
-// ── Add custom asset ──
 function openAddAssetModal(){
   document.body.insertAdjacentHTML('beforeend',
     `<div class="overlay" id="addAssetPop" onclick="if(event.target.id==='addAssetPop')this.remove()">
@@ -1488,7 +1219,6 @@ function openAddAssetModal(){
       <button onclick="document.getElementById('addAssetPop').remove()" style="width:100%;background:none;border:none;color:var(--mu);padding:12px;cursor:pointer;font-family:inherit;font-size:14px;margin-top:4px">Annuler</button>
     </div></div>`);
 }
-
 function saveCustomAsset(){
   const name=document.getElementById('na-name').value.trim();
   const ticker=document.getElementById('na-ticker').value.trim().toUpperCase();
@@ -1504,8 +1234,6 @@ function saveCustomAsset(){
   showToast(name+' ajouté ✓');
 }
 
-
-// INIT
 async function init(){
   load();
   loadInvestments();
