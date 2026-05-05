@@ -1005,7 +1005,7 @@ async function fetchSP500(){
     if(!meta||!result)return;
     if(!marketData['sp500'])marketData['sp500']={history:{}};
     // Prix actuel + variation 24h
-    showToast('VUAA prix: '+meta.regularMarketPrice);
+    marketData['sp500'].price=meta.regularMarketPrice;
     const prev=meta.chartPreviousClose;
     marketData['sp500'].changePct24h=prev?((meta.regularMarketPrice-prev)/prev)*100:0;
     // Construire l'historique 1M depuis ce premier appel
