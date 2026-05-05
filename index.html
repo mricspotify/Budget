@@ -1118,7 +1118,7 @@ function renderInvestPage(){
     const color=asset.color||'#7F77DD';
     const isPos=s.pnlEur>=0;
     const pricePos=s.md?(s.md.changePct24h>=0):true;
-    const isManual=!asset.coingecko;
+    const isManual=!asset.coingecko&&!asset.yahoo;
 
     const priceStr=s.currentPrice
       ?s.currentPrice.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:s.currentPrice>100?2:6})+' €'
@@ -1252,7 +1252,7 @@ function openAssetDetail(assetId){
   const color=asset.color||'#7F77DD';
   const hasBuys=(asset.buys||[]).length>0;
   const isPos=s.pnlEur>=0;
-  const isManual=!asset.coingecko;
+  const isManual=!asset.coingecko&&!asset.yahoo;
 
   const buysHtml=hasBuys
     ?[...(asset.buys||[])].sort((a,b)=>new Date(b.date)-new Date(a.date)).map(buy=>{
