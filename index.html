@@ -15,11 +15,8 @@
 --b:rgba(255,255,255,0.07);--b2:rgba(255,255,255,0.13);
 --tx:#eeeef5;--mu:rgba(238,238,245,0.4);--mu2:rgba(238,238,245,0.62);
 --pu:#7F77DD;--pudim:rgba(127,119,221,0.15);--pubor:rgba(127,119,221,0.35);
---te:#1D9E75;--tedim:rgba(29,158,117,0.15);
---am:#EF9F27;--amdim:rgba(239,159,39,0.15);
---co:#D85A30;--codim:rgba(216,90,48,0.15);
---bl:#378ADD;--bldim:rgba(55,138,221,0.15);
---re:#E24B4A;--redim:rgba(226,75,74,0.15);
+--te:#1D9E75;--am:#EF9F27;--co:#D85A30;--bl:#378ADD;--re:#E24B4A;
+--redim:rgba(226,75,74,0.15);
 }
 html,body{height:100%;background:var(--bg);color:var(--tx);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;overflow:hidden}
 .app{display:flex;flex-direction:column;height:100vh;height:100dvh;max-width:480px;margin:0 auto}
@@ -90,13 +87,6 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:-apple-sy
 .prog-wrap{width:100%;height:5px;background:var(--s3);border-radius:3px;margin-top:14px;overflow:hidden}
 .prog-bar{height:5px;border-radius:3px;background:var(--pu)}
 .prog-info{display:flex;justify-content:space-between;margin-top:5px;font-size:11px;color:var(--mu)}
-.inv-card{background:var(--s2);border:0.5px solid var(--b);border-radius:12px;padding:15px;margin-bottom:10px}
-.inv-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
-.inv-name{font-size:14px;font-weight:600}
-.inv-sub{font-size:11px;color:var(--mu);margin-top:1px}
-.badge{font-size:10px;padding:3px 9px;border-radius:20px;font-weight:600}
-.inv-row{display:flex;justify-content:space-between;font-size:12px;padding:3px 0;color:var(--mu2)}
-.inv-row b{color:var(--tx);font-weight:500}
 .sav-card{background:var(--s2);border:0.5px solid var(--b);border-radius:14px;padding:14px 15px;margin-bottom:9px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:background .15s;border-left:2.5px solid var(--card-color)}
 .sav-card:active{background:var(--s3)}
 .sav-left{display:flex;align-items:center;gap:12px;flex:1;min-width:0}
@@ -147,6 +137,7 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:-apple-sy
 .smb{background:var(--pudim);border:0.5px solid var(--pubor);color:var(--pu);border-radius:7px;padding:5px 10px;font-size:12px;cursor:pointer;font-family:inherit}
 .incrow{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:0.5px solid var(--b)}
 .incrow:last-child{border-bottom:none}
+/* ── Invest page ── */
 .inv-summary{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
 .inv-sum-card{background:var(--s2);border:0.5px solid var(--b);border-radius:12px;padding:12px 14px}
 .inv-sum-lbl{font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.06em;font-weight:500;margin-bottom:4px}
@@ -206,6 +197,8 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:-apple-sy
     <div class="topbar-icon">🏦</div>
   </div>
   <div class="pages">
+
+    <!-- DASHBOARD -->
     <div class="page active" id="page-dash">
       <div class="inner">
         <div class="mnav-row">
@@ -224,6 +217,8 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:-apple-sy
         <div class="sec"><div class="sh">Épargne (reste) — 6 derniers mois</div><div class="chart-wrap"><canvas id="saveChart"></canvas></div></div>
       </div>
     </div>
+
+    <!-- ADD -->
     <div class="page" id="page-add">
       <div class="inner">
         <div class="ptitle" id="add-title">Nouvelle dépense</div>
@@ -235,6 +230,8 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:-apple-sy
         <button class="btnd" id="cancel-btn" style="display:none" onclick="cancelEdit()">Annuler la modification</button>
       </div>
     </div>
+
+    <!-- HISTORY -->
     <div class="page" id="page-hist">
       <div class="inner">
         <div class="ptitle">Historique</div>
@@ -242,6 +239,8 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:-apple-sy
         <div id="hist-list"></div>
       </div>
     </div>
+
+    <!-- SAVINGS -->
     <div class="page" id="page-save">
       <div class="inner">
         <div class="ptitle">Épargne & investissements</div>
@@ -256,6 +255,8 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:-apple-sy
         <button class="btnp" style="margin-top:4px" onclick="openAccountModal()">+ Ajouter un compte</button>
       </div>
     </div>
+
+    <!-- INVESTMENTS -->
     <div class="page" id="page-inv">
       <div class="inner">
         <div class="inv-page-title-row">
@@ -264,7 +265,7 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:-apple-sy
             <span id="refresh-icon">↻</span> Actualiser
           </button>
         </div>
-        <div class="inv-summary" id="inv-summary">
+        <div class="inv-summary">
           <div class="inv-sum-card" style="border-left:2.5px solid var(--te)">
             <div class="inv-sum-lbl">Valeur totale</div>
             <div class="inv-sum-val" style="color:var(--te)" id="inv-total-val">—</div>
@@ -280,12 +281,13 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:-apple-sy
         <button class="btnp" style="margin-top:4px;background:var(--s2);border:0.5px solid var(--b2);color:var(--mu2);font-size:13px;font-weight:500" onclick="openAddAssetModal()">+ Ajouter un actif</button>
       </div>
     </div>
+
+    <!-- SETTINGS -->
     <div class="page" id="page-set">
       <div class="inner">
         <div class="ptitle">Paramètres</div>
         <div class="sec">
-          <div class="sh" onclick="toggleSection('inc-body')" style="cursor:pointer">
-            Revenus mensuels
+          <div class="sh" onclick="toggleSection('inc-body')" style="cursor:pointer">Revenus mensuels
             <div style="display:flex;gap:8px;align-items:center">
               <button class="sh-btn" onclick="event.stopPropagation();openSalModal(true)">+ Ajouter</button>
               <span id="inc-arrow" style="color:var(--mu);font-size:16px">▾</span>
@@ -294,8 +296,7 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:-apple-sy
           <div id="inc-body"><div id="inc-list"></div></div>
         </div>
         <div class="sec">
-          <div class="sh" onclick="toggleSection('bon-body')" style="cursor:pointer">
-            Rentrées d'argent
+          <div class="sh" onclick="toggleSection('bon-body')" style="cursor:pointer">Rentrées d'argent
             <div style="display:flex;gap:8px;align-items:center">
               <button class="sh-btn" onclick="event.stopPropagation();openBonusModal()">+ Ajouter</button>
               <span id="bon-arrow" style="color:var(--mu);font-size:16px">▾</span>
@@ -304,8 +305,7 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:-apple-sy
           <div id="bon-body"><div id="bonus-list"></div></div>
         </div>
         <div class="sec">
-          <div class="sh" onclick="toggleSection('rec-body')" style="cursor:pointer">
-            Dépenses récurrentes
+          <div class="sh" onclick="toggleSection('rec-body')" style="cursor:pointer">Dépenses récurrentes
             <div style="display:flex;gap:8px;align-items:center">
               <button class="sh-btn" onclick="event.stopPropagation();openRecurModal()">+ Ajouter</button>
               <span id="rec-arrow" style="color:var(--mu);font-size:16px">▾</span>
@@ -333,7 +333,9 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:-apple-sy
         </div>
       </div>
     </div>
-  </div>
+
+  </div><!-- /pages -->
+
   <nav class="nav">
     <button class="nb active" onclick="showPage('dash',this)"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Accueil</button>
     <button class="nb" onclick="showPage('add',this)"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>Ajouter</button>
@@ -346,46 +348,126 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:-apple-sy
 <div class="toast" id="toast"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
+// ─── Constants ────────────────────────────────
 const MONTHS=['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
 const MS=['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
 const CAT={
-  fixes:    {label:'Fixes',     icon:'🏠',color:'#7F77DD'},
-  courses:  {label:'Courses',   icon:'🛒',color:'#1D9E75'},
-  transport:{label:'Transport', icon:'🚗',color:'#378ADD'},
-  extras:   {label:'Extras',    icon:'✨',color:'#EF9F27'},
-  invest:   {label:'Invest',    icon:'📈',color:'#378ADD'},
-  autre:    {label:'Autre',     icon:'📌',color:'#888780'},
-  rentree:  {label:'Rentrée',   icon:'💸',color:'#1D9E75'},
+  fixes:    {label:'Fixes',    icon:'🏠',color:'#7F77DD'},
+  courses:  {label:'Courses',  icon:'🛒',color:'#1D9E75'},
+  transport:{label:'Transport',icon:'🚗',color:'#378ADD'},
+  extras:   {label:'Extras',   icon:'✨',color:'#EF9F27'},
+  invest:   {label:'Invest',   icon:'📈',color:'#378ADD'},
+  autre:    {label:'Autre',    icon:'📌',color:'#888780'},
+  rentree:  {label:'Rentrée',  icon:'💸',color:'#1D9E75'},
 };
-const RECUR_DEF=[];const INC_DEF={};const BON_DEF={};const EXP_DEF=[];
-let expenses=[],recurItems=[],monthInc={},monthBon={},lastMonth='',offset=0;
-let editId=null,selCatVal=null,histFilt='all',tChart=null,selRecurCat=null;
 const SK='bg11',SR='br10',SI='bi10',SB='bb10',SL='bl10';
 
-function save(){try{localStorage.setItem(SK,JSON.stringify(expenses));localStorage.setItem(SR,JSON.stringify(recurItems));localStorage.setItem(SI,JSON.stringify(monthInc));localStorage.setItem(SB,JSON.stringify(monthBon));localStorage.setItem(SL,lastMonth);}catch(e){}supaSave();}
-function load(){try{expenses=JSON.parse(localStorage.getItem(SK))||EXP_DEF;recurItems=JSON.parse(localStorage.getItem(SR))||RECUR_DEF;monthInc=JSON.parse(localStorage.getItem(SI))||INC_DEF;monthBon=JSON.parse(localStorage.getItem(SB))||BON_DEF;lastMonth=localStorage.getItem(SL)||'';userAccounts=JSON.parse(localStorage.getItem('bg11_acc'))||[];}catch(e){expenses=EXP_DEF;recurItems=RECUR_DEF;monthInc=INC_DEF;monthBon=BON_DEF;userAccounts=[];}}
-function mk(y,m){return y+'-'+String(m+1).padStart(2,'0');}
-function getInc(y,m){return parseFloat(monthInc[mk(y,m)])||0;}
-function getBonRemb(y,m){return (monthBon[mk(y,m)]||[]).filter(b=>b.desc.toLowerCase().includes('rembours')).reduce((s,b)=>s+b.amount,0);}
-function getExp(y,m){return expenses.filter(e=>{const d=new Date(e.date);return d.getFullYear()===y&&d.getMonth()===m;});}
-function sumCat(txs){const b={};Object.keys(CAT).forEach(k=>b[k]=0);txs.forEach(e=>{if(b[e.cat]!==undefined)b[e.cat]+=e.amount;else b.autre+=e.amount;});return b;}
-function fa(n){return parseFloat(n).toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';}
-function fr(n){return Math.round(n).toLocaleString('fr-FR')+' €';}
+// ─── State ────────────────────────────────────
+let expenses=[],recurItems=[],monthInc={},monthBon={},userAccounts=[],userInvestments={};
+let lastMonth='',offset=0,editId=null,selCatVal=null,histFilt='all',selRecurCat=null;
+let tChart=null;
 
-function checkMonth(){
-  const now=new Date();const key=mk(now.getFullYear(),now.getMonth());
-  if(key!==lastMonth){
-    lastMonth=key;
-    const d=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-01';
-    recurItems.filter(r=>r.active).forEach(r=>{
-      if(!expenses.some(e=>e.date===d&&e.desc===r.desc&&e.recurId===r.id))
-        expenses.unshift({id:Date.now().toString()+r.id,date:d,desc:r.desc,amount:r.amount,cat:r.cat,recurId:r.id});
+// ─── Persistence ──────────────────────────────
+function save(){
+  try{
+    localStorage.setItem(SK,JSON.stringify(expenses));
+    localStorage.setItem(SR,JSON.stringify(recurItems));
+    localStorage.setItem(SI,JSON.stringify(monthInc));
+    localStorage.setItem(SB,JSON.stringify(monthBon));
+    localStorage.setItem(SL,lastMonth);
+    localStorage.setItem('bg11_acc',JSON.stringify(userAccounts)); // FIX: comptes persistés
+  }catch(e){}
+  supaSave();
+}
+function load(){
+  try{
+    expenses   =JSON.parse(localStorage.getItem(SK))||[];
+    recurItems =JSON.parse(localStorage.getItem(SR))||[];
+    monthInc   =JSON.parse(localStorage.getItem(SI))||{};
+    monthBon   =JSON.parse(localStorage.getItem(SB))||{};
+    lastMonth  =localStorage.getItem(SL)||'';
+    userAccounts=JSON.parse(localStorage.getItem('bg11_acc'))||[];
+  }catch(e){expenses=[];recurItems=[];monthInc={};monthBon={};userAccounts=[];}
+}
+function saveInvestments(){try{localStorage.setItem('bg11_inv',JSON.stringify(userInvestments));}catch(e){}}
+function loadInvestments(){try{const s=localStorage.getItem('bg11_inv');if(s)userInvestments=JSON.parse(s);}catch(e){}}
+
+// ─── Supabase ─────────────────────────────────
+const SUPA_URL='https://wkpdvqlnolnaqsukziez.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndrcGR2cWxub2xuYXFzdWt6aWV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwNDAwMTAsImV4cCI6MjA5MTYxNjAxMH0.fPxl96RJbj0UyZ1Zf_1djZJ7xRTt69u02082_AwhS6Q';
+
+async function supaSave(){
+  try{
+    const r=await fetch(SUPA_URL+'/rest/v1/budget_data',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Prefer':'resolution=merge-duplicates'},
+      body:JSON.stringify({id:1,
+        expenses:JSON.stringify(expenses),month_inc:JSON.stringify(monthInc),
+        month_bon:JSON.stringify(monthBon),recur_items:JSON.stringify(recurItems),
+        accounts:JSON.stringify(userAccounts),last_month:lastMonth,
+        investments:JSON.stringify(userInvestments)})
     });
-    save();
-    if(!monthInc[key])setTimeout(()=>openSalModal(false),600);
-  }
+    if(!r.ok)console.warn('supaSave',r.status);
+  }catch(e){console.warn('supaSave',e);}
+}
+async function supaLoad(){
+  try{
+    const r=await fetch(SUPA_URL+'/rest/v1/budget_data?id=eq.1',
+      {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});
+    if(!r.ok)return false;
+    const rows=await r.json();
+    if(!rows||!rows.length)return false;
+    const d=rows[0];
+    if(d.expenses)   expenses    =JSON.parse(d.expenses);
+    if(d.month_inc)  monthInc    =JSON.parse(d.month_inc);
+    if(d.month_bon)  monthBon    =JSON.parse(d.month_bon);
+    if(d.recur_items)recurItems  =JSON.parse(d.recur_items);
+    if(d.accounts)   userAccounts=JSON.parse(d.accounts);
+    if(d.last_month) lastMonth   =d.last_month;
+    if(d.investments)userInvestments=JSON.parse(d.investments);
+    try{
+      localStorage.setItem(SK,JSON.stringify(expenses));
+      localStorage.setItem(SR,JSON.stringify(recurItems));
+      localStorage.setItem(SI,JSON.stringify(monthInc));
+      localStorage.setItem(SB,JSON.stringify(monthBon));
+      localStorage.setItem(SL,lastMonth);
+      localStorage.setItem('bg11_acc',JSON.stringify(userAccounts));
+      localStorage.setItem('bg11_inv',JSON.stringify(userInvestments));
+    }catch(e){}
+    return true;
+  }catch(e){console.warn('supaLoad',e);return false;}
 }
 
+// ─── Helpers ──────────────────────────────────
+function mk(y,m){return y+'-'+String(m+1).padStart(2,'0');}
+function getInc(y,m){return parseFloat(monthInc[mk(y,m)])||0;}
+function getBonRemb(y,m){return(monthBon[mk(y,m)]||[]).filter(b=>b.desc.toLowerCase().includes('rembours')).reduce((s,b)=>s+b.amount,0);}
+function getExp(y,m){return expenses.filter(e=>{const d=new Date(e.date);return d.getFullYear()===y&&d.getMonth()===m;});}
+function sumCat(txs){const b={};Object.keys(CAT).forEach(k=>b[k]=0);txs.forEach(e=>{b[e.cat]!==undefined?b[e.cat]+=e.amount:b.autre+=e.amount;});return b;}
+function fa(n){return parseFloat(n).toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';}
+function fr(n){return Math.round(n).toLocaleString('fr-FR')+' €';}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
+function toggleSection(id){
+  const el=document.getElementById(id),arrow=document.getElementById(id.replace('body','arrow'));
+  if(!el)return;const open=el.style.display!=='none';
+  el.style.display=open?'none':'block';if(arrow)arrow.textContent=open?'▸':'▾';
+}
+
+// ─── Month check ──────────────────────────────
+function checkMonth(){
+  const now=new Date(),key=mk(now.getFullYear(),now.getMonth());
+  if(key===lastMonth)return;
+  lastMonth=key;
+  const d=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-01';
+  recurItems.filter(r=>r.active).forEach(r=>{
+    if(!expenses.some(e=>e.date===d&&e.desc===r.desc&&e.recurId===r.id))
+      expenses.unshift({id:Date.now().toString()+r.id,date:d,desc:r.desc,amount:r.amount,cat:r.cat,recurId:r.id});
+  });
+  save();
+  if(!monthInc[key])setTimeout(()=>openSalModal(false),600);
+}
+
+// ─── Navigation ───────────────────────────────
 function showPage(id,btn){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
@@ -398,9 +480,9 @@ function showPage(id,btn){
   if(id==='add'&&!editId)resetForm();
   if(id==='inv')renderInvestPage();
 }
-
 function changeMonth(d){offset+=d;renderDash();}
 
+// ─── Savings calc ─────────────────────────────
 function getAllMonths(){
   const s=new Set();
   expenses.forEach(e=>{const d=new Date(e.date);s.add(mk(d.getFullYear(),d.getMonth()));});
@@ -408,40 +490,31 @@ function getAllMonths(){
   Object.keys(monthBon).forEach(k=>s.add(k));
   return [...s].sort();
 }
-
 function calcSaveTotal(){
-  let resteTotal=0;
+  let rest=0;
   getAllMonths().forEach(key=>{
-    const[y,m]=key.split('-').map(Number);const mo=m-1;
+    const[y,m]=key.split('-').map(Number),mo=m-1;
     const txs=getExp(y,mo);
     const dep=txs.filter(e=>e.cat!=='rentree').reduce((s,e)=>s+e.amount,0);
-    const remb=getBonRemb(y,mo);
     const inc=getInc(y,mo);
-    if(inc>0)resteTotal+=inc+remb-dep;
+    if(inc>0)rest+=inc+getBonRemb(y,mo)-dep;
   });
-  let rentreesTotal=0;
-  Object.values(monthBon).forEach(bons=>bons.forEach(b=>{
-    if(!b.desc.toLowerCase().includes('rembours'))rentreesTotal+=b.amount;
-  }));
-  const accsTotal=userAccounts.reduce((s,a)=>s+a.balance,0);
-  return resteTotal+rentreesTotal+accsTotal;
+  let rentrees=0;
+  Object.values(monthBon).forEach(bons=>bons.forEach(b=>{if(!b.desc.toLowerCase().includes('rembours'))rentrees+=b.amount;}));
+  return rest+rentrees+userAccounts.reduce((s,a)=>s+a.balance,0);
 }
 
+// ─── Dashboard ────────────────────────────────
 function renderDash(){
-  const now=new Date();
-  const ref=new Date(now.getFullYear(),now.getMonth()+offset,1);
-  const y=ref.getFullYear(),m=ref.getMonth();
-  const lbl=MONTHS[m]+' '+y;
+  const now=new Date(),ref=new Date(now.getFullYear(),now.getMonth()+offset,1);
+  const y=ref.getFullYear(),m=ref.getMonth(),lbl=MONTHS[m]+' '+y;
   document.getElementById('dash-month').textContent=lbl;
   document.getElementById('tsub').textContent=lbl;
   const txs=getExp(y,m);
   const rentreeTxs=txs.filter(e=>e.cat==='rentree');
-  const depTxs=txs.filter(e=>e.cat!=='rentree');
-  const total=depTxs.reduce((s,e)=>s+e.amount,0);
+  const total=txs.filter(e=>e.cat!=='rentree').reduce((s,e)=>s+e.amount,0);
   const rentreeAmt=rentreeTxs.reduce((s,e)=>s+e.amount,0);
-  const by=sumCat(txs);
-  const inc=getInc(y,m);
-  const rest=inc+rentreeAmt-total;
+  const by=sumCat(txs),inc=getInc(y,m),rest=inc+rentreeAmt-total;
   document.getElementById('d-inc').textContent=inc>0?fa(inc):'— €';
   document.getElementById('d-dep').textContent=fa(total);
   const re=document.getElementById('d-rest');
@@ -450,53 +523,51 @@ function renderDash(){
   document.getElementById('d-bonuses').innerHTML=rentreeTxs.map(b=>`<div style="font-size:11px;color:var(--te);margin-top:3px">+${fa(b.amount)} ${b.desc}</div>`).join('');
   const cats=Object.entries(by).filter(([k,v])=>v>0&&k!=='rentree').sort((a,b)=>b[1]-a[1]);
   const cc=document.getElementById('cat-cards');
-  if(cats.length===0){cc.innerHTML='';}else{
+  if(!cats.length){cc.innerHTML='';}else{
     const cols=cats.length>=3?3:cats.length;
     cc.innerHTML='<div style="display:grid;grid-template-columns:repeat('+cols+',1fr);gap:8px">'+
-      cats.map(([k,v])=>{const c=CAT[k];return '<div class="card tap" onclick="openCatPop(\''+k+'\','+y+','+m+')" style="text-align:center;padding:11px 8px"><div style="font-size:20px;margin-bottom:3px">'+c.icon+'</div><div style="font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px">'+c.label+'</div><div style="font-size:14px;font-weight:600;color:'+c.color+'">'+fa(v)+'</div></div>';}).join('')+
-    '</div>';
+      cats.map(([k,v])=>{const c=CAT[k];return '<div class="card tap" onclick="openCatPop(\''+k+'\','+y+','+m+')" style="text-align:center;padding:11px 8px"><div style="font-size:20px;margin-bottom:3px">'+c.icon+'</div><div style="font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px">'+c.label+'</div><div style="font-size:14px;font-weight:600;color:'+c.color+'">'+fa(v)+'</div></div>';}).join('')+'</div>';
   }
   const maxV=Math.max(...Object.values(by),1);
-  document.getElementById('breakdown').innerHTML=cats.map(([k,v])=>{const c=CAT[k];const pct=Math.round(v/maxV*100);return '<div class="brow"><div class="bdot" style="background:'+c.color+'"></div><span class="bname">'+c.label+'</span><div class="btrack"><div class="bbar" style="background:'+c.color+';width:'+pct+'%"></div></div><span class="bamt" style="color:'+c.color+'">'+fa(v)+'</span></div>';}).join('');
+  document.getElementById('breakdown').innerHTML=cats.map(([k,v])=>{const c=CAT[k],pct=Math.round(v/maxV*100);return '<div class="brow"><div class="bdot" style="background:'+c.color+'"></div><span class="bname">'+c.label+'</span><div class="btrack"><div class="bbar" style="background:'+c.color+';width:'+pct+'%"></div></div><span class="bamt" style="color:'+c.color+'">'+fa(v)+'</span></div>';}).join('');
   renderTrend(y,m);
 }
 
 function openCatPop(cat,y,m){
   const c=CAT[cat];
   const txs=getExp(y,m).filter(e=>e.cat===cat).sort((a,b)=>new Date(b.date)-new Date(a.date));
-  const depTxs=txs.filter(e=>e.cat!=='rentree');
-  const total=depTxs.reduce((s,e)=>s+e.amount,0);
-  const html='<div class="overlay" id="catpop" onclick="if(event.target.id===\'catpop\')this.remove()"><div class="modal"><div style="display:flex;align-items:center;gap:10px;margin-bottom:16px"><span style="font-size:24px">'+c.icon+'</span><div><div style="font-size:17px;font-weight:600">'+c.label+' — '+MONTHS[m]+' '+y+'</div><div style="font-size:12px;color:var(--mu)">Total : '+fa(total)+'</div></div></div><div style="max-height:55vh;overflow-y:auto">'+(txs.length===0?'<div style="text-align:center;color:var(--mu);padding:20px">Aucune dépense</div>':txs.map(e=>{const d=new Date(e.date);return '<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:0.5px solid var(--b)"><div><div style="font-size:13px">'+e.desc+'</div><div style="font-size:11px;color:var(--mu)">'+d.getDate().toString().padStart(2,'0')+' '+MS[d.getMonth()]+'</div></div><div style="font-size:13px;font-weight:600;color:var(--co)">'+fa(e.amount)+'</div></div>';}).join(''))+'</div><button onclick="document.getElementById(\'catpop\').remove()" style="width:100%;background:var(--s3);border:none;color:var(--mu2);border-radius:12px;padding:13px;font-size:15px;cursor:pointer;font-family:inherit;margin-top:12px">Fermer</button></div></div>';
-  document.body.insertAdjacentHTML('beforeend',html);
+  const total=txs.filter(e=>e.cat!=='rentree').reduce((s,e)=>s+e.amount,0);
+  document.body.insertAdjacentHTML('beforeend',
+    '<div class="overlay" id="catpop" onclick="if(event.target.id===\'catpop\')this.remove()"><div class="modal">'+
+    '<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px"><span style="font-size:24px">'+c.icon+'</span><div><div style="font-size:17px;font-weight:600">'+c.label+' — '+MONTHS[m]+' '+y+'</div><div style="font-size:12px;color:var(--mu)">Total : '+fa(total)+'</div></div></div>'+
+    '<div style="max-height:55vh;overflow-y:auto">'+(txs.length?txs.map(e=>{const d=new Date(e.date);return '<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:0.5px solid var(--b)"><div><div style="font-size:13px">'+e.desc+'</div><div style="font-size:11px;color:var(--mu)">'+d.getDate().toString().padStart(2,'0')+' '+MS[d.getMonth()]+'</div></div><div style="font-size:13px;font-weight:600;color:var(--co)">'+fa(e.amount)+'</div></div>';}).join(''):'<div style="text-align:center;color:var(--mu);padding:20px">Aucune dépense</div>')+'</div>'+
+    '<button onclick="document.getElementById(\'catpop\').remove()" style="width:100%;background:var(--s3);border:none;color:var(--mu2);border-radius:12px;padding:13px;font-size:15px;cursor:pointer;font-family:inherit;margin-top:12px">Fermer</button></div></div>');
 }
 
 function renderTrend(cy,cm){
-  const canvas=document.getElementById('trendChart');
-  const canvas2=document.getElementById('saveChart');
-  if(!canvas||typeof Chart==='undefined')return;
-  const labels=[],depData=[],saveData=[];
+  const c1=document.getElementById('trendChart'),c2=document.getElementById('saveChart');
+  if(!c1||typeof Chart==='undefined')return;
+  const labels=[],dep=[],sav=[];
   for(let i=5;i>=0;i--){
-    const d=new Date(cy,cm-i,1);
-    const y2=d.getFullYear(),m2=d.getMonth();
-    const txs=getExp(y2,m2);
-    const dep=txs.filter(e=>e.cat!=='rentree').reduce((s,e)=>s+e.amount,0);
-    const rent=txs.filter(e=>e.cat==='rentree').reduce((s,e)=>s+e.amount,0);
-    const inc=getInc(y2,m2);
-    const rest=inc+rent-dep;
+    const d=new Date(cy,cm-i,1),y2=d.getFullYear(),m2=d.getMonth(),txs=getExp(y2,m2);
+    const depAmt=txs.filter(e=>e.cat!=='rentree').reduce((s,e)=>s+e.amount,0);
+    const rentAmt=txs.filter(e=>e.cat==='rentree').reduce((s,e)=>s+e.amount,0);
     labels.push(MS[m2]);
-    depData.push(parseFloat(dep.toFixed(2)));
-    saveData.push(parseFloat(rest.toFixed(2)));
+    dep.push(parseFloat(depAmt.toFixed(2)));
+    sav.push(parseFloat((getInc(y2,m2)+rentAmt-depAmt).toFixed(2)));
   }
-  const chartOpts=(data,color,negColor)=>({type:'bar',data:{labels,datasets:[{data,backgroundColor:data.map(v=>v>=0?color:(negColor||'rgba(226,75,74,0.7)')),borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:'rgba(238,238,245,0.38)',font:{size:11}},border:{display:false}},y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'rgba(238,238,245,0.38)',font:{size:10},callback:v=>v+'€'},border:{display:false}}}}});
-  try{if(tChart)tChart.destroy();tChart=new Chart(canvas.getContext('2d'),chartOpts(depData,'rgba(127,119,221,0.75)'));}catch(e){}
-  try{if(window.sChart)window.sChart.destroy();window.sChart=new Chart(canvas2.getContext('2d'),chartOpts(saveData,'rgba(29,158,117,0.75)','rgba(226,75,74,0.7)'));}catch(e){}
+  const opts=(data,color)=>({type:'bar',data:{labels,datasets:[{data,backgroundColor:data.map(v=>v>=0?color:'rgba(226,75,74,0.7)'),borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:'rgba(238,238,245,0.38)',font:{size:11}},border:{display:false}},y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'rgba(238,238,245,0.38)',font:{size:10},callback:v=>v+'€'},border:{display:false}}}}});
+  try{if(tChart)tChart.destroy();tChart=new Chart(c1.getContext('2d'),opts(dep,'rgba(127,119,221,0.75)'));}catch(e){}
+  try{if(window.sChart)window.sChart.destroy();window.sChart=new Chart(c2.getContext('2d'),opts(sav,'rgba(29,158,117,0.75)'));}catch(e){}
 }
 
+// ─── Add / Edit expense ───────────────────────
 function buildCatGrid(){document.getElementById('cat-grid').innerHTML=Object.entries(CAT).map(([k,c])=>'<button class="catb" onclick="pickCat(this,\''+k+'\')"><span class="catic">'+c.icon+'</span>'+c.label+'</button>').join('');}
 function pickCat(btn,cat){document.querySelectorAll('#cat-grid .catb').forEach(b=>b.classList.remove('sel'));btn.classList.add('sel');selCatVal=cat;}
 function resetForm(){
   editId=null;selCatVal=null;
-  document.getElementById('f-desc').value='';document.getElementById('f-amount').value='';
+  document.getElementById('f-desc').value='';
+  document.getElementById('f-amount').value='';
   document.getElementById('f-date').value=new Date().toISOString().split('T')[0];
   document.getElementById('add-title').textContent='Nouvelle dépense';
   document.getElementById('submit-btn').textContent='Enregistrer la dépense';
@@ -516,54 +587,68 @@ function cancelEdit(){resetForm();document.querySelectorAll('.nb')[0].click();}
 function editExp(id){
   const e=expenses.find(x=>x.id===id);if(!e)return;
   editId=id;selCatVal=e.cat;
-  document.getElementById('f-desc').value=e.desc;document.getElementById('f-amount').value=e.amount;document.getElementById('f-date').value=e.date;
-  document.getElementById('add-title').textContent='Modifier la dépense';document.getElementById('submit-btn').textContent='Enregistrer';document.getElementById('cancel-btn').style.display='block';
-  document.querySelectorAll('.catb').forEach(b=>{if(b.getAttribute('onclick')&&b.getAttribute('onclick').includes("'"+e.cat+"'"))b.classList.add('sel');});
+  document.getElementById('f-desc').value=e.desc;
+  document.getElementById('f-amount').value=e.amount;
+  document.getElementById('f-date').value=e.date;
+  document.getElementById('add-title').textContent='Modifier la dépense';
+  document.getElementById('submit-btn').textContent='Enregistrer';
+  document.getElementById('cancel-btn').style.display='block';
+  document.querySelectorAll('.catb').forEach(b=>{if(b.getAttribute('onclick')?.includes("'"+e.cat+"'"))b.classList.add('sel');});
   document.querySelectorAll('.nb')[1].click();
 }
 function delExp(id){if(!confirm('Supprimer ?'))return;expenses=expenses.filter(e=>e.id!==id);save();renderHist();showToast('Supprimée');}
 function openAS(id,ev){
   ev.stopPropagation();const e=expenses.find(x=>x.id===id);if(!e)return;
-  document.body.insertAdjacentHTML('beforeend','<div class="as" id="xas" onclick="if(event.target.classList.contains(\'as-bg\'))document.getElementById(\'xas\').remove()"><div class="as-bg"></div><div class="as-box"><div style="text-align:center;padding:6px 8px 12px;font-size:13px;color:var(--mu);border-bottom:0.5px solid var(--b);margin-bottom:4px">'+e.desc+' · '+fa(e.amount)+'</div><div class="as-item" onclick="document.getElementById(\'xas\').remove();editExp(\''+id+'\')"><span style="font-size:18px">✏️</span><span>Modifier</span></div><div class="as-item" style="color:var(--re)" onclick="document.getElementById(\'xas\').remove();delExp(\''+id+'\')"><span style="font-size:18px">🗑️</span><span>Supprimer</span></div><button class="as-cancel" onclick="document.getElementById(\'xas\').remove()">Annuler</button></div></div>');
+  document.body.insertAdjacentHTML('beforeend',
+    '<div class="as" id="xas" onclick="if(event.target.classList.contains(\'as-bg\'))document.getElementById(\'xas\').remove()"><div class="as-bg"></div><div class="as-box">'+
+    '<div style="text-align:center;padding:6px 8px 12px;font-size:13px;color:var(--mu);border-bottom:0.5px solid var(--b);margin-bottom:4px">'+e.desc+' · '+fa(e.amount)+'</div>'+
+    '<div class="as-item" onclick="document.getElementById(\'xas\').remove();editExp(\''+id+'\')"><span style="font-size:18px">✏️</span><span>Modifier</span></div>'+
+    '<div class="as-item" style="color:var(--re)" onclick="document.getElementById(\'xas\').remove();delExp(\''+id+'\')"><span style="font-size:18px">🗑️</span><span>Supprimer</span></div>'+
+    '<button class="as-cancel" onclick="document.getElementById(\'xas\').remove()">Annuler</button></div></div>');
 }
 
+// ─── History ──────────────────────────────────
 function buildFilter(){
-  const bar=document.getElementById('filterbar');
-  bar.innerHTML=[{k:'all',l:'Tout'},...Object.entries(CAT).map(([k,c])=>({k,l:c.icon+' '+c.label}))].map(f=>'<button class="fchip'+(histFilt===f.k?' on':'')+'" onclick="setFilt(\''+f.k+'\')">'+f.l+'</button>').join('');
+  document.getElementById('filterbar').innerHTML=
+    [{k:'all',l:'Tout'},...Object.entries(CAT).map(([k,c])=>({k,l:c.icon+' '+c.label}))]
+    .map(f=>'<button class="fchip'+(histFilt===f.k?' on':'')+'" onclick="setFilt(\''+f.k+'\')">'+f.l+'</button>').join('');
 }
 function setFilt(f){histFilt=f;buildFilter();renderHist();}
 function renderHist(){
   const filtered=histFilt==='all'?expenses:expenses.filter(e=>e.cat===histFilt);
   const grouped={};
-  filtered.forEach(e=>{const d=new Date(e.date);const key=d.getFullYear()+'-'+String(d.getMonth()).padStart(2,'0');const lbl=MONTHS[d.getMonth()]+' '+d.getFullYear();if(!grouped[key])grouped[key]={lbl,y:d.getFullYear(),m:d.getMonth(),items:[]};grouped[key].items.push(e);});
+  filtered.forEach(e=>{
+    const d=new Date(e.date),key=d.getFullYear()+'-'+String(d.getMonth()).padStart(2,'0');
+    if(!grouped[key])grouped[key]={lbl:MONTHS[d.getMonth()]+' '+d.getFullYear(),y:d.getFullYear(),m:d.getMonth(),items:[]};
+    grouped[key].items.push(e);
+  });
   const order=Object.keys(grouped).sort((a,b)=>b.localeCompare(a));
   const c=document.getElementById('hist-list');
-  if(order.length===0){c.innerHTML='<div class="empty">Aucune dépense.</div>';return;}
+  if(!order.length){c.innerHTML='<div class="empty">Aucune dépense.</div>';return;}
   c.innerHTML=order.map(key=>{
-    const g=grouped[key];
-    const sorted=[...g.items].sort((a,b)=>new Date(b.date)-new Date(a.date));
-    const sortedDep=sorted.filter(e=>e.cat!=='rentree');
-    const sortedRentrees=sorted.filter(e=>e.cat==='rentree');
-    const total=sortedDep.reduce((s,e)=>s+e.amount,0);
-    const sortedRentreeAmt=sortedRentrees.reduce((s,e)=>s+e.amount,0);
-    const inc=getInc(g.y,g.m);
-    const eco=inc>0?Math.max(0,inc+sortedRentreeAmt-total):null;
-    const borderColor=eco!==null&&eco>0?'var(--te)':'var(--co)';
-    return '<div style="margin-bottom:18px"><div class="mhrow"><span class="mhtitle">'+g.lbl+'</span><span class="mhmeta">'+fa(total)+(eco!==null?' · <span style="color:var(--te)">'+fa(eco)+' épargnés</span>':'')+'</span></div><div class="txlist" style="border-left:2.5px solid '+borderColor+'">'+sorted.map(e=>{const cfg=CAT[e.cat]||CAT.autre;const d=new Date(e.date);return '<div class="txrow"><div class="txic" style="background:'+cfg.color+'22">'+cfg.icon+'</div><div class="txinfo"><div class="txname">'+e.desc+'</div><div class="txdate">'+d.getDate().toString().padStart(2,'0')+' '+MS[d.getMonth()]+'</div></div><div style="display:flex;align-items:center;gap:6px"><span class="txamt">'+fa(e.amount)+'</span><button class="txmenu" onclick="openAS(\''+e.id+'\',event)">···</button></div></div>';}).join('')+'<div style="display:flex;justify-content:space-between;padding:8px 13px;font-size:11px;color:var(--mu);border-top:0.5px solid var(--b)"><span>'+sorted.length+' transaction'+(sorted.length>1?'s':'')+'</span><span>'+fa(total)+'</span></div></div></div>';
+    const g=grouped[key],sorted=[...g.items].sort((a,b)=>new Date(b.date)-new Date(a.date));
+    const total=sorted.filter(e=>e.cat!=='rentree').reduce((s,e)=>s+e.amount,0);
+    const rentAmt=sorted.filter(e=>e.cat==='rentree').reduce((s,e)=>s+e.amount,0);
+    const inc=getInc(g.y,g.m),eco=inc>0?Math.max(0,inc+rentAmt-total):null;
+    const border=eco!==null&&eco>0?'var(--te)':'var(--co)';
+    return '<div style="margin-bottom:18px"><div class="mhrow"><span class="mhtitle">'+g.lbl+'</span><span class="mhmeta">'+fa(total)+(eco!==null?' · <span style="color:var(--te)">'+fa(eco)+' épargnés</span>':'')+'</span></div>'+
+      '<div class="txlist" style="border-left:2.5px solid '+border+'">'+
+      sorted.map(e=>{const cfg=CAT[e.cat]||CAT.autre,d=new Date(e.date);return '<div class="txrow"><div class="txic" style="background:'+cfg.color+'22">'+cfg.icon+'</div><div class="txinfo"><div class="txname">'+e.desc+'</div><div class="txdate">'+d.getDate().toString().padStart(2,'0')+' '+MS[d.getMonth()]+'</div></div><div style="display:flex;align-items:center;gap:6px"><span class="txamt">'+fa(e.amount)+'</span><button class="txmenu" onclick="openAS(\''+e.id+'\',event)">···</button></div></div>';}).join('')+
+      '<div style="display:flex;justify-content:space-between;padding:8px 13px;font-size:11px;color:var(--mu);border-top:0.5px solid var(--b)"><span>'+sorted.length+' transaction'+(sorted.length>1?'s':'')+'</span><span>'+fa(total)+'</span></div></div></div>';
   }).join('');
 }
 
+// ─── Savings page ─────────────────────────────
 function renderSave(){
-  const typeIcons={banque:'🏦',invest:'📈',crypto:'₿',epargne:'💳',cash:'💵',autre:'🔮'};
-  const typeColors={banque:'var(--bl)',invest:'var(--am)',crypto:'#F7931A',epargne:'var(--te)',cash:'var(--te)',autre:'var(--mu2)'};
+  const TI={banque:'🏦',invest:'📈',crypto:'₿',epargne:'💳',cash:'💵',autre:'🔮'};
+  const TC={banque:'var(--bl)',invest:'var(--am)',crypto:'#F7931A',epargne:'var(--te)',cash:'var(--te)',autre:'var(--mu2)'};
   let resteTotal=0;const resteParMois=[];
   getAllMonths().forEach(key=>{
-    const[y,m]=key.split('-').map(Number);const mo=m-1;
+    const[y,m]=key.split('-').map(Number),mo=m-1;
     const txs=getExp(y,mo);
     const dep=txs.filter(e=>e.cat!=='rentree').reduce((s,e)=>s+e.amount,0);
-    const remb=getBonRemb(y,mo);
     const inc=getInc(y,mo);
-    if(inc>0){const reste=inc+remb-dep;resteTotal+=reste;resteParMois.push({key,y,m:mo,reste});}
+    if(inc>0){const reste=inc+getBonRemb(y,mo)-dep;resteTotal+=reste;resteParMois.push({key,y,m:mo,reste});}
   });
   const rentreesMap={};
   Object.entries(monthBon).forEach(([k,bons])=>bons.forEach(b=>{
@@ -575,77 +660,131 @@ function renderSave(){
   }));
   const rentreesTotal=Object.values(rentreesMap).reduce((s,v)=>s+v.total,0);
   const accsTotal=userAccounts.reduce((s,a)=>s+a.balance,0);
-  const grandTotal=resteTotal+rentreesTotal+accsTotal;
-  const goal=Math.ceil(grandTotal/10000)*10000||10000;
-  const prev=goal-10000;
-  const pct=grandTotal>0?Math.min(100,Math.round(((grandTotal-prev)/(goal-prev))*100)):0;
-  document.getElementById('save-total').textContent=fr(grandTotal);
+  const grand=resteTotal+rentreesTotal+accsTotal;
+  const goal=Math.ceil(grand/10000)*10000||10000,prev=goal-10000;
+  const pct=grand>0?Math.min(100,Math.round(((grand-prev)/(goal-prev))*100)):0;
+  document.getElementById('save-total').textContent=fr(grand);
   document.getElementById('save-bar').style.width=pct+'%';
   document.getElementById('save-pct').textContent=pct+'% · Prochain objectif '+fr(goal);
   document.getElementById('save-prev').textContent=fr(prev);
   document.getElementById('save-next').textContent=fr(goal);
   window._saveData={resteParMois,rentreesMap};
-  function makeCard(icon,name,sub,amount,color,onclickStr,menuStr=''){
-    return '<div class="sav-card" onclick="'+onclickStr+'" style="--card-color:'+color+'"><div class="sav-left"><div class="sav-icon" style="background:'+color+'22;color:'+color+'">'+icon+'</div><div class="sav-info"><div class="sav-name">'+name+'</div><div class="sav-sub">'+sub+'</div></div></div><div class="sav-right"><div class="sav-amt" style="color:'+color+'">'+fa(amount)+'</div>'+menuStr+'</div></div>';
-  }
-  let html='';
-  html+=makeCard('💵','Reste accumulé','Cumul mensuel · '+resteParMois.length+' mois',resteTotal,'var(--te)',"openSavePop('reste')");
+  const mkCard=(icon,name,sub,amt,color,click,menu='')=>
+    '<div class="sav-card" onclick="'+click+'" style="--card-color:'+color+'">'+
+    '<div class="sav-left"><div class="sav-icon" style="background:'+color+'22;color:'+color+'">'+icon+'</div>'+
+    '<div class="sav-info"><div class="sav-name">'+name+'</div><div class="sav-sub">'+sub+'</div></div></div>'+
+    '<div class="sav-right"><div class="sav-amt" style="color:'+color+'">'+fa(amt)+'</div>'+menu+'</div></div>';
+  let html=mkCard('💵','Reste accumulé','Cumul mensuel · '+resteParMois.length+' mois',resteTotal,'var(--te)',"openSavePop('reste')");
   Object.entries(rentreesMap).sort((a,b)=>b[1].total-a[1].total).forEach(([desc,data])=>{
     const safe=desc.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
     const icon=desc.toLowerCase().includes('héritage')||desc.toLowerCase().includes('heritage')?'🏛️':desc.toLowerCase().includes('intér')||desc.toLowerCase().includes('inter')?'💹':'💸';
-    html+=makeCard(icon,desc,'Rentrée exceptionnelle · '+data.items.length+' entrée'+(data.items.length>1?'s':''),data.total,'var(--bl)',"openSavePop('rentree','"+safe+"')");
+    html+=mkCard(icon,desc,'Rentrée exceptionnelle · '+data.items.length+' entrée'+(data.items.length>1?'s':''),data.total,'var(--bl)',"openSavePop('rentree','"+safe+"')");
   });
   userAccounts.forEach((a,i)=>{
-    const color=typeColors[a.type]||'var(--mu2)';
-    const icon=typeIcons[a.type]||'🔮';
-    const menu='<button class="sav-menu" onclick="event.stopPropagation();openInvAS('+i+')" title="Options">···</button>';
-    html+=makeCard(icon,a.name,a.type+' · Compte manuel',a.balance,color,"openSavePop('compte',"+i+")",menu);
+    const color=TC[a.type]||'var(--mu2)',icon=TI[a.type]||'🔮';
+    html+=mkCard(icon,a.name,a.type+' · Compte manuel',a.balance,color,"openSavePop('compte',"+i+")",'<button class="sav-menu" onclick="event.stopPropagation();openInvAS('+i+')" title="Options">···</button>');
   });
   if(!html)html='<div style="color:var(--mu);font-size:14px;padding:48px 0;text-align:center;line-height:1.8">Aucune donnée<br><span style="font-size:12px">Importe ton fichier JSON</span></div>';
-  const ic=document.getElementById('inv-cards-list');
-  const ac=document.getElementById('accounts-cards');
-  if(ic)ic.innerHTML=html;
-  if(ac)ac.innerHTML='';
+  document.getElementById('inv-cards-list').innerHTML=html;
+  document.getElementById('accounts-cards').innerHTML='';
 }
 
 function openSavePop(type,desc){
   const d=window._saveData||{};
   let title='',sub='',items=[],total=0,color='var(--pu)';
-  if(type==='reste'){title='💵 Reste accumulé';sub='Salaire − dépenses de chaque mois';color='var(--te)';const sorted=(d.resteParMois||[]).slice().reverse();total=sorted.reduce((s,r)=>s+r.reste,0);items=sorted.map(({y,m,reste})=>({label:MONTHS[m]+' '+y,sub:'Salaire − dépenses fixes/courantes',amt:'+'+fa(reste),color:'var(--te)'}));}
-  else if(type==='rentree'){const data=(d.rentreesMap||{})[desc]||{total:0,items:[]};const icon=desc.toLowerCase().includes('héritage')||desc.toLowerCase().includes('heritage')?'🏛️':desc.toLowerCase().includes('intér')||desc.toLowerCase().includes('inter')?'💹':'💸';title=icon+' '+desc;sub='Rentrée exceptionnelle';color='var(--bl)';total=data.total;items=[...data.items].sort((a,b)=>b.date.localeCompare(a.date)).map(it=>({label:it.label,sub:desc,amt:'+'+fa(it.amount),color:'var(--bl)'}));}
-  else if(type==='compte'){const a=userAccounts[desc];if(!a)return;const typeIcons2={banque:'🏦',invest:'📈',crypto:'₿',epargne:'💳',cash:'💵',autre:'🔮'};const typeColors2={banque:'var(--bl)',invest:'var(--am)',crypto:'#F7931A',epargne:'var(--te)',cash:'var(--te)',autre:'var(--mu2)'};title=(typeIcons2[a.type]||'🔮')+' '+a.name;sub='Compte '+a.type;color=typeColors2[a.type]||'var(--pu)';total=a.balance;items=[{label:'Solde actuel',sub:'Saisi manuellement',amt:fa(a.balance),color}];}
-  const rows=items.length===0?'<div style="text-align:center;color:var(--mu);padding:32px 0;font-size:13px">Aucune entrée</div>':items.map(it=>'<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:0.5px solid var(--b)"><div><div style="font-size:13px;font-weight:500;color:var(--tx)">'+it.label+'</div><div style="font-size:11px;color:var(--mu);margin-top:2px">'+it.sub+'</div></div><span style="font-size:13px;font-weight:600;color:'+it.color+'">'+it.amt+'</span></div>').join('');
-  document.body.insertAdjacentHTML('beforeend','<div class="overlay" id="savepop" onclick="if(event.target.id===\'savepop\')this.remove()"><div class="modal" style="max-height:82vh;display:flex;flex-direction:column;padding-bottom:max(20px,env(safe-area-inset-bottom))"><div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:2px"><div style="font-size:18px;font-weight:700;letter-spacing:-.02em">'+title+'</div><span style="font-size:17px;font-weight:700;color:'+color+'">'+fa(total)+'</span></div><div style="font-size:12px;color:var(--mu);margin-bottom:14px">'+sub+' · '+items.length+' entrée'+(items.length>1?'s':'')+'</div><div style="overflow-y:auto;flex:1;margin:0 -2px;padding:0 2px">'+rows+'</div><button onclick="document.getElementById(\'savepop\').remove()" style="width:100%;background:var(--s3);border:none;color:var(--mu2);border-radius:12px;padding:13px;font-size:15px;cursor:pointer;font-family:inherit;margin-top:14px;flex-shrink:0">Fermer</button></div></div>');
+  if(type==='reste'){
+    title='💵 Reste accumulé';sub='Salaire − dépenses de chaque mois';color='var(--te)';
+    const sorted=(d.resteParMois||[]).slice().reverse();
+    total=sorted.reduce((s,r)=>s+r.reste,0);
+    items=sorted.map(({y,m,reste})=>({label:MONTHS[m]+' '+y,sub:'Salaire − dépenses fixes/courantes',amt:'+'+fa(reste),color:'var(--te)'}));
+  } else if(type==='rentree'){
+    const data=(d.rentreesMap||{})[desc]||{total:0,items:[]};
+    const icon=desc.toLowerCase().includes('héritage')||desc.toLowerCase().includes('heritage')?'🏛️':desc.toLowerCase().includes('intér')||desc.toLowerCase().includes('inter')?'💹':'💸';
+    title=icon+' '+desc;sub='Rentrée exceptionnelle';color='var(--bl)';total=data.total;
+    items=[...data.items].sort((a,b)=>b.date.localeCompare(a.date)).map(it=>({label:it.label,sub:desc,amt:'+'+fa(it.amount),color:'var(--bl)'}));
+  } else if(type==='compte'){
+    const a=userAccounts[desc];if(!a)return;
+    const TI2={banque:'🏦',invest:'📈',crypto:'₿',epargne:'💳',cash:'💵',autre:'🔮'};
+    const TC2={banque:'var(--bl)',invest:'var(--am)',crypto:'#F7931A',epargne:'var(--te)',cash:'var(--te)',autre:'var(--mu2)'};
+    title=(TI2[a.type]||'🔮')+' '+a.name;sub='Compte '+a.type;color=TC2[a.type]||'var(--pu)';total=a.balance;
+    items=[{label:'Solde actuel',sub:'Saisi manuellement',amt:fa(a.balance),color}];
+  }
+  const rows=items.length?items.map(it=>'<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:0.5px solid var(--b)"><div><div style="font-size:13px;font-weight:500;color:var(--tx)">'+it.label+'</div><div style="font-size:11px;color:var(--mu);margin-top:2px">'+it.sub+'</div></div><span style="font-size:13px;font-weight:600;color:'+it.color+'">'+it.amt+'</span></div>').join(''):'<div style="text-align:center;color:var(--mu);padding:32px 0;font-size:13px">Aucune entrée</div>';
+  document.body.insertAdjacentHTML('beforeend',
+    '<div class="overlay" id="savepop" onclick="if(event.target.id===\'savepop\')this.remove()"><div class="modal" style="max-height:82vh;display:flex;flex-direction:column;padding-bottom:max(20px,env(safe-area-inset-bottom))">'+
+    '<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:2px"><div style="font-size:18px;font-weight:700;letter-spacing:-.02em">'+title+'</div><span style="font-size:17px;font-weight:700;color:'+color+'">'+fa(total)+'</span></div>'+
+    '<div style="font-size:12px;color:var(--mu);margin-bottom:14px">'+sub+' · '+items.length+' entrée'+(items.length>1?'s':'')+'</div>'+
+    '<div style="overflow-y:auto;flex:1;margin:0 -2px;padding:0 2px">'+rows+'</div>'+
+    '<button onclick="document.getElementById(\'savepop\').remove()" style="width:100%;background:var(--s3);border:none;color:var(--mu2);border-radius:12px;padding:13px;font-size:15px;cursor:pointer;font-family:inherit;margin-top:14px;flex-shrink:0">Fermer</button></div></div>');
 }
 
+// ─── Accounts ─────────────────────────────────
+function openInvAS(idx){
+  const a=userAccounts[idx];
+  document.body.insertAdjacentHTML('beforeend',
+    '<div class="as" id="xias" onclick="if(event.target.classList.contains(\'as-bg\'))document.getElementById(\'xias\').remove()"><div class="as-bg"></div><div class="as-box">'+
+    '<div style="text-align:center;padding:6px 8px 12px;font-size:13px;color:var(--mu);border-bottom:0.5px solid var(--b);margin-bottom:4px">'+a.name+'</div>'+
+    '<div class="as-item" onclick="document.getElementById(\'xias\').remove();openAccountModal('+idx+')"><span style="font-size:18px">✏️</span><span>Modifier</span></div>'+
+    '<div class="as-item" style="color:var(--re)" onclick="document.getElementById(\'xias\').remove();deleteAccount('+idx+')"><span style="font-size:18px">🗑️</span><span>Supprimer</span></div>'+
+    '<button class="as-cancel" onclick="document.getElementById(\'xias\').remove()">Annuler</button></div></div>');
+}
+let selAccType='banque';
+function openAccountModal(editIdx){
+  const acc=editIdx!==undefined?userAccounts[editIdx]:null;
+  document.body.insertAdjacentHTML('beforeend',
+    '<div class="overlay" id="accpop" onclick="if(event.target.id===\'accpop\')this.remove()"><div class="modal">'+
+    '<div class="modal-title">'+(acc?'Modifier le compte':'Nouveau compte')+'</div>'+
+    '<div class="fsec" style="margin-bottom:10px"><label class="fl">Nom du compte</label><input class="fi" type="text" id="acc-name" placeholder="Ex: BNP, Binance, Livret A" value="'+(acc?acc.name:'')+'"></div>'+
+    '<div class="fsec" style="margin-bottom:10px"><label class="fl">Solde actuel (€)</label><input class="fi" type="number" id="acc-bal" placeholder="0.00" inputmode="decimal" value="'+(acc?acc.balance:'')+'"></div>'+
+    '<div class="fsec" style="margin-bottom:10px"><label class="fl">Type</label><div class="catg" style="grid-template-columns:repeat(3,1fr)">'+
+    ['🏦 Banque','📈 Invest.','₿ Crypto','💳 Épargne','💵 Cash','🔮 Autre'].map((t,i)=>{const types=['banque','invest','crypto','epargne','cash','autre'];const sel=acc&&acc.type===types[i]?' sel':'';return '<button class="catb'+sel+'" onclick="pickAccType(this,\''+types[i]+'\')"><span class="catic">'+t.split(' ')[0]+'</span>'+t.split(' ')[1]+'</button>';}).join('')+'</div></div>'+
+    '<button class="btnp" onclick="saveAccount('+(editIdx!==undefined?editIdx:'undefined')+')">Enregistrer</button>'+
+    (acc?'<button class="btnd" onclick="deleteAccount('+editIdx+')">Supprimer ce compte</button>':'')+
+    '<button onclick="document.getElementById(\'accpop\').remove()" style="width:100%;background:none;border:none;color:var(--mu);padding:12px;cursor:pointer;font-family:inherit;font-size:14px;margin-top:4px">Annuler</button></div></div>');
+  if(acc)setTimeout(()=>{document.querySelectorAll('#accpop .catb').forEach(b=>{if(b.getAttribute('onclick')?.includes("'"+acc.type+"'"))b.classList.add('sel');});},50);
+}
+function pickAccType(btn,type){document.querySelectorAll('#accpop .catb').forEach(b=>b.classList.remove('sel'));btn.classList.add('sel');selAccType=type;}
+function saveAccount(editIdx){
+  const name=document.getElementById('acc-name').value.trim();
+  const balance=parseFloat(document.getElementById('acc-bal').value.replace(',','.'));
+  if(!name||isNaN(balance)){showToast('Remplis tous les champs');return;}
+  const acc={name,balance,type:selAccType||'banque'};
+  if(editIdx!==undefined&&editIdx!=='undefined')userAccounts[editIdx]=acc;else userAccounts.push(acc);
+  save();document.getElementById('accpop').remove();renderSave();showToast('Compte enregistré ✓');
+}
+function deleteAccount(idx){
+  if(!confirm('Supprimer ce compte ?'))return;
+  userAccounts.splice(idx,1);save();
+  try{document.getElementById('accpop').remove();}catch(e){}
+  renderSave();showToast('Compte supprimé');
+}
+
+// ─── Settings ─────────────────────────────────
 function renderSet(){
   document.getElementById('s-count').textContent=expenses.length;
   const entries=Object.entries(monthInc).sort((a,b)=>b[0].localeCompare(a[0]));
-  const il=document.getElementById('inc-list');
-  il.innerHTML=entries.length===0?'<div style="color:var(--mu);font-size:13px;padding:8px 0">Aucun revenu</div>':entries.map(([k,v])=>{const[y,m]=k.split('-');return '<div class="incrow"><div><div style="font-size:13px">'+MONTHS[parseInt(m)-1]+' '+y+'</div></div><div style="display:flex;align-items:center;gap:8px"><span style="font-size:13px;font-weight:600;color:var(--te)">'+fa(v)+'</span><button class="smb" onclick="editInc(\''+k+'\','+v+')">Modifier</button></div></div>';}).join('');
+  document.getElementById('inc-list').innerHTML=entries.length?entries.map(([k,v])=>{const[y,m]=k.split('-');return '<div class="incrow"><div><div style="font-size:13px">'+MONTHS[parseInt(m)-1]+' '+y+'</div></div><div style="display:flex;align-items:center;gap:8px"><span style="font-size:13px;font-weight:600;color:var(--te)">'+fa(v)+'</span><button class="smb" onclick="editInc(\''+k+'\','+v+')">Modifier</button></div></div>';}).join(''):'<div style="color:var(--mu);font-size:13px;padding:8px 0">Aucun revenu</div>';
   const bEntries=[];
   Object.entries(monthBon).forEach(([k,bons])=>bons.forEach((b,i)=>bEntries.push({key:k,b,i})));
-  bEntries.sort((a,b2)=>b2.key.localeCompare(a.key));
-  const bl=document.getElementById('bonus-list');
-  bl.innerHTML=bEntries.length===0?'<div style="color:var(--mu);font-size:13px;padding:8px 0">Aucune rentrée</div>':bEntries.map(({key,b,i})=>{const[y,m]=key.split('-');return '<div class="incrow"><div><div style="font-size:13px">'+b.desc+'</div><div style="font-size:11px;color:var(--mu)">'+MONTHS[parseInt(m)-1]+' '+y+'</div></div><div style="display:flex;align-items:center;gap:8px"><span style="font-size:13px;font-weight:600;color:var(--te)">+'+fa(b.amount)+'</span><button class="smb" onclick="editBonus(\''+key+'\','+i+')">Modifier</button></div></div>';}).join('');
+  bEntries.sort((a,b)=>b.key.localeCompare(a.key));
+  document.getElementById('bonus-list').innerHTML=bEntries.length?bEntries.map(({key,b,i})=>{const[y,m]=key.split('-');return '<div class="incrow"><div><div style="font-size:13px">'+b.desc+'</div><div style="font-size:11px;color:var(--mu)">'+MONTHS[parseInt(m)-1]+' '+y+'</div></div><div style="display:flex;align-items:center;gap:8px"><span style="font-size:13px;font-weight:600;color:var(--te)">+'+fa(b.amount)+'</span><button class="smb" onclick="editBonus(\''+key+'\','+i+')">Modifier</button></div></div>';}).join(''):'<div style="color:var(--mu);font-size:13px;padding:8px 0">Aucune rentrée</div>';
   document.getElementById('recur-list').innerHTML=recurItems.map(r=>'<div class="recur-item"><div style="font-size:18px">'+(CAT[r.cat]?.icon||'📌')+'</div><div class="recur-info"><div class="recur-name">'+r.desc+'</div><div class="recur-amt">'+fa(r.amount)+' · '+(CAT[r.cat]?.label||'Autre')+'</div></div><div style="display:flex;gap:6px;align-items:center"><button class="txmenu" onclick="openRecurAS(\''+r.id+'\',event)">···</button><button class="toggle '+(r.active?'on':'off')+'" onclick="toggleRecur(\''+r.id+'\')"></button></div></div>').join('');
 }
-
 function editInc(key,cur){
-  const[y,m]=key.split('-');const lbl=MONTHS[parseInt(m)]+' '+y;
+  const[y,m]=key.split('-'),lbl=MONTHS[parseInt(m)]+' '+y;
   document.body.insertAdjacentHTML('beforeend','<div class="saloverlay" id="salover" onclick="if(event.target.id===\'salover\')this.remove()"><div class="salmodal"><div class="salemoji">💰</div><div class="saltitle">Modifier le revenu</div><div class="salsub">'+lbl+'</div><input class="salinput" type="number" id="salin" inputmode="decimal" value="'+cur+'"><div class="salhint">Modifie le salaire pour ce mois</div><button class="btnp" onclick="saveInc(\''+key+'\')">Confirmer</button><button onclick="document.getElementById(\'salover\').remove()" style="width:100%;background:none;border:none;color:var(--mu);padding:12px;cursor:pointer;font-family:inherit;font-size:14px;margin-top:4px">Annuler</button></div></div>');
   setTimeout(()=>document.getElementById('salin').focus(),100);
 }
 function saveInc(key){const v=parseFloat(document.getElementById('salin').value);if(!v||v<=0){showToast('Montant invalide');return;}monthInc[key]=v;save();document.getElementById('salover').remove();renderSet();renderDash();showToast('Revenu modifié ✓');}
 function openSalModal(fromSet){
-  const now=new Date();const y=now.getFullYear(),m=now.getMonth();const ex=getInc(y,m);
+  const now=new Date(),y=now.getFullYear(),m=now.getMonth(),ex=getInc(y,m);
   document.body.insertAdjacentHTML('beforeend','<div class="saloverlay" id="salover" onclick="if(event.target.id===\'salover\')this.remove()"><div class="salmodal"><div class="salemoji">💰</div><div class="saltitle">'+(fromSet?'Ajouter un revenu':'Nouveau mois !')+'</div><div class="salsub">'+MONTHS[m]+' '+y+' — Quel est ton salaire ?</div><input class="salinput" type="number" id="salin" placeholder="1500" inputmode="decimal" value="'+(ex||'')+'"><div class="salhint">Modifiable à tout moment dans Réglages</div><button class="btnp" onclick="saveSal('+y+','+m+')">Confirmer</button>'+(fromSet?'<button onclick="document.getElementById(\'salover\').remove()" style="width:100%;background:none;border:none;color:var(--mu);padding:12px;cursor:pointer;font-family:inherit;font-size:14px;margin-top:4px">Annuler</button>':'')+'</div></div>');
   setTimeout(()=>document.getElementById('salin').focus(),100);
 }
 function saveSal(y,m){const v=parseFloat(document.getElementById('salin').value);if(!v||v<=0){showToast('Montant invalide');return;}monthInc[mk(y,m)]=v;save();document.getElementById('salover').remove();renderDash();renderSet();showToast('Revenu enregistré ✓');}
 function openBonusModal(){
-  const now=new Date();
-  document.body.insertAdjacentHTML('beforeend','<div class="overlay" id="bonpop" onclick="if(event.target.id===\'bonpop\')this.remove()"><div class="modal"><div class="modal-title">Nouvelle rentrée d\'argent</div><div class="fsec" style="margin-bottom:10px"><label class="fl">Description</label><input class="fi" type="text" id="bon-desc" placeholder="Ex: Remboursement"></div><div class="fsec" style="margin-bottom:10px"><label class="fl">Montant (€)</label><input class="fi" type="number" id="bon-amt" placeholder="0.00" inputmode="decimal"></div><div class="fsec" style="margin-bottom:10px"><label class="fl">Mois (AAAA-MM)</label><input class="fi" type="text" id="bon-month" placeholder="'+(now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0'))+'" value="'+(now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0'))+'"></div><button class="btnp" onclick="saveBonus()">Ajouter</button><button onclick="document.getElementById(\'bonpop\').remove()" style="width:100%;background:none;border:none;color:var(--mu);padding:12px;cursor:pointer;font-family:inherit;font-size:14px;margin-top:4px">Annuler</button></div></div>');
+  const now=new Date(),ym=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+  document.body.insertAdjacentHTML('beforeend','<div class="overlay" id="bonpop" onclick="if(event.target.id===\'bonpop\')this.remove()"><div class="modal"><div class="modal-title">Nouvelle rentrée d\'argent</div><div class="fsec" style="margin-bottom:10px"><label class="fl">Description</label><input class="fi" type="text" id="bon-desc" placeholder="Ex: Remboursement"></div><div class="fsec" style="margin-bottom:10px"><label class="fl">Montant (€)</label><input class="fi" type="number" id="bon-amt" placeholder="0.00" inputmode="decimal"></div><div class="fsec" style="margin-bottom:10px"><label class="fl">Mois (AAAA-MM)</label><input class="fi" type="text" id="bon-month" placeholder="'+ym+'" value="'+ym+'"></div><button class="btnp" onclick="saveBonus()">Ajouter</button><button onclick="document.getElementById(\'bonpop\').remove()" style="width:100%;background:none;border:none;color:var(--mu);padding:12px;cursor:pointer;font-family:inherit;font-size:14px;margin-top:4px">Annuler</button></div></div>');
 }
 function saveBonus(){
   const desc=document.getElementById('bon-desc').value.trim();
@@ -656,29 +795,30 @@ function saveBonus(){
   monthBon[month].push({desc,amount:amt});
   save();document.getElementById('bonpop').remove();renderSet();renderDash();showToast('Rentrée ajoutée ✓');
 }
+function editBonus(key,idx){
+  const b=monthBon[key][idx],[y,m]=key.split('-'),lbl=MONTHS[parseInt(m)-1]+' '+y;
+  document.body.insertAdjacentHTML('beforeend','<div class="saloverlay" id="bonover" onclick="if(event.target.id===\'bonover\')this.remove()"><div class="salmodal"><div class="salemoji">💸</div><div class="saltitle">Modifier la rentrée</div><div class="salsub">'+lbl+'</div><div class="fsec" style="margin-bottom:10px"><label class="fl">Description</label><input class="fi" type="text" id="bedit-desc" value="'+b.desc+'"></div><div class="fsec" style="margin-bottom:10px"><label class="fl">Montant (€)</label><input class="fi" type="number" id="bedit-amt" inputmode="decimal" value="'+b.amount+'"></div><button class="btnp" onclick="saveBonusEdit(\''+key+'\','+idx+')">Confirmer</button><button class="btnd" onclick="deleteBonusEdit(\''+key+'\','+idx+')">Supprimer</button><button onclick="document.getElementById(\'bonover\').remove()" style="width:100%;background:none;border:none;color:var(--mu);padding:12px;cursor:pointer;font-family:inherit;font-size:14px;margin-top:4px">Annuler</button></div></div>');
+}
+function saveBonusEdit(key,idx){const desc=document.getElementById('bedit-desc').value.trim();const amount=parseFloat(document.getElementById('bedit-amt').value);if(!desc||!amount){showToast('Champs invalides');return;}monthBon[key][idx]={desc,amount};save();document.getElementById('bonover').remove();renderSet();renderDash();showToast('Rentrée modifiée ✓');}
+function deleteBonusEdit(key,idx){if(!confirm('Supprimer cette rentrée ?'))return;monthBon[key].splice(idx,1);if(!monthBon[key].length)delete monthBon[key];save();document.getElementById('bonover').remove();renderSet();renderDash();showToast('Rentrée supprimée');}
 function openRecurModal(){
   selRecurCat=null;
   document.body.insertAdjacentHTML('beforeend','<div class="overlay" id="recpop" onclick="if(event.target.id===\'recpop\')this.remove()"><div class="modal"><div class="modal-title">Nouvelle récurrence</div><div class="fsec" style="margin-bottom:10px"><label class="fl">Description</label><input class="fi" type="text" id="rec-desc" placeholder="Ex: Netflix"></div><div class="fsec" style="margin-bottom:10px"><label class="fl">Montant (€)</label><input class="fi" type="number" id="rec-amt" placeholder="0.00" inputmode="decimal"></div><div class="fsec" style="margin-bottom:10px"><label class="fl">Catégorie</label><div class="catg">'+Object.entries(CAT).map(([k,c])=>'<button class="catb" onclick="pickRCat(this,\''+k+'\')"><span class="catic">'+c.icon+'</span>'+c.label+'</button>').join('')+'</div></div><button class="btnp" onclick="saveRecur()">Ajouter</button><button onclick="document.getElementById(\'recpop\').remove()" style="width:100%;background:none;border:none;color:var(--mu);padding:12px;cursor:pointer;font-family:inherit;font-size:14px;margin-top:4px">Annuler</button></div></div>');
 }
 function pickRCat(btn,cat){document.querySelectorAll('#recpop .catb').forEach(b=>b.classList.remove('sel'));btn.classList.add('sel');selRecurCat=cat;}
-function saveRecur(){const desc=document.getElementById('rec-desc').value.trim();const amt=parseFloat(document.getElementById('rec-amt').value);if(!desc||!amt||!selRecurCat){showToast('Remplis tous les champs');return;}recurItems.push({id:'r'+Date.now(),desc,amount:amt,cat:selRecurCat,active:true});save();document.getElementById('recpop').remove();renderSet();showToast('Récurrence ajoutée ✓');}
+function saveRecur(){const desc=document.getElementById('rec-desc').value.trim(),amt=parseFloat(document.getElementById('rec-amt').value);if(!desc||!amt||!selRecurCat){showToast('Remplis tous les champs');return;}recurItems.push({id:'r'+Date.now(),desc,amount:amt,cat:selRecurCat,active:true});save();document.getElementById('recpop').remove();renderSet();showToast('Récurrence ajoutée ✓');}
 function openRecurAS(id,ev){ev.stopPropagation();document.body.insertAdjacentHTML('beforeend','<div class="as" id="xras" onclick="if(event.target.classList.contains(\'as-bg\'))document.getElementById(\'xras\').remove()"><div class="as-bg"></div><div class="as-box"><div class="as-item" style="color:var(--re)" onclick="document.getElementById(\'xras\').remove();delRecur(\''+id+'\')"><span style="font-size:18px">🗑️</span><span>Supprimer</span></div><button class="as-cancel" onclick="document.getElementById(\'xras\').remove()">Annuler</button></div></div>');}
 function delRecur(id){if(!confirm('Supprimer ?'))return;recurItems=recurItems.filter(r=>r.id!==id);save();renderSet();}
-function toggleRecur(id){const r=recurItems.find(x=>x.id===id);if(r)r.active=!r.active;save();renderSet();}
-function resetAll(){if(!confirm('Supprimer TOUTES les données ?'))return;expenses=EXP_DEF;monthInc=INC_DEF;monthBon=BON_DEF;lastMonth='';recurItems=RECUR_DEF;userAccounts=[];save();saveAccounts();renderDash();renderSet();renderSave();showToast('Réinitialisé');}
-function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
-function openInvAS(idx){
-  const a=userAccounts[idx];
-  document.body.insertAdjacentHTML('beforeend','<div class="as" id="xias" onclick="if(event.target.classList.contains(\'as-bg\'))document.getElementById(\'xias\').remove()"><div class="as-bg"></div><div class="as-box"><div style="text-align:center;padding:6px 8px 12px;font-size:13px;color:var(--mu);border-bottom:0.5px solid var(--b);margin-bottom:4px">'+a.name+'</div><div class="as-item" onclick="document.getElementById(\'xias\').remove();openAccountModal('+idx+')"><span style="font-size:18px">✏️</span><span>Modifier</span></div><div class="as-item" style="color:var(--re)" onclick="document.getElementById(\'xias\').remove();deleteAccount('+idx+')"><span style="font-size:18px">🗑️</span><span>Supprimer</span></div><button class="as-cancel" onclick="document.getElementById(\'xias\').remove()">Annuler</button></div></div>');
-}
-function toggleSection(id){
-  const el=document.getElementById(id);const arrow=document.getElementById(id.replace('body','arrow'));
-  if(!el)return;const open=el.style.display!=='none';el.style.display=open?'none':'block';if(arrow)arrow.textContent=open?'▸':'▾';
+function toggleRecur(id){const r=recurItems.find(x=>x.id===id);if(r){r.active=!r.active;save();renderSet();}}
+function resetAll(){
+  if(!confirm('Supprimer TOUTES les données ?'))return;
+  expenses=[];recurItems=[];monthInc={};monthBon={};lastMonth='';userAccounts=[];userInvestments={};
+  save();saveInvestments();
+  renderDash();renderSet();renderSave();showToast('Réinitialisé');
 }
 function exportData(){
-  const data={expenses,monthInc,monthBon,recurItems,accounts:userAccounts,investments:userInvestments};
-  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
-  const url=URL.createObjectURL(blob);const a=document.createElement('a');
+  const blob=new Blob([JSON.stringify({expenses,monthInc,monthBon,recurItems,accounts:userAccounts,investments:userInvestments},null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob),a=document.createElement('a');
   a.href=url;a.download='monbudget_backup.json';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
   showToast('Export téléchargé ✓');
 }
@@ -688,11 +828,11 @@ function importData(input){
   reader.onload=e=>{
     try{
       const data=JSON.parse(e.target.result);
-      if(data.expenses)expenses=data.expenses;
-      if(data.monthInc)monthInc=data.monthInc;
-      if(data.monthBon)monthBon=data.monthBon;
-      if(data.recurItems)recurItems=data.recurItems;
-      if(data.accounts)userAccounts=data.accounts;
+      if(data.expenses)   expenses    =data.expenses;
+      if(data.monthInc)   monthInc    =data.monthInc;
+      if(data.monthBon)   monthBon    =data.monthBon;
+      if(data.recurItems) recurItems  =data.recurItems;
+      if(data.accounts)   userAccounts=data.accounts;
       if(data.investments)userInvestments=data.investments;
       save();saveInvestments();
       supaSave().then(()=>showToast('Données importées et sauvegardées ✓'));
@@ -701,94 +841,27 @@ function importData(input){
   };
   reader.readAsText(file);input.value='';
 }
-let userAccounts=[];
-function saveAccounts(){try{localStorage.setItem('bg11_acc',JSON.stringify(userAccounts));}catch(e){}}
-function openAccountModal(editIdx){
-  const acc=editIdx!==undefined?userAccounts[editIdx]:null;
-  document.body.insertAdjacentHTML('beforeend','<div class="overlay" id="accpop" onclick="if(event.target.id===\'accpop\')this.remove()"><div class="modal"><div class="modal-title">'+(acc?'Modifier le compte':'Nouveau compte')+'</div><div class="fsec" style="margin-bottom:10px"><label class="fl">Nom du compte</label><input class="fi" type="text" id="acc-name" placeholder="Ex: BNP, Binance, Livret A" value="'+(acc?acc.name:'')+'"></div><div class="fsec" style="margin-bottom:10px"><label class="fl">Solde actuel (€)</label><input class="fi" type="number" id="acc-bal" placeholder="0.00" inputmode="decimal" value="'+(acc?acc.balance:'')+'"></div><div class="fsec" style="margin-bottom:10px"><label class="fl">Type</label><div class="catg" style="grid-template-columns:repeat(3,1fr)">'+['🏦 Banque','📈 Invest.','₿ Crypto','💳 Épargne','💵 Cash','🔮 Autre'].map((t,i)=>{const types=['banque','invest','crypto','epargne','cash','autre'];const sel=acc&&acc.type===types[i]?' sel':'';return '<button class="catb'+sel+'" onclick="pickAccType(this,\''+types[i]+'\')"><span class="catic">'+t.split(' ')[0]+'</span>'+t.split(' ')[1]+'</button>';}).join('')+'</div></div><button class="btnp" onclick="saveAccount('+(editIdx!==undefined?editIdx:'undefined')+')">Enregistrer</button>'+(acc?'<button class="btnd" onclick="deleteAccount('+editIdx+')">Supprimer ce compte</button>':'')+'<button onclick="document.getElementById(\'accpop\').remove()" style="width:100%;background:none;border:none;color:var(--mu);padding:12px;cursor:pointer;font-family:inherit;font-size:14px;margin-top:4px">Annuler</button></div></div>');
-  if(acc)setTimeout(()=>{document.querySelectorAll('#accpop .catb').forEach(b=>{if(b.getAttribute('onclick')&&b.getAttribute('onclick').includes("'"+acc.type+"'"))b.classList.add('sel');});},50);
-}
-let selAccType='banque';
-function pickAccType(btn,type){document.querySelectorAll('#accpop .catb').forEach(b=>b.classList.remove('sel'));btn.classList.add('sel');selAccType=type;}
-function saveAccount(editIdx){
-  const name=document.getElementById('acc-name').value.trim();const balance=parseFloat(document.getElementById('acc-bal').value.replace(',','.'));
-  if(!name||isNaN(balance)){showToast('Remplis tous les champs');return;}
-  const acc={name,balance,type:selAccType||'banque'};
-  if(editIdx!==undefined&&editIdx!=='undefined')userAccounts[editIdx]=acc;else userAccounts.push(acc);
-  saveAccounts();document.getElementById('accpop').remove();renderSave();showToast('Compte enregistré ✓');
-}
-function deleteAccount(idx){
-  if(!confirm('Supprimer ce compte ?'))return;userAccounts.splice(idx,1);saveAccounts();
-  try{document.getElementById('accpop').remove();}catch(e){}renderSave();showToast('Compte supprimé');
-}
-function editBonus(key,idx){
-  const b=monthBon[key][idx];const[y,m]=key.split('-');const lbl=MONTHS[parseInt(m)-1]+' '+y;
-  document.body.insertAdjacentHTML('beforeend','<div class="saloverlay" id="bonover" onclick="if(event.target.id===\'bonover\')this.remove()"><div class="salmodal"><div class="salemoji">💸</div><div class="saltitle">Modifier la rentrée</div><div class="salsub">'+lbl+'</div><div class="fsec" style="margin-bottom:10px"><label class="fl">Description</label><input class="fi" type="text" id="bedit-desc" value="'+b.desc+'"></div><div class="fsec" style="margin-bottom:10px"><label class="fl">Montant (€)</label><input class="fi" type="number" id="bedit-amt" inputmode="decimal" value="'+b.amount+'"></div><button class="btnp" onclick="saveBonusEdit(\''+key+'\','+idx+')">Confirmer</button><button class="btnd" onclick="deleteBonusEdit(\''+key+'\','+idx+')">Supprimer</button><button onclick="document.getElementById(\'bonover\').remove()" style="width:100%;background:none;border:none;color:var(--mu);padding:12px;cursor:pointer;font-family:inherit;font-size:14px;margin-top:4px">Annuler</button></div></div>');
-}
-function saveBonusEdit(key,idx){const desc=document.getElementById('bedit-desc').value.trim();const amount=parseFloat(document.getElementById('bedit-amt').value);if(!desc||!amount){showToast('Champs invalides');return;}monthBon[key][idx]={desc,amount};save();document.getElementById('bonover').remove();renderSet();renderDash();showToast('Rentrée modifiée ✓');}
-function deleteBonusEdit(key,idx){if(!confirm('Supprimer cette rentrée ?'))return;monthBon[key].splice(idx,1);if(monthBon[key].length===0)delete monthBon[key];save();document.getElementById('bonover').remove();renderSet();renderDash();showToast('Rentrée supprimée');}
 
-// SUPABASE
-const SUPA_URL='https://wkpdvqlnolnaqsukziez.supabase.co';
-const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndrcGR2cWxub2xuYXFzdWt6aWV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwNDAwMTAsImV4cCI6MjA5MTYxNjAxMH0.fPxl96RJbj0UyZ1Zf_1djZJ7xRTt69u02082_AwhS6Q';
-const SUPA_ROW_ID=1;
-async function supaSave(){
-  try{
-    const payload={id:SUPA_ROW_ID,expenses:JSON.stringify(expenses),month_inc:JSON.stringify(monthInc),month_bon:JSON.stringify(monthBon),recur_items:JSON.stringify(recurItems),accounts:JSON.stringify(userAccounts),last_month:lastMonth,investments:JSON.stringify(userInvestments)};
-    const r=await fetch(SUPA_URL+'/rest/v1/budget_data',{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Prefer':'resolution=merge-duplicates'},body:JSON.stringify(payload)});
-    if(!r.ok)console.warn('supaSave error',r.status);
-  }catch(e){console.warn('supaSave failed',e);}
-}
-async function supaLoad(){
-  try{
-    const r=await fetch(SUPA_URL+'/rest/v1/budget_data?id=eq.'+SUPA_ROW_ID,{headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});
-    if(!r.ok)return false;const rows=await r.json();if(!rows||rows.length===0)return false;
-    const d=rows[0];
-    if(d.expenses){expenses=JSON.parse(d.expenses);}
-    if(d.month_inc){monthInc=JSON.parse(d.month_inc);}
-    if(d.month_bon){monthBon=JSON.parse(d.month_bon);}
-    if(d.recur_items){recurItems=JSON.parse(d.recur_items);}
-    if(d.accounts){userAccounts=JSON.parse(d.accounts);}
-    if(d.last_month){lastMonth=d.last_month;}
-    if(d.investments){userInvestments=JSON.parse(d.investments);}
-    try{localStorage.setItem(SK,JSON.stringify(expenses));localStorage.setItem(SR,JSON.stringify(recurItems));localStorage.setItem(SI,JSON.stringify(monthInc));localStorage.setItem(SB,JSON.stringify(monthBon));localStorage.setItem(SL,lastMonth);localStorage.setItem('bg11_acc',JSON.stringify(userAccounts));localStorage.setItem('bg11_inv',JSON.stringify(userInvestments));}catch(e){}
-    return true;
-  }catch(e){console.warn('supaLoad failed',e);return false;}
-}
-
-// ═══════════════════════════════════════════════
-// INVESTMENT PAGE
-// ═══════════════════════════════════════════════
-
-const ASSET_CATALOGUE = {
-  btc: {name:'Bitcoin', ticker:'BTC', icon:'₿',  color:'#F7931A', coingecko:'bitcoin'},
-  eth: {name:'Ethereum',ticker:'ETH', icon:'⟠',  color:'#627EEA', coingecko:'ethereum'},
-  sol: {name:'Solana',  ticker:'SOL', icon:'◎',  color:'#9945FF', coingecko:'solana'},
+// ─── Investment page ───────────────────────────
+const ASSET_CATALOGUE={
+  btc:{name:'Bitcoin', ticker:'BTC',icon:'₿', color:'#F7931A',coingecko:'bitcoin'},
+  eth:{name:'Ethereum',ticker:'ETH',icon:'⟠',color:'#627EEA',coingecko:'ethereum'},
+  sol:{name:'Solana',  ticker:'SOL',icon:'◎', color:'#9945FF',coingecko:'solana'},
 };
 
-let userInvestments={};
-let marketData={};
-let pricesLoaded=false;
-let invMiniCharts={};
+let marketData={},pricesLoaded=false,invMiniCharts={};
 
-function saveInvestments(){try{localStorage.setItem('bg11_inv',JSON.stringify(userInvestments));}catch(e){}}
-function loadInvestments(){try{const s=localStorage.getItem('bg11_inv');if(s)userInvestments=JSON.parse(s);}catch(e){}}
-
-function hexToRgba(hex,alpha){
-  if(hex&&hex.startsWith('#')){const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);return `rgba(${r},${g},${b},${alpha})`;}
-  return 'rgba(127,119,221,'+alpha+')';
+function hexToRgba(hex,a){
+  if(hex?.startsWith('#')){const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);return `rgba(${r},${g},${b},${a})`;}
+  return `rgba(127,119,221,${a})`;
 }
 
 function buildAssetMap(){
   const map={};
   Object.entries(ASSET_CATALOGUE).forEach(([id,cat])=>{map[id]={id,...cat,buys:[]};});
   Object.entries(userInvestments).forEach(([id,inv])=>{
-    if(id==='sp500')return;
-    if(ASSET_CATALOGUE[id]){
-      map[id].buys=inv.buys||[];
-    } else {
-      map[id]={id,...inv,buys:inv.buys||[]};
-    }
+    if(ASSET_CATALOGUE[id])map[id].buys=inv.buys||[];
+    else map[id]={id,...inv,buys:inv.buys||[]};
   });
   return map;
 }
@@ -798,31 +871,27 @@ function calcAssetStats(asset){
   const totalInvested=buys.reduce((s,b)=>s+b.amountEur,0);
   const totalQty=buys.reduce((s,b)=>s+(b.qty||0),0);
   const avgPrice=totalQty>0?buys.reduce((s,b)=>s+(b.pricePerUnit*(b.qty||0)),0)/totalQty:0;
-  const mdKey=asset.coingecko||asset.id;
-  const md=marketData[mdKey]||null;
-  const currentPrice=md?md.price:null;
-  const currentValue=(currentPrice&&totalQty>0)?currentPrice*totalQty:totalInvested;
+  const md=marketData[asset.coingecko||asset.id]||null;
+  const currentPrice=md?.price||null;
+  const currentValue=currentPrice&&totalQty>0?currentPrice*totalQty:totalInvested;
   const pnlEur=currentValue-totalInvested;
-  const pnlPct=totalInvested>0?(pnlEur/totalInvested)*100:0;
-  return{totalInvested,totalQty,avgPrice,currentPrice,currentValue,pnlEur,pnlPct,md};
+  return{totalInvested,totalQty,avgPrice,currentPrice,currentValue,pnlEur,pnlPct:totalInvested>0?pnlEur/totalInvested*100:0,md};
 }
 
 function getChartData(asset,tf){
-  const mdKey=asset.coingecko||asset.id;
-  const md=marketData[mdKey];
-  if(md&&md.history){
-    const hist=md.history[tf]||md.history['1M']||md.history['1S']||null;
-    if(hist&&hist.prices&&hist.prices.length>1)return hist;
+  const md=marketData[asset.coingecko||asset.id];
+  if(md?.history){
+    const h=md.history[tf]||md.history['1M']||md.history['1S']||null;
+    if(h?.prices?.length>1)return h;
   }
   const buys=(asset.buys||[]).filter(b=>b.pricePerUnit>0).sort((a,b)=>new Date(a.date)-new Date(b.date));
-  if(buys.length===0)return null;
+  if(!buys.length)return null;
   const src=buys.length===1?[buys[0],buys[0]]:buys;
   return{
     prices:src.map(b=>b.pricePerUnit),
     labels:src.map((b,i)=>{
       if(buys.length===1)return i===0?'Achat':'Auj.';
-      const d=new Date(b.date);
-      return('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2);
+      const d=new Date(b.date);return('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2);
     })
   };
 }
@@ -830,12 +899,11 @@ function getChartData(asset,tf){
 async function fetchCryptoPrices(){
   const cgIds=[...new Set([
     ...Object.values(ASSET_CATALOGUE).map(a=>a.coingecko).filter(Boolean),
-    ...Object.values(userInvestments).map(a=>a.coingecko).filter(Boolean)
+    ...Object.values(userInvestments).map(a=>a.coingecko).filter(Boolean),
   ])];
   if(!cgIds.length)return;
   try{
-    const url=`https://api.coingecko.com/api/v3/coins/markets?vs_currency=eur&ids=${cgIds.join(',')}&sparkline=true&price_change_percentage=24h&per_page=20`;
-    const r=await fetch(url);
+    const r=await fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=eur&ids=${cgIds.join(',')}&sparkline=true&price_change_percentage=24h&per_page=20`);
     if(!r.ok)return;
     const data=await r.json();
     const JOURS=['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
@@ -843,10 +911,9 @@ async function fetchCryptoPrices(){
       if(!marketData[coin.id])marketData[coin.id]={history:{}};
       marketData[coin.id].price=coin.current_price;
       marketData[coin.id].changePct24h=coin.price_change_percentage_24h||0;
-      const sp=(coin.sparkline_in_7d&&coin.sparkline_in_7d.price)||[];
+      const sp=coin.sparkline_in_7d?.price||[];
       if(sp.length>1){
-        const now=Date.now();const step=7*24*3600*1000/sp.length;
-        const stride=Math.max(1,Math.floor(sp.length/50));
+        const now=Date.now(),step=7*24*3600*1000/sp.length,stride=Math.max(1,Math.floor(sp.length/50));
         const prices=[],labels=[];
         for(let i=0;i<sp.length;i+=stride){
           prices.push(sp[i]);
@@ -857,17 +924,16 @@ async function fetchCryptoPrices(){
       }
     });
     await Promise.allSettled(cgIds.map(id=>fetchCoinHistory(id,'1M')));
-  }catch(e){console.warn('CoinGecko failed',e);}
+  }catch(e){console.warn('CoinGecko',e);}
 }
 
 async function fetchCoinHistory(cgId,tf){
   if(!cgId)return;
   const days={'1S':7,'1M':30,'1A':365,'Global':1825}[tf]||30;
   try{
-    const url=`https://api.coingecko.com/api/v3/coins/${cgId}/market_chart?vs_currency=eur&days=${days}`;
-    const r=await fetch(url);if(!r.ok)return;
-    const data=await r.json();
-    const raw=data.prices||[];
+    const r=await fetch(`https://api.coingecko.com/api/v3/coins/${cgId}/market_chart?vs_currency=eur&days=${days}`);
+    if(!r.ok)return;
+    const raw=(await r.json()).prices||[];
     const JOURS=['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
     const stride=Math.max(1,Math.floor(raw.length/60));
     const prices=[],labels=[];
@@ -880,28 +946,25 @@ async function fetchCoinHistory(cgId,tf){
     }
     if(!marketData[cgId])marketData[cgId]={history:{}};
     marketData[cgId].history[tf]={prices,labels};
-  }catch(e){console.warn('fetchCoinHistory failed',cgId,tf,e);}
+  }catch(e){console.warn('fetchCoinHistory',cgId,tf,e);}
 }
 
 async function refreshPrices(){
-  const btn=document.getElementById('refresh-btn');
-  const icon=document.getElementById('refresh-icon');
+  const btn=document.getElementById('refresh-btn'),icon=document.getElementById('refresh-icon');
   if(btn)btn.disabled=true;
   if(icon)icon.style.animation='spin 1s linear infinite';
   await fetchCryptoPrices();
   pricesLoaded=true;
   if(btn)btn.disabled=false;
   if(icon)icon.style.animation='';
-  renderInvestPage();
-  showToast('Prix actualisés ✓');
+  renderInvestPage();showToast('Prix actualisés ✓');
 }
 
 function drawChart(canvasId,prices,labels,color){
   const canvas=document.getElementById(canvasId);
   if(!canvas||typeof Chart==='undefined'||!prices||prices.length<2)return;
-  const ctx=canvas.getContext('2d');
   if(invMiniCharts[canvasId]){try{invMiniCharts[canvasId].destroy();}catch(e){}delete invMiniCharts[canvasId];}
-  invMiniCharts[canvasId]=new Chart(ctx,{
+  invMiniCharts[canvasId]=new Chart(canvas.getContext('2d'),{
     type:'line',
     data:{labels:labels||prices.map((_,i)=>i),datasets:[{data:prices,borderColor:color,borderWidth:2,fill:true,backgroundColor:hexToRgba(color,0.12),tension:0.4,pointRadius:0}]},
     options:{responsive:false,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{x:{display:false},y:{display:false}},animation:false}
@@ -909,65 +972,54 @@ function drawChart(canvasId,prices,labels,color){
 }
 
 function renderInvestPage(){
-  const assetMap=buildAssetMap();
-  const assets=Object.values(assetMap);
+  const assetMap=buildAssetMap(),assets=Object.values(assetMap);
   let totalValue=0,totalInvested=0;
   assets.forEach(a=>{const s=calcAssetStats(a);if(s.totalInvested>0){totalValue+=s.currentValue;totalInvested+=s.totalInvested;}});
-  const globalPnl=totalValue-totalInvested;
-  const globalPct=totalInvested>0?(globalPnl/totalInvested)*100:0;
-  const tvEl=document.getElementById('inv-total-val');
-  const tiEl=document.getElementById('inv-total-invested');
+  const gPnl=totalValue-totalInvested,gPct=totalInvested>0?gPnl/totalInvested*100:0;
+  document.getElementById('inv-total-val').textContent      =totalInvested>0?fa(totalValue):'—';
+  document.getElementById('inv-total-invested').textContent =totalInvested>0?fa(totalInvested):'—';
   const tpEl=document.getElementById('inv-total-pnl');
+  tpEl.textContent=totalInvested>0?(gPnl>=0?'+':'')+fa(gPnl):'Aucun achat';
+  tpEl.style.color=totalInvested>0?(gPnl>=0?'var(--te)':'var(--re)'):'var(--mu)';
   const tpctEl=document.getElementById('inv-total-pct');
-  if(tvEl)tvEl.textContent=totalInvested>0?fa(totalValue):'—';
-  if(tiEl)tiEl.textContent=totalInvested>0?fa(totalInvested):'—';
-  if(tpEl){tpEl.textContent=totalInvested>0?(globalPnl>=0?'+':'')+fa(globalPnl):'Aucun achat';tpEl.style.color=totalInvested>0?(globalPnl>=0?'var(--te)':'var(--re)'):'var(--mu)';}
-  if(tpctEl){tpctEl.textContent=totalInvested>0?(globalPct>=0?'+':'')+globalPct.toFixed(1)+'%':'—';tpctEl.style.color=totalInvested>0?(globalPct>=0?'var(--te)':'var(--re)'):'var(--mu)';}
+  tpctEl.textContent=totalInvested>0?(gPct>=0?'+':'')+gPct.toFixed(1)+'%':'—';
+  tpctEl.style.color=totalInvested>0?(gPct>=0?'var(--te)':'var(--re)'):'var(--mu)';
   Object.keys(invMiniCharts).forEach(k=>{try{invMiniCharts[k].destroy();}catch(e){}});
   invMiniCharts={};
   const container=document.getElementById('asset-cards-list');
-  if(!container)return;
   container.innerHTML='';
   window._assetMap=assetMap;
   assets.forEach(asset=>{
-    const s=calcAssetStats(asset);
-    const hasBuys=(asset.buys||[]).length>0;
-    const color=asset.color||'#7F77DD';
-    const isPos=s.pnlEur>=0;
-    const pricePos=s.md?(s.md.changePct24h>=0):true;
-    const isManual=!asset.coingecko;
+    const s=calcAssetStats(asset),hasBuys=asset.buys.length>0;
+    const color=asset.color||'#7F77DD',isPos=s.pnlEur>=0,isManual=!asset.coingecko;
+    const pricePos=s.md?s.md.changePct24h>=0:true;
     const priceStr=s.currentPrice
       ?s.currentPrice.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:s.currentPrice>100?2:6})+' €'
-      :isManual
-        ?(hasBuys?s.avgPrice.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €':'<span style="color:var(--mu)">Manuel</span>')
-        :'<span class="price-loading"></span>';
+      :isManual?(hasBuys?s.avgPrice.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €':'<span style="color:var(--mu)">Manuel</span>')
+      :'<span class="price-loading"></span>';
     const priceChgStr=s.md
       ?`<span style="color:${pricePos?'var(--te)':'var(--re)'}">${pricePos?'▲':'▼'} ${Math.abs(s.md.changePct24h).toFixed(2)}%</span>`
       :isManual?'<span style="color:var(--mu);font-size:10px">prix manuel</span>':'<span style="color:var(--mu)">—</span>';
     const valStr=hasBuys?`<span style="color:${isPos?'var(--te)':'var(--re)'}">${fa(s.currentValue)}</span>`:`<span style="color:var(--mu)">Aucun achat</span>`;
     const varStr=hasBuys&&s.md?`<span style="color:${isPos?'var(--te)':'var(--re)'}">${isPos?'+':''}${fa(s.pnlEur)} (${isPos?'+':''}${s.pnlPct.toFixed(1)}%)</span>`:'';
-    const chartId='mc-'+asset.id;
+    const cid='mc-'+asset.id;
     const card=document.createElement('div');
-    card.className='asset-card';
-    card.style.setProperty('--asset-color',color);
+    card.className='asset-card';card.style.setProperty('--asset-color',color);
     card.onclick=()=>openAssetDetail(asset.id);
     card.innerHTML=`
       <div class="ac-top">
         <div class="ac-left">
-          <div class="ac-icon" style="background:${hexToRgba(color,0.15)};color:${color}">${asset.icon}</div>
+          <div class="ac-icon" style="background:${hexToRgba(color,.15)};color:${color}">${asset.icon}</div>
           <div><div class="ac-name">${asset.name}</div><div class="ac-ticker">${asset.ticker}</div></div>
         </div>
         <div class="ac-right">
-          <div class="ac-price-block">
-            <div class="ac-price">${priceStr}</div>
-            <div class="ac-price-chg">${priceChgStr}</div>
-          </div>
+          <div class="ac-price-block"><div class="ac-price">${priceStr}</div><div class="ac-price-chg">${priceChgStr}</div></div>
           <button class="ac-add" onclick="event.stopPropagation();openBuyModal('${asset.id}')">+</button>
         </div>
       </div>
-      <div class="ac-chart" id="wrap-${chartId}">
-        <canvas id="${chartId}" width="400" height="110"></canvas>
-        ${isManual&&(asset.buys||[]).length===0?`<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;color:rgba(238,238,245,0.25);pointer-events:none">Ajoute un achat pour voir le graphique</div>`:''}
+      <div class="ac-chart" id="wrap-${cid}">
+        <canvas id="${cid}" width="400" height="110"></canvas>
+        ${isManual&&!hasBuys?'<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;color:rgba(238,238,245,0.25);pointer-events:none">Ajoute un achat pour voir le graphique</div>':''}
       </div>
       <div class="ac-footer">
         <div style="margin-bottom:2px">
@@ -982,37 +1034,29 @@ function renderInvestPage(){
         </div>
       </div>`;
     container.appendChild(card);
-  });
-  Object.values(assetMap).forEach(asset=>{
-    const chartId='mc-'+asset.id;
     const hist=getChartData(asset,'1M');
-    if(hist&&hist.prices.length>1){
-      requestAnimationFrame(()=>{drawChart(chartId,hist.prices,hist.labels,asset.color||'#7F77DD');});
-    }
+    if(hist?.prices?.length>1)requestAnimationFrame(()=>drawChart(cid,hist.prices,hist.labels,color));
   });
   if(!pricesLoaded)refreshPrices();
 }
 
 function openBuyModal(assetId){
-  const assetMap=window._assetMap||buildAssetMap();
-  const asset=assetMap[assetId]||ASSET_CATALOGUE[assetId]||{name:assetId,ticker:assetId,icon:'📈',color:'#7F77DD'};
-  const cgId=asset.coingecko||null;
-  const md=cgId?marketData[cgId]||null:null;
-  const curPrice=md?md.price:'';
+  const asset=(window._assetMap||buildAssetMap())[assetId]||ASSET_CATALOGUE[assetId]||{name:assetId,ticker:assetId,icon:'📈'};
+  const md=asset.coingecko?marketData[asset.coingecko]||null:null;
+  const curPrice=md?.price||'';
   document.body.insertAdjacentHTML('beforeend',
-    `<div class="overlay" id="buypop" onclick="if(event.target.id==='buypop')this.remove()">
-    <div class="modal">
-      <div class="modal-title">${asset.icon} Ajouter un achat — ${asset.name}</div>
-      <div class="fsec" style="margin-bottom:10px"><label class="fl">Montant investi (€)</label><input class="fi" type="number" id="buy-amt" placeholder="100.00" inputmode="decimal" oninput="calcBuyQty()"></div>
-      <div class="fsec" style="margin-bottom:10px">
-        <label class="fl">Prix unitaire à l'achat (€)</label>
-        <input class="fi" type="number" id="buy-price" placeholder="${curPrice||'Ex: 500'}" inputmode="decimal" value="${curPrice||''}" oninput="calcBuyQty()">
-        ${md?`<div style="font-size:11px;color:var(--mu);margin-top:5px">Prix actuel : ${md.price.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})} €</div>`:''}
-      </div>
-      <div class="fsec" style="margin-bottom:10px"><label class="fl">Quantité <span style="color:var(--mu)">(auto)</span></label><input class="fi" type="number" id="buy-qty" placeholder="0.001" inputmode="decimal" step="any"></div>
-      <div class="fsec" style="margin-bottom:10px"><label class="fl">Date</label><input class="fi" type="date" id="buy-date" value="${new Date().toISOString().split('T')[0]}"></div>
-      <button class="btnp" onclick="saveBuy('${assetId}')">Enregistrer</button>
-      <button onclick="document.getElementById('buypop').remove()" style="width:100%;background:none;border:none;color:var(--mu);padding:12px;cursor:pointer;font-family:inherit;font-size:14px;margin-top:4px">Annuler</button>
+    `<div class="overlay" id="buypop" onclick="if(event.target.id==='buypop')this.remove()"><div class="modal">
+    <div class="modal-title">${asset.icon} Ajouter un achat — ${asset.name}</div>
+    <div class="fsec" style="margin-bottom:10px"><label class="fl">Montant investi (€)</label><input class="fi" type="number" id="buy-amt" placeholder="100.00" inputmode="decimal" oninput="calcBuyQty()"></div>
+    <div class="fsec" style="margin-bottom:10px">
+      <label class="fl">Prix unitaire à l'achat (€)</label>
+      <input class="fi" type="number" id="buy-price" placeholder="${curPrice||'Ex: 500'}" inputmode="decimal" value="${curPrice}" oninput="calcBuyQty()">
+      ${md?`<div style="font-size:11px;color:var(--mu);margin-top:5px">Prix actuel : ${md.price.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})} €</div>`:''}
+    </div>
+    <div class="fsec" style="margin-bottom:10px"><label class="fl">Quantité <span style="color:var(--mu)">(auto)</span></label><input class="fi" type="number" id="buy-qty" placeholder="0.001" inputmode="decimal" step="any"></div>
+    <div class="fsec" style="margin-bottom:10px"><label class="fl">Date</label><input class="fi" type="date" id="buy-date" value="${new Date().toISOString().split('T')[0]}"></div>
+    <button class="btnp" onclick="saveBuy('${assetId}')">Enregistrer</button>
+    <button onclick="document.getElementById('buypop').remove()" style="width:100%;background:none;border:none;color:var(--mu);padding:12px;cursor:pointer;font-family:inherit;font-size:14px;margin-top:4px">Annuler</button>
     </div></div>`);
 }
 function calcBuyQty(){
@@ -1031,25 +1075,16 @@ function saveBuy(assetId){
     userInvestments[assetId]={id:assetId,...cat,buys:[]};
   }
   userInvestments[assetId].buys.push({id:'b'+Date.now(),date,amountEur:amt,qty:qty||0,pricePerUnit:price||0});
-  saveInvestments();supaSave();
-  document.getElementById('buypop').remove();
-  renderInvestPage();
-  showToast('Achat enregistré ✓');
+  saveInvestments();supaSave();document.getElementById('buypop').remove();renderInvestPage();showToast('Achat enregistré ✓');
 }
 
 function openAssetDetail(assetId){
-  const assetMap=window._assetMap||buildAssetMap();
-  const asset=assetMap[assetId]||{name:assetId,icon:'📈',color:'#7F77DD',buys:[]};
-  const s=calcAssetStats(asset);
-  const color=asset.color||'#7F77DD';
-  const hasBuys=(asset.buys||[]).length>0;
-  const isPos=s.pnlEur>=0;
-  const isManual=!asset.coingecko;
+  const assetMap=window._assetMap||buildAssetMap(),asset=assetMap[assetId]||{name:assetId,icon:'📈',color:'#7F77DD',buys:[]};
+  const s=calcAssetStats(asset),color=asset.color||'#7F77DD',hasBuys=asset.buys.length>0,isPos=s.pnlEur>=0;
   const buysHtml=hasBuys
-    ?[...(asset.buys||[])].sort((a,b)=>new Date(b.date)-new Date(a.date)).map(buy=>{
+    ?[...asset.buys].sort((a,b)=>new Date(b.date)-new Date(a.date)).map(buy=>{
         const curVal=s.currentPrice&&buy.qty?s.currentPrice*buy.qty:buy.amountEur;
-        const bPnl=curVal-buy.amountEur;const bPos=bPnl>=0;
-        const d=new Date(buy.date);
+        const bPnl=curVal-buy.amountEur,bPos=bPnl>=0,d=new Date(buy.date);
         return `<div class="idm-buy-row">
           <div>
             <div class="idm-buy-date">${d.getDate().toString().padStart(2,'0')} ${MS[d.getMonth()]} ${d.getFullYear()}</div>
@@ -1071,7 +1106,7 @@ function openAssetDetail(assetId){
     <div class="inv-detail-modal">
       <div class="idm-header">
         <div style="display:flex;align-items:center;gap:10px">
-          <div class="idm-icon" style="background:${hexToRgba(color,0.15)};color:${color}">${asset.icon}</div>
+          <div class="idm-icon" style="background:${hexToRgba(color,.15)};color:${color}">${asset.icon}</div>
           <div>
             <div style="font-size:17px;font-weight:700">${asset.name}</div>
             <div style="font-size:12px;color:var(--mu)">${asset.ticker}${s.currentPrice?' · '+s.currentPrice.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €':''}</div>
@@ -1102,30 +1137,23 @@ function openAssetDetail(assetId){
         ${buysHtml}
       </div>
     </div></div>`);
-  requestAnimationFrame(()=>{
-    requestAnimationFrame(()=>{
-      switchTF(assetId,'1M',document.querySelector('#tf-bar-'+assetId+' .tf-btn.active'));
-    });
-  });
+  requestAnimationFrame(()=>requestAnimationFrame(()=>switchTF(assetId,'1M',document.querySelector('#tf-bar-'+assetId+' .tf-btn.active'))));
 }
 
 function drawDetailChart(assetId,prices,labels,color){
-  const canvasId='detail-chart-'+assetId;
-  const canvas=document.getElementById(canvasId);
+  const cid='detail-chart-'+assetId,canvas=document.getElementById(cid);
   if(!canvas||typeof Chart==='undefined'||!prices||prices.length<2)return;
-  const ctx=canvas.getContext('2d');
-  if(invMiniCharts[canvasId]){try{invMiniCharts[canvasId].destroy();}catch(e){}delete invMiniCharts[canvasId];}
-  invMiniCharts[canvasId]=new Chart(ctx,{
+  if(invMiniCharts[cid]){try{invMiniCharts[cid].destroy();}catch(e){}delete invMiniCharts[cid];}
+  invMiniCharts[cid]=new Chart(canvas.getContext('2d'),{
     type:'line',
-    data:{labels:labels||prices.map((_,i)=>i),datasets:[{data:prices,borderColor:color,borderWidth:2,fill:true,backgroundColor:hexToRgba(color,0.10),tension:0.4,pointRadius:0}]},
+    data:{labels:labels||prices.map((_,i)=>i),datasets:[{data:prices,borderColor:color,borderWidth:2,fill:true,backgroundColor:hexToRgba(color,.10),tension:0.4,pointRadius:0}]},
     options:{
       responsive:false,maintainAspectRatio:false,
       plugins:{legend:{display:false},tooltip:{enabled:true,mode:'index',intersect:false,callbacks:{label:c=>'  '+c.parsed.y.toLocaleString('fr-FR',{minimumFractionDigits:0,maximumFractionDigits:0})+' €'}}},
       scales:{
         x:{display:true,ticks:{color:'rgba(238,238,245,0.35)',font:{size:10},maxTicksLimit:5,maxRotation:0},grid:{display:false},border:{display:false}},
         y:{display:true,position:'right',ticks:{color:'rgba(238,238,245,0.35)',font:{size:10},maxTicksLimit:4,callback:v=>v>=1000?Math.round(v/1000)+'k€':Math.round(v)+'€'},grid:{color:'rgba(255,255,255,0.03)'},border:{display:false}}
-      },
-      animation:false
+      },animation:false
     }
   });
 }
@@ -1135,28 +1163,22 @@ async function switchTF(assetId,tf,btn){
   if(bar)bar.querySelectorAll('.tf-btn').forEach(b=>b.classList.remove('active'));
   if(btn)btn.classList.add('active');
   const asset=(window._assetMap||buildAssetMap())[assetId]||{};
-  const color=asset.color||'#7F77DD';
-  const lbl=document.getElementById('detail-chart-lbl-'+assetId);
+  const color=asset.color||'#7F77DD',lbl=document.getElementById('detail-chart-lbl-'+assetId);
   const tfLabels={'1S':'7 jours','1M':'1 mois','1A':'1 an','Global':'Depuis le début'};
   const cgId=asset.coingecko||null;
-  if(cgId&&(!marketData[cgId]||!marketData[cgId].history||!marketData[cgId].history[tf])){
+  if(cgId&&!marketData[cgId]?.history?.[tf]){
     if(lbl)lbl.textContent='Chargement…';
     await fetchCoinHistory(cgId,tf);
   }
   const hist=getChartData(asset,tf);
-  if(hist&&hist.prices&&hist.prices.length>1){
-    drawDetailChart(assetId,hist.prices,hist.labels,color);
-    if(lbl)lbl.textContent='Évolution · '+(tfLabels[tf]||tf);
-  } else {
-    if(lbl)lbl.textContent='Données non disponibles';
-  }
+  if(hist?.prices?.length>1){drawDetailChart(assetId,hist.prices,hist.labels,color);if(lbl)lbl.textContent='Évolution · '+(tfLabels[tf]||tf);}
+  else if(lbl)lbl.textContent='Données non disponibles';
 }
 
 function openBuyAS(assetId,buyId){
   document.body.insertAdjacentHTML('beforeend',
     `<div class="as" id="xbas" onclick="if(event.target.classList.contains('as-bg'))document.getElementById('xbas').remove()">
-    <div class="as-bg"></div>
-    <div class="as-box">
+    <div class="as-bg"></div><div class="as-box">
       <div class="as-item" onclick="document.getElementById('xbas').remove();openEditBuyModal('${assetId}','${buyId}')"><span style="font-size:18px">✏️</span><span>Modifier</span></div>
       <div class="as-item" style="color:var(--re)" onclick="document.getElementById('xbas').remove();deleteBuy('${assetId}','${buyId}')"><span style="font-size:18px">🗑️</span><span>Supprimer</span></div>
       <button class="as-cancel" onclick="document.getElementById('xbas').remove()">Annuler</button>
@@ -1167,15 +1189,14 @@ function openEditBuyModal(assetId,buyId){
   const buy=inv.buys.find(b=>b.id===buyId);if(!buy)return;
   const asset=(window._assetMap||buildAssetMap())[assetId]||{name:assetId,icon:'📈'};
   document.body.insertAdjacentHTML('beforeend',
-    `<div class="overlay" id="editbuypop" onclick="if(event.target.id==='editbuypop')this.remove()">
-    <div class="modal">
-      <div class="modal-title">${asset.icon} Modifier l'achat</div>
-      <div class="fsec" style="margin-bottom:10px"><label class="fl">Montant (€)</label><input class="fi" type="number" id="ebuy-amt" inputmode="decimal" value="${buy.amountEur}"></div>
-      <div class="fsec" style="margin-bottom:10px"><label class="fl">Prix unitaire (€)</label><input class="fi" type="number" id="ebuy-price" inputmode="decimal" value="${buy.pricePerUnit||''}"></div>
-      <div class="fsec" style="margin-bottom:10px"><label class="fl">Quantité</label><input class="fi" type="number" id="ebuy-qty" inputmode="decimal" step="any" value="${buy.qty||''}"></div>
-      <div class="fsec" style="margin-bottom:10px"><label class="fl">Date</label><input class="fi" type="date" id="ebuy-date" value="${buy.date}"></div>
-      <button class="btnp" onclick="saveEditBuy('${assetId}','${buyId}')">Enregistrer</button>
-      <button onclick="document.getElementById('editbuypop').remove()" style="width:100%;background:none;border:none;color:var(--mu);padding:12px;cursor:pointer;font-family:inherit;font-size:14px;margin-top:4px">Annuler</button>
+    `<div class="overlay" id="editbuypop" onclick="if(event.target.id==='editbuypop')this.remove()"><div class="modal">
+    <div class="modal-title">${asset.icon} Modifier l'achat</div>
+    <div class="fsec" style="margin-bottom:10px"><label class="fl">Montant (€)</label><input class="fi" type="number" id="ebuy-amt" inputmode="decimal" value="${buy.amountEur}"></div>
+    <div class="fsec" style="margin-bottom:10px"><label class="fl">Prix unitaire (€)</label><input class="fi" type="number" id="ebuy-price" inputmode="decimal" value="${buy.pricePerUnit||''}"></div>
+    <div class="fsec" style="margin-bottom:10px"><label class="fl">Quantité</label><input class="fi" type="number" id="ebuy-qty" inputmode="decimal" step="any" value="${buy.qty||''}"></div>
+    <div class="fsec" style="margin-bottom:10px"><label class="fl">Date</label><input class="fi" type="date" id="ebuy-date" value="${buy.date}"></div>
+    <button class="btnp" onclick="saveEditBuy('${assetId}','${buyId}')">Enregistrer</button>
+    <button onclick="document.getElementById('editbuypop').remove()" style="width:100%;background:none;border:none;color:var(--mu);padding:12px;cursor:pointer;font-family:inherit;font-size:14px;margin-top:4px">Annuler</button>
     </div></div>`);
 }
 function saveEditBuy(assetId,buyId){
@@ -1188,36 +1209,30 @@ function saveEditBuy(assetId,buyId){
   if(!amt||!date){showToast('Montant et date requis');return;}
   inv.buys[i]={...inv.buys[i],amountEur:amt,pricePerUnit:price||0,qty:qty||0,date};
   saveInvestments();supaSave();
-  document.getElementById('editbuypop').remove();
-  document.getElementById('inv-detail')?.remove();
-  renderInvestPage();
-  showToast('Achat modifié ✓');
+  document.getElementById('editbuypop').remove();document.getElementById('inv-detail')?.remove();
+  renderInvestPage();showToast('Achat modifié ✓');
 }
 function deleteBuy(assetId,buyId){
   if(!confirm('Supprimer cet achat ?'))return;
   if(userInvestments[assetId])userInvestments[assetId].buys=userInvestments[assetId].buys.filter(b=>b.id!==buyId);
-  saveInvestments();supaSave();
-  document.getElementById('inv-detail')?.remove();
-  renderInvestPage();
-  showToast('Achat supprimé');
+  saveInvestments();supaSave();document.getElementById('inv-detail')?.remove();renderInvestPage();showToast('Achat supprimé');
 }
 
 function openAddAssetModal(){
   document.body.insertAdjacentHTML('beforeend',
-    `<div class="overlay" id="addAssetPop" onclick="if(event.target.id==='addAssetPop')this.remove()">
-    <div class="modal">
-      <div class="modal-title">➕ Ajouter un actif</div>
-      <div class="fsec" style="margin-bottom:10px"><label class="fl">Nom</label><input class="fi" type="text" id="na-name" placeholder="Ex: NVIDIA, Dogecoin..."></div>
-      <div class="fsec" style="margin-bottom:10px"><label class="fl">Ticker</label><input class="fi" type="text" id="na-ticker" placeholder="Ex: NVDA, DOGE"></div>
-      <div class="fsec" style="margin-bottom:10px">
-        <label class="fl">ID CoinGecko <span style="color:var(--mu)">(crypto — pour prix auto)</span></label>
-        <input class="fi" type="text" id="na-cg" placeholder="Ex: dogecoin, cardano">
-        <div style="font-size:11px;color:var(--mu);margin-top:5px">Trouve l'ID sur coingecko.com/fr</div>
-      </div>
-      <div class="fsec" style="margin-bottom:10px"><label class="fl">Emoji</label><input class="fi" type="text" id="na-icon" maxlength="2" value="📈"></div>
-      <div class="fsec" style="margin-bottom:10px"><label class="fl">Couleur hex</label><input class="fi" type="text" id="na-color" placeholder="#7F77DD" value="#7F77DD"></div>
-      <button class="btnp" onclick="saveCustomAsset()">Créer l'actif</button>
-      <button onclick="document.getElementById('addAssetPop').remove()" style="width:100%;background:none;border:none;color:var(--mu);padding:12px;cursor:pointer;font-family:inherit;font-size:14px;margin-top:4px">Annuler</button>
+    `<div class="overlay" id="addAssetPop" onclick="if(event.target.id==='addAssetPop')this.remove()"><div class="modal">
+    <div class="modal-title">➕ Ajouter un actif</div>
+    <div class="fsec" style="margin-bottom:10px"><label class="fl">Nom</label><input class="fi" type="text" id="na-name" placeholder="Ex: NVIDIA, Dogecoin..."></div>
+    <div class="fsec" style="margin-bottom:10px"><label class="fl">Ticker</label><input class="fi" type="text" id="na-ticker" placeholder="Ex: NVDA, DOGE"></div>
+    <div class="fsec" style="margin-bottom:10px">
+      <label class="fl">ID CoinGecko <span style="color:var(--mu)">(crypto — pour prix auto)</span></label>
+      <input class="fi" type="text" id="na-cg" placeholder="Ex: dogecoin, cardano">
+      <div style="font-size:11px;color:var(--mu);margin-top:5px">Trouve l'ID sur coingecko.com/fr</div>
+    </div>
+    <div class="fsec" style="margin-bottom:10px"><label class="fl">Emoji</label><input class="fi" type="text" id="na-icon" maxlength="2" value="📈"></div>
+    <div class="fsec" style="margin-bottom:10px"><label class="fl">Couleur hex</label><input class="fi" type="text" id="na-color" placeholder="#7F77DD" value="#7F77DD"></div>
+    <button class="btnp" onclick="saveCustomAsset()">Créer l'actif</button>
+    <button onclick="document.getElementById('addAssetPop').remove()" style="width:100%;background:none;border:none;color:var(--mu);padding:12px;cursor:pointer;font-family:inherit;font-size:14px;margin-top:4px">Annuler</button>
     </div></div>`);
 }
 function saveCustomAsset(){
@@ -1229,24 +1244,17 @@ function saveCustomAsset(){
   if(!name||!ticker){showToast('Nom et ticker requis');return;}
   const id=ticker.toLowerCase().replace(/[^a-z0-9]/g,'');
   userInvestments[id]={id,name,ticker,icon,color,coingecko:cg,buys:[]};
-  saveInvestments();supaSave();
-  document.getElementById('addAssetPop').remove();
-  renderInvestPage();
-  showToast(name+' ajouté ✓');
+  saveInvestments();supaSave();document.getElementById('addAssetPop').remove();renderInvestPage();showToast(name+' ajouté ✓');
 }
 
+// ─── Init ─────────────────────────────────────
 async function init(){
-  load();
-  loadInvestments();
+  load();loadInvestments();
   renderDash();renderSet();renderSave();buildFilter();buildCatGrid();
   document.getElementById('f-date').value=new Date().toISOString().split('T')[0];
   const loaded=await supaLoad();
-  if(loaded){
-    checkMonth();renderDash();renderSet();renderSave();buildFilter();
-    showToast('Données chargées ✓');
-  } else {
-    checkMonth();renderDash();renderSet();renderSave();buildFilter();
-  }
+  checkMonth();renderDash();renderSet();renderSave();buildFilter();
+  if(loaded)showToast('Données chargées ✓');
 }
 init();
 </script>
