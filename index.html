@@ -581,9 +581,11 @@ function renderSave(){
   let resteTotal=0;const resteParMois=[];
   getAllMonths().forEach(key=>{
     const[y,m]=key.split('-').map(Number),mo=m-1;
-    const dep=getExp(y,mo).filter(e=>e.cat!=='revenu').reduce((s,e)=>s+e.amount,0);
+    const txs=getExp(y,mo);
+    const dep=txs.filter(e=>e.cat!=='revenu').reduce((s,e)=>s+e.amount,0);
+    const revAmt=txs.filter(e=>e.cat==='revenu').reduce((s,e)=>s+e.amount,0);
     const sal=getIncBase(y,mo);
-    if(sal>0){const reste=sal+getBonRemb(y,mo)-dep;resteTotal+=reste;resteParMois.push({key,y,m:mo,reste});}
+    if(sal>0){const reste=sal+revAmt+getBonRemb(y,mo)-dep;resteTotal+=reste;resteParMois.push({key,y,m:mo,reste});}
   });
   const rentreesMap={};
   Object.entries(monthBon).forEach(([k,bons])=>bons.forEach(b=>{
