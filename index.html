@@ -432,7 +432,7 @@ function calcSaveTotal(){
     const dep=txs.filter(e=>e.cat!=='revenu').reduce((s,e)=>s+e.amount,0);
     const revAmt=txs.filter(e=>e.cat==='revenu').reduce((s,e)=>s+e.amount,0);
     const sal=getIncBase(y,mo);
-    if(sal>0)rest+=sal+revAmt+getBonRemb(y,mo)-dep;
+    if(sal>0||revAmt>0)rest+=sal+revAmt+getBonRemb(y,mo)-dep;
   });
   let rentrees=0;
   Object.values(monthBon).forEach(bons=>bons.forEach(b=>{if(!b.desc.toLowerCase().includes('rembours'))rentrees+=b.amount;}));
@@ -449,19 +449,21 @@ function renderDash(){
   const total=txs.filter(e=>e.cat!=='revenu').reduce((s,e)=>s+e.amount,0);
   const revAmt=txs.filter(e=>e.cat==='revenu').reduce((s,e)=>s+e.amount,0);
   const sal=getIncBase(y,m),incTotal=sal+revAmt,by=sumCat(txs),rest=incTotal-total;
-  document.getElementById('d-inc').textContent=incTotal>0?fa(incTotal):'— €';
+  document.getElementById('d-inc').textContent=sal>0?fa(sal):'— €';
   document.getElementById('d-dep').textContent=fa(total);
   const re=document.getElementById('d-rest');re.textContent=fa(rest);re.style.color=rest>=0?'var(--te)':'var(--re)';
   document.getElementById('d-save').textContent=fr(calcSaveTotal());
   document.getElementById('d-bonuses').innerHTML=(monthBon[mk(y,m)]||[]).map(b=>`<div style="font-size:11px;color:var(--te);margin-top:3px">+${fa(b.amount)} ${b.desc}</div>`).join('');
-  const cats=Object.entries(by).filter(([k,v])=>v>0&&k!=='revenu').sort((a,b)=>b[1]-a[1]);
+  // Cards catégories : dépenses + revenu ponctuel (trié : dépenses d'abord, revenu à la fin)
+  const allCats=Object.entries(by).filter(([k,v])=>v>0).sort((a,b)=>{if(a[0]==='revenu')return 1;if(b[0]==='revenu')return -1;return b[1]-a[1];});
+  const expCats=allCats.filter(([k])=>k!=='revenu');
   const cc=document.getElementById('cat-cards');
-  if(!cats.length){cc.innerHTML='';}else{
-    const cols=cats.length>=3?3:cats.length;
-    cc.innerHTML='<div style="display:grid;grid-template-columns:repeat('+cols+',1fr);gap:8px">'+cats.map(([k,v])=>{const c=CAT[k];return '<div class="card tap" onclick="openCatPop(\''+k+'\','+y+','+m+')" style="text-align:center;padding:11px 8px"><div style="font-size:20px;margin-bottom:3px">'+c.icon+'</div><div style="font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px">'+c.label+'</div><div style="font-size:14px;font-weight:600;color:'+c.color+'">'+fa(v)+'</div></div>';}).join('')+'</div>';
+  if(!allCats.length){cc.innerHTML='';}else{
+    const cols=allCats.length>=3?3:allCats.length;
+    cc.innerHTML='<div style="display:grid;grid-template-columns:repeat('+cols+',1fr);gap:8px">'+allCats.map(([k,v])=>{const c=CAT[k],isRev=k==='revenu';return '<div class="card tap" onclick="openCatPop(\''+k+'\','+y+','+m+')" style="text-align:center;padding:11px 8px'+(isRev?';border:0.5px solid rgba(29,158,117,0.3);background:rgba(29,158,117,0.06)':'')+'"><div style="font-size:20px;margin-bottom:3px">'+c.icon+'</div><div style="font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px">'+c.label+'</div><div style="font-size:14px;font-weight:600;color:'+(isRev?'var(--te)':c.color)+'">'+(isRev?'+':'')+fa(v)+'</div></div>';}).join('')+'</div>';
   }
-  const maxV=Math.max(...cats.map(([,v])=>v),1);
-  document.getElementById('breakdown').innerHTML=cats.map(([k,v])=>{const c=CAT[k],pct=Math.round(v/maxV*100);return '<div class="brow"><div class="bdot" style="background:'+c.color+'"></div><span class="bname">'+c.label+'</span><div class="btrack"><div class="bbar" style="background:'+c.color+';width:'+pct+'%"></div></div><span class="bamt" style="color:'+c.color+'">'+fa(v)+'</span></div>';}).join('');
+  const maxV=Math.max(...expCats.map(([,v])=>v),1);
+  document.getElementById('breakdown').innerHTML=expCats.map(([k,v])=>{const c=CAT[k],pct=Math.round(v/maxV*100);return '<div class="brow"><div class="bdot" style="background:'+c.color+'"></div><span class="bname">'+c.label+'</span><div class="btrack"><div class="bbar" style="background:'+c.color+';width:'+pct+'%"></div></div><span class="bamt" style="color:'+c.color+'">'+fa(v)+'</span></div>';}).join('');
   renderTrend(y,m);
 }
 
@@ -469,26 +471,24 @@ function renderDash(){
 function openRevenuPop(){
   const now=new Date(),ref=new Date(now.getFullYear(),now.getMonth()+offset,1);
   const y=ref.getFullYear(),m=ref.getMonth(),sal=getIncBase(y,m);
-  const revTxs=getExp(y,m).filter(e=>e.cat==='revenu').sort((a,b)=>new Date(b.date)-new Date(a.date));
-  const total=sal+revTxs.reduce((s,e)=>s+e.amount,0);
-  const rows=[
-    sal>0?`<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:0.5px solid var(--b)"><div><div style="font-size:13px;font-weight:500">Salaire</div><div style="font-size:11px;color:var(--mu)">Revenu de base</div></div><span style="font-size:13px;font-weight:600;color:var(--bl)">${fa(sal)}</span></div>`:'',
-    ...revTxs.map(e=>{const d=new Date(e.date);return `<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:0.5px solid var(--b)"><div><div style="font-size:13px;font-weight:500">${e.desc}</div><div style="font-size:11px;color:var(--mu)">${d.getDate().toString().padStart(2,'0')} ${MS[d.getMonth()]} · Gain ponctuel</div></div><span style="font-size:13px;font-weight:600;color:var(--te)">+${fa(e.amount)}</span></div>`;})
-  ].filter(Boolean).join('');
+  const row=sal>0?'<div style="display:flex;justify-content:space-between;padding:10px 0"><div><div style="font-size:13px;font-weight:500">Salaire</div><div style="font-size:11px;color:var(--mu)">Revenu de base mensuel</div></div><span style="font-size:13px;font-weight:600;color:var(--bl)">'+fa(sal)+'</span></div>':'<div style="text-align:center;color:var(--mu);padding:20px">Aucun salaire renseigné</div>';
   document.body.insertAdjacentHTML('beforeend',
     '<div class="overlay" id="revpop" onclick="if(event.target.id===\'revpop\')this.remove()"><div class="modal">'+
-    '<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px"><span style="font-size:24px">💰</span><div><div style="font-size:17px;font-weight:600">Revenus — '+MONTHS[m]+' '+y+'</div><div style="font-size:12px;color:var(--mu)">Total : '+fa(total)+'</div></div></div>'+
-    '<div style="max-height:55vh;overflow-y:auto">'+(rows||'<div style="text-align:center;color:var(--mu);padding:20px">Aucun revenu ce mois</div>')+'</div>'+
+    '<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px"><span style="font-size:24px">💵</span><div><div style="font-size:17px;font-weight:600">Salaire — '+MONTHS[m]+' '+y+'</div><div style="font-size:12px;color:var(--mu)">'+(sal>0?fa(sal):'Non renseigné')+'</div></div></div>'+
+    '<div style="max-height:55vh;overflow-y:auto">'+row+'</div>'+
     '<button onclick="document.getElementById(\'revpop\').remove()" style="width:100%;background:var(--s3);border:none;color:var(--mu2);border-radius:12px;padding:13px;font-size:15px;cursor:pointer;font-family:inherit;margin-top:12px">Fermer</button></div></div>');
 }
 
 function openCatPop(cat,y,m){
-  const c=CAT[cat],txs=getExp(y,m).filter(e=>e.cat===cat).sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const c=CAT[cat],isRev=cat==='revenu';
+  const txs=getExp(y,m).filter(e=>e.cat===cat).sort((a,b)=>new Date(b.date)-new Date(a.date));
   const total=txs.reduce((s,e)=>s+e.amount,0);
+  const amtColor=isRev?'var(--te)':'var(--co)';
+  const prefix=isRev?'+':'';
   document.body.insertAdjacentHTML('beforeend',
     '<div class="overlay" id="catpop" onclick="if(event.target.id===\'catpop\')this.remove()"><div class="modal">'+
-    '<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px"><span style="font-size:24px">'+c.icon+'</span><div><div style="font-size:17px;font-weight:600">'+c.label+' — '+MONTHS[m]+' '+y+'</div><div style="font-size:12px;color:var(--mu)">Total : '+fa(total)+'</div></div></div>'+
-    '<div style="max-height:55vh;overflow-y:auto">'+(txs.length?txs.map(e=>{const d=new Date(e.date);return '<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:0.5px solid var(--b)"><div><div style="font-size:13px">'+e.desc+'</div><div style="font-size:11px;color:var(--mu)">'+d.getDate().toString().padStart(2,'0')+' '+MS[d.getMonth()]+'</div></div><div style="font-size:13px;font-weight:600;color:var(--co)">'+fa(e.amount)+'</div></div>';}).join(''):'<div style="text-align:center;color:var(--mu);padding:20px">Aucune entrée</div>')+'</div>'+
+    '<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px"><span style="font-size:24px">'+c.icon+'</span><div><div style="font-size:17px;font-weight:600">'+c.label+' — '+MONTHS[m]+' '+y+'</div><div style="font-size:12px;color:var(--mu)">'+(isRev?'Total encaissé : ':'Total : ')+fa(total)+'</div></div></div>'+
+    '<div style="max-height:55vh;overflow-y:auto">'+(txs.length?txs.map(e=>{const d=new Date(e.date);return '<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:0.5px solid var(--b)"><div><div style="font-size:13px">'+e.desc+'</div><div style="font-size:11px;color:var(--mu)">'+d.getDate().toString().padStart(2,'0')+' '+MS[d.getMonth()]+'</div></div><div style="font-size:13px;font-weight:600;color:'+amtColor+'">'+prefix+fa(e.amount)+'</div></div>';}).join(''):'<div style="text-align:center;color:var(--mu);padding:20px">Aucune entrée</div>')+'</div>'+
     '<button onclick="document.getElementById(\'catpop\').remove()" style="width:100%;background:var(--s3);border:none;color:var(--mu2);border-radius:12px;padding:13px;font-size:15px;cursor:pointer;font-family:inherit;margin-top:12px">Fermer</button></div></div>');
 }
 
@@ -585,7 +585,7 @@ function renderSave(){
     const dep=txs.filter(e=>e.cat!=='revenu').reduce((s,e)=>s+e.amount,0);
     const revAmt=txs.filter(e=>e.cat==='revenu').reduce((s,e)=>s+e.amount,0);
     const sal=getIncBase(y,mo);
-    if(sal>0){const reste=sal+revAmt+getBonRemb(y,mo)-dep;resteTotal+=reste;resteParMois.push({key,y,m:mo,reste});}
+    if(sal>0||revAmt>0){const reste=sal+revAmt+getBonRemb(y,mo)-dep;resteTotal+=reste;resteParMois.push({key,y,m:mo,reste});}
   });
   const rentreesMap={};
   Object.entries(monthBon).forEach(([k,bons])=>bons.forEach(b=>{
