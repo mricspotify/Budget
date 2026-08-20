@@ -78,6 +78,7 @@ body{background:
 .brow{display:flex;align-items:center;gap:11px;padding:8px 0;border-bottom:1px solid var(--b)}
 .brow:last-child{border-bottom:none}
 .bdot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.bemoji{font-size:16px;width:24px;text-align:center;flex-shrink:0;line-height:1}
 .bname{flex:1;font-size:13px;color:var(--mu2);font-weight:500}
 .btrack{width:68px;height:4px;background:var(--s3);border-radius:3px;overflow:hidden;flex-shrink:0}
 .bbar{height:4px;border-radius:3px;transition:width .4s cubic-bezier(.4,0,.2,1)}
@@ -529,7 +530,7 @@ function renderDash(){
     cc.innerHTML='<div style="display:grid;grid-template-columns:repeat('+cols+',1fr);gap:8px">'+allCats.map(([k,v])=>{const c=CAT[k],isRev=k==='revenu';return '<div class="card tap" onclick="openCatPop(\''+k+'\','+y+','+m+')" style="text-align:center;padding:11px 8px'+(isRev?';border:0.5px solid rgba(29,158,117,0.3);background:rgba(29,158,117,0.06)':'')+'"><div style="font-size:20px;margin-bottom:3px">'+c.icon+'</div><div style="font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px">'+c.label+'</div><div style="font-size:14px;font-weight:600;color:'+(isRev?'var(--te)':c.color)+'">'+(isRev?'+':'')+fa(v)+'</div></div>';}).join('')+'</div>';
   }
   const maxV=Math.max(...expCats.map(([,v])=>v),1);
-  document.getElementById('breakdown').innerHTML=expCats.map(([k,v])=>{const c=CAT[k],pct=Math.round(v/maxV*100);return '<div class="brow"><div class="bdot" style="background:'+c.color+'"></div><span class="bname">'+c.label+'</span><div class="btrack"><div class="bbar" style="background:'+c.color+';width:'+pct+'%"></div></div><span class="bamt" style="color:'+c.color+'">'+fa(v)+'</span></div>';}).join('');
+  document.getElementById('breakdown').innerHTML=expCats.map(([k,v])=>{const c=CAT[k],pct=Math.round(v/maxV*100);return '<div class="brow"><span class="bemoji">'+c.icon+'</span><span class="bname">'+c.label+'</span><div class="btrack"><div class="bbar" style="background:'+c.color+';width:'+pct+'%"></div></div><span class="bamt" style="color:'+c.color+'">'+fa(v)+'</span></div>';}).join('');
   renderTrend(y,m);
 }
 
