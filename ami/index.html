@@ -1076,6 +1076,19 @@ function saveCustomAsset(){
 }
 
 // ─── Init ─────────────────────────────────────
+function showBackupReminder(){
+  if(document.getElementById('bkpover'))return;
+  document.body.insertAdjacentHTML('beforeend',`<div class="saloverlay" id="bkpover" onclick="if(event.target.id==='bkpover')this.remove()"><div class="salmodal"><div class="salemoji">💾</div><div class="saltitle">Pense à sauvegarder !</div><div class="salsub">Tes données sont enregistrées sur ce téléphone uniquement. Fais une sauvegarde de temps en temps pour ne rien perdre.</div><button class="btnp" onclick="exportData();document.getElementById('bkpover').remove()">Exporter ma sauvegarde</button><button onclick="document.getElementById('bkpover').remove()" style="width:100%;background:none;border:none;color:var(--mu);padding:12px;cursor:pointer;font-family:inherit;font-size:14px;margin-top:4px">Plus tard</button></div></div>`);
+}
+function maybeBackupReminder(){
+  const now=new Date(),key=mk(now.getFullYear(),now.getMonth());
+  let last='';try{last=localStorage.getItem(SK+'_bkp')||'';}catch(e){}
+  if(last===key)return;
+  if(!expenses.length&&!Object.keys(monthInc).length)return;
+  if(document.getElementById('salover')){setTimeout(maybeBackupReminder,1500);return;}
+  try{localStorage.setItem(SK+'_bkp',key);}catch(e){}
+  showBackupReminder();
+}
 async function init(){
   load();loadInvestments();
   expenses=expenses.map(migrateCat);
@@ -1085,6 +1098,7 @@ async function init(){
   const loaded=await supaLoad();
   checkMonth();renderDash();renderSet();renderSave();buildFilter();
   if(loaded)showToast('Données chargées ✓');
+  setTimeout(maybeBackupReminder,900);
 }
 init();
 </script>
