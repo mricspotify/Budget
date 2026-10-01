@@ -1,0 +1,37 @@
+# Copie de référence de .github/workflows/prix.yml du repo mricspotify/Budget (le site en ligne).
+# Toutes les heures en semaine pendant la Bourse européenne : met à jour prix.json (prix VUAA + NVIDIA).
+name: Prix des actifs
+
+on:
+  schedule:
+    - cron: "5 6-20 * * 1-5"   # heure UTC → ~8h-22h à Paris
+  workflow_dispatch:
+  push:
+    paths: [".github/workflows/prix.yml", "tools/prix.py"]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: prix
+  cancel-in-progress: false
+
+jobs:
+  prix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Récupérer les prix
+        run: python tools/prix.py
+      - name: Publier prix.json
+        run: |
+          git config user.name "robot-prix"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add prix.json
+          git diff --cached --quiet && { echo "Aucun changement"; exit 0; }
+          git commit -m "chore(prix): mise a jour automatique"
+          git pull --rebase origin main
+          git push
