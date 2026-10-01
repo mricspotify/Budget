@@ -11,7 +11,6 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <link rel="icon" type="image/png" sizes="64x64" href="icons/favicon.png">
 <link rel="manifest" href="manifest.json">
-
 <title>Mon Budget</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -131,6 +130,8 @@ body{background:
   border:1px solid var(--pubor);border-radius:20px;padding:22px 20px;text-align:center;margin-bottom:14px;box-shadow:0 16px 40px -20px rgba(139,130,245,0.5)}
 .total-lbl{font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:8px}
 .total-val{font-size:34px;font-weight:800;color:var(--tx);letter-spacing:-.045em;text-shadow:0 2px 20px rgba(139,130,245,0.4)}
+.total-sub{font-size:13px;color:var(--mu2);font-weight:500;margin-top:6px;letter-spacing:-.01em}
+.total-sub b{color:var(--te);font-weight:700;font-size:15px}
 .prog-wrap{width:100%;height:6px;background:var(--s3);border-radius:4px;margin-top:16px;overflow:hidden}
 .prog-bar{height:6px;border-radius:4px;background:linear-gradient(90deg,var(--pu),#a99af8);transition:width .5s cubic-bezier(.4,0,.2,1)}
 .prog-info{display:flex;justify-content:space-between;margin-top:7px;font-size:11px;color:var(--mu);font-weight:500}
@@ -212,6 +213,8 @@ body{background:
 .ac-top{display:flex;align-items:center;justify-content:space-between;padding:14px 15px 0}
 .ac-left{display:flex;align-items:center;gap:11px}
 .ac-icon{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.inv-grp{margin:18px 2px 10px}
+.inv-grp:first-child{margin-top:0}
 .ac-name{font-size:14px;font-weight:700;letter-spacing:-.02em}
 .ac-ticker{font-size:11px;color:var(--mu);margin-top:1px;font-weight:500}
 .ac-right{display:flex;align-items:center;gap:9px}
@@ -307,6 +310,7 @@ body{background:
       <div class="total-block">
         <div class="total-lbl">Épargne totale</div>
         <div class="total-val" id="save-total">—</div>
+        <div class="total-sub" id="save-total-inv"></div>
         <div class="prog-wrap"><div class="prog-bar" id="save-bar"></div></div>
         <div class="prog-info"><span id="save-prev">—</span><span style="color:var(--pu)" id="save-pct">—</span><span id="save-next">—</span></div>
       </div>
@@ -700,6 +704,8 @@ function renderSave(){
   const goal=Math.ceil(grand/10000)*10000||10000,prev=goal-10000;
   const pct=grand>0?Math.min(100,Math.round(((grand-prev)/(goal-prev))*100)):0;
   document.getElementById('save-total').textContent=fr(grand);
+  window._saveGrand=grand;renderSaveInvLine();
+  if(!pricesLoaded)loadPricesOnce().then(renderSaveInvLine);
   document.getElementById('save-bar').style.width=pct+'%';
   document.getElementById('save-pct').textContent=pct+'% · Prochain objectif '+fr(goal);
   document.getElementById('save-prev').textContent=fr(prev);
@@ -719,6 +725,16 @@ function renderSave(){
   if(!html)html='<div style="color:var(--mu);font-size:14px;padding:48px 0;text-align:center;line-height:1.8">Aucune donnée<br><span style="font-size:12px">Importe ton fichier JSON</span></div>';
   document.getElementById('inv-cards-list').innerHTML=html;
   document.getElementById('accounts-cards').innerHTML='';
+}
+// Ligne sous l'épargne totale : épargne + valeur actuelle des investissements (onglet Invest)
+function renderSaveInvLine(){
+  const el=document.getElementById('save-total-inv');if(!el||window._saveGrand===undefined)return;
+  let invVal=0,invested=0;
+  Object.values(buildAssetMap()).forEach(a=>{const s=calcAssetStats(a);if(s.totalInvested>0){invVal+=s.currentValue;invested+=s.totalInvested;}});
+  el.textContent='';
+  if(invested<=0)return;
+  el.append('Avec investissements : ');
+  const b=document.createElement('b');b.textContent=fr(window._saveGrand+invVal);el.append(b);
 }
 
 function openSavePop(type,desc){
@@ -897,11 +913,24 @@ function importData(input){
 }
 
 // ─── Investment page ───────────────────────────
+// Logo Solana (3 barres penchées, dégradé officiel violet → vert), taille 1em pour suivre la police
+const SOL_SVG='<svg viewBox="0 0 24 20" style="width:1em;height:1em;vertical-align:-.12em"><defs><linearGradient id="solg" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#9945FF"/><stop offset="1" stop-color="#14F195"/></linearGradient></defs><path fill="url(#solg)" d="M5 1h18l-4 4H1zM1 8h18l4 4H5zM5 15h18l-4 4H1z"/></svg>';
+// Logos officiels BTC / ETH (pièces rondes), un peu plus grands que le texte
+const BTC_SVG='<svg viewBox="0 0 32 32" style="width:1.25em;height:1.25em;vertical-align:-.25em"><circle cx="16" cy="16" r="16" fill="#F7931A"/><path fill="#fff" d="M23.189 14.02c.314-2.096-1.283-3.223-3.465-3.975l.708-2.84-1.728-.43-.69 2.765c-.454-.114-.92-.22-1.385-.326l.695-2.783L15.596 6l-.708 2.839c-.376-.086-.746-.17-1.104-.26l.002-.009-2.384-.595-.46 1.846s1.283.294 1.256.312c.7.175.826.638.805 1.006l-.806 3.235c.048.012.11.03.18.057l-.183-.045-1.13 4.532c-.086.212-.303.531-.793.41.018.025-1.256-.313-1.256-.313l-.858 1.978 2.25.561c.418.105.828.215 1.231.318l-.715 2.872 1.727.43.708-2.84c.472.127.93.245 1.378.357l-.706 2.828 1.728.43.715-2.866c2.948.558 5.164.333 6.097-2.333.752-2.146-.037-3.385-1.588-4.192 1.13-.26 1.98-1.003 2.207-2.538zm-3.95 5.538c-.533 2.147-4.148.986-5.32.695l.95-3.805c1.172.293 4.929.872 4.37 3.11zm.535-5.569c-.487 1.953-3.495.96-4.47.717l.86-3.45c.975.243 4.118.696 3.61 2.733z"/></svg>';
+const ETH_SVG='<svg viewBox="0 0 32 32" style="width:1.25em;height:1.25em;vertical-align:-.25em"><circle cx="16" cy="16" r="16" fill="#627EEA"/><g fill="#fff"><path fill-opacity=".602" d="M16.498 4v8.87l7.497 3.35z"/><path d="M16.498 4L9 16.22l7.498-3.35z"/><path fill-opacity=".602" d="M16.498 21.968v6.027L24 17.616z"/><path d="M16.498 27.995v-6.028L9 17.616z"/><path fill-opacity=".2" d="M16.498 20.573l7.497-4.353-7.497-3.348z"/><path fill-opacity=".602" d="M9 16.22l7.498 4.353v-7.701z"/></g></svg>';
+// NVIDIA : œil officiel seul (Simple Icons, CC0), recadré · S&P 500 : pièce bleue « 500 »
+const NVDA_SVG='<svg viewBox="0 3.8 24 16.4" style="width:1.6em;height:1.1em;vertical-align:-.2em"><path fill="#76B900" d="M8.948 8.798v-1.43a6.7 6.7 0 0 1 .424-.018c3.922-.124 6.493 3.374 6.493 3.374s-2.774 3.851-5.75 3.851c-.398 0-.787-.062-1.158-.185v-4.346c1.528.185 1.837.857 2.747 2.385l2.04-1.714s-1.492-1.952-4-1.952a6.016 6.016 0 0 0-.796.035m0-4.735v2.138l.424-.027c5.45-.185 9.01 4.47 9.01 4.47s-4.08 4.964-8.33 4.964c-.37 0-.733-.035-1.095-.097v1.325c.3.035.61.062.91.062 3.957 0 6.82-2.023 9.593-4.408.459.371 2.34 1.263 2.73 1.652-2.633 2.208-8.772 3.984-12.253 3.984-.335 0-.653-.018-.971-.053v1.864H24V4.063zm0 10.326v1.131c-3.657-.654-4.673-4.46-4.673-4.46s1.758-1.944 4.673-2.262v1.237H8.94c-1.528-.186-2.73 1.245-2.73 1.245s.68 2.412 2.739 3.11M2.456 10.9s2.164-3.197 6.5-3.533V6.201C4.153 6.59 0 10.653 0 10.653s2.35 6.802 8.948 7.42v-1.237c-4.84-.6-6.492-5.936-6.492-5.936z"/></svg>';
+const SPX_SVG='<svg viewBox="0 0 32 32" style="width:1.25em;height:1.25em;vertical-align:-.25em"><defs><linearGradient id="spg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3B82F6"/><stop offset="1" stop-color="#1E3A8A"/></linearGradient></defs><circle cx="16" cy="16" r="16" fill="url(#spg)"/><text x="16" y="20.5" text-anchor="middle" font-family="Sora,sans-serif" font-weight="800" font-size="12.5" letter-spacing="-.6" fill="#fff">500</text></svg>';
 const ASSET_CATALOGUE={
-  btc:{name:'Bitcoin', ticker:'BTC',icon:'₿', color:'#F7931A',coingecko:'bitcoin'},
-  eth:{name:'Ethereum',ticker:'ETH',icon:'⟠',color:'#627EEA',coingecko:'ethereum'},
-  sol:{name:'Solana',  ticker:'SOL',icon:'◎', color:'#9945FF',coingecko:'solana'},
+  btc:{name:'Bitcoin', ticker:'BTC',icon:BTC_SVG,color:'#F7931A',coingecko:'bitcoin'},
+  eth:{name:'Ethereum',ticker:'ETH',icon:ETH_SVG,color:'#627EEA',coingecko:'ethereum'},
+  sol:{name:'Solana',  ticker:'SOL',icon:SOL_SVG,color:'#9945FF',coingecko:'solana'},
+  // Actions : prix via les versions « tokenisées » sur CoinGecko (suivent le cours réel, même API gratuite)
+  // ⚠️ id 'spx' et pas 'sp500' : 'sp500' est purgé par purgeInv() (ancienne entrée)
+  nvda:{name:'NVIDIA',  ticker:'NVDA',icon:NVDA_SVG,color:'#76B900',coingecko:'nvidia-xstock',group:'stock'},
+  spx: {name:'S&P 500', ticker:'SPY', icon:SPX_SVG,color:'#3B82F6',coingecko:'sp500-xstock',group:'stock'},
 };
+const INV_GROUPS={crypto:'Crypto',stock:'Actions & indices'};
 let marketData={},pricesLoaded=false,invMiniCharts={};
 
 function hexToRgba(hex,a){
@@ -975,10 +1004,12 @@ async function fetchCoinHistory(cgId,tf){
     marketData[cgId].history[tf]={prices,labels};
   }catch(e){console.warn('fetchCoinHistory',cgId,tf,e);}
 }
+let pricesPromise=null;
+function loadPricesOnce(){if(!pricesPromise)pricesPromise=fetchCryptoPrices().then(()=>{pricesLoaded=true;});return pricesPromise;}
 async function refreshPrices(){
   const btn=document.getElementById('refresh-btn'),icon=document.getElementById('refresh-icon');
   if(btn)btn.disabled=true;if(icon)icon.style.animation='spin 1s linear infinite';
-  await fetchCryptoPrices();pricesLoaded=true;
+  await fetchCryptoPrices();pricesLoaded=true;renderSaveInvLine();
   if(btn)btn.disabled=false;if(icon)icon.style.animation='';
   renderInvestPage();showToast('Prix actualisés ✓');
 }
@@ -998,7 +1029,11 @@ function renderInvestPage(){
   const tpctEl=document.getElementById('inv-total-pct');tpctEl.textContent=totalInvested>0?(gPct>=0?'+':'')+gPct.toFixed(1)+'%':'—';tpctEl.style.color=totalInvested>0?(gPct>=0?'var(--te)':'var(--re)'):'var(--mu)';
   Object.keys(invMiniCharts).forEach(k=>{try{invMiniCharts[k].destroy();}catch(e){}});invMiniCharts={};
   const container=document.getElementById('asset-cards-list');container.innerHTML='';window._assetMap=assetMap;
+  const grp=a=>a.group||'crypto';
+  assets.sort((a,b)=>(grp(a)==='stock')-(grp(b)==='stock'));
+  let lastGrp=null;
   assets.forEach(asset=>{
+    if(grp(asset)!==lastGrp){lastGrp=grp(asset);const h=document.createElement('div');h.className='sh inv-grp';h.textContent=INV_GROUPS[lastGrp]||lastGrp;container.appendChild(h);}
     const s=calcAssetStats(asset),hasBuys=asset.buys.length>0,color=asset.color||'#7F77DD',isPos=s.pnlEur>=0,isManual=!asset.coingecko,pricePos=s.md?s.md.changePct24h>=0:true;
     const priceStr=s.currentPrice?s.currentPrice.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:s.currentPrice>100?2:6})+' €':isManual?(hasBuys?s.avgPrice.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €':'<span style="color:var(--mu)">Manuel</span>'):'<span class="price-loading"></span>';
     const priceChgStr=s.md?`<span style="color:${pricePos?'var(--te)':'var(--re)'}">${pricePos?'▲':'▼'} ${Math.abs(s.md.changePct24h).toFixed(2)}%</span>`:isManual?'<span style="color:var(--mu);font-size:10px">prix manuel</span>':'<span style="color:var(--mu)">—</span>';
