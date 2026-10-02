@@ -819,8 +819,8 @@ function renderSave(){
   window._saveGrand=grand;renderSaveInvLine();
   if(!pricesLoaded)loadPricesOnce().then(renderSaveInvLine);
   window._saveData={resteParMois,rentreesMap};
-  // La bordure gauche ET le montant de la carte reprennent la couleur de son icône (halo --glow)
-  const mkCard=(icon,name,sub,amt,color,click,menu='')=>{color=(icon.match(/--glow:(#[0-9A-Fa-f]{6})/)||[])[1]||color;return '<div class="sav-card" onclick="'+click+'" style="--card-color:'+color+'"><div class="sav-left"><div class="sav-icon">'+icon+'</div><div class="sav-info"><div class="sav-name">'+name+'</div><div class="sav-sub">'+sub+'</div></div></div><div class="sav-right"><div class="sav-amt" style="color:'+color+'">'+fa(amt)+'</div>'+menu+'</div></div>';};
+  // Bordure gauche = couleur de l'icône ; montant en blanc (comme « Sans investissements »), pour toutes les cartes
+  const mkCard=(icon,name,sub,amt,color,click,menu='')=>{color=(icon.match(/--glow:(#[0-9A-Fa-f]{6})/)||[])[1]||color;return '<div class="sav-card" onclick="'+click+'" style="--card-color:'+color+'"><div class="sav-left"><div class="sav-icon">'+icon+'</div><div class="sav-info"><div class="sav-name">'+name+'</div><div class="sav-sub">'+sub+'</div></div></div><div class="sav-right"><div class="sav-amt" style="color:var(--tx)">'+fa(amt)+'</div>'+menu+'</div></div>';};
   let html=mkCard(ico('piggy'),'Reste accumulé','Cumul mensuel · '+resteParMois.length+' mois',resteTotal,'var(--te)',"openSavePop('reste')");
   Object.entries(rentreesMap).sort((a,b)=>b[1].total-a[1].total).forEach(([desc,data])=>{
     const safe=desc.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
@@ -902,21 +902,21 @@ function openSavePop(type,desc){
   const d=window._saveData||{};
   let title='',sub='',items=[],total=0,color='var(--pu)';
   if(type==='reste'){
-    title=ico('piggy')+' Reste accumulé';sub='Salaire − dépenses de chaque mois';color=ICO.piggy[1];
+    title=ico('piggy')+' Reste accumulé';sub='Salaire − dépenses de chaque mois';color='var(--tx)';
     const sorted=(d.resteParMois||[]).slice().reverse();
     total=sorted.reduce((s,r)=>s+r.reste,0);
     // Couleur rouge si mois négatif
-    items=sorted.map(({y,m,reste})=>({label:MONTHS[m]+' '+y,sub:'Salaire − dépenses',amt:(reste>=0?'+':'')+fa(reste),color:reste>=0?ICO.piggy[1]:'var(--re)'}));
+    items=sorted.map(({y,m,reste})=>({label:MONTHS[m]+' '+y,sub:'Salaire − dépenses',amt:(reste>=0?'+':'')+fa(reste),color:reste>=0?'var(--tx)':'var(--re)'}));
   } else if(type==='rentree'){
     const data=(d.rentreesMap||{})[desc]||{total:0,items:[]};
     const icon=desc.toLowerCase().includes('héritage')||desc.toLowerCase().includes('heritage')?ico('heritage'):desc.toLowerCase().includes('intér')||desc.toLowerCase().includes('inter')?ico('interest'):ico('bonus');
-    title=icon+' '+desc;sub='Rentrée exceptionnelle';color=(icon.match(/--glow:(#[0-9A-Fa-f]{6})/)||[])[1]||'var(--bl)';total=data.total;
+    title=icon+' '+desc;sub='Rentrée exceptionnelle';color='var(--tx)';total=data.total;
     items=[...data.items].sort((a,b)=>b.date.localeCompare(a.date)).map(it=>({label:it.label,sub:desc,amt:'+'+fa(it.amount),color}));
   } else if(type==='compte'){
     const a=userAccounts[desc];if(!a)return;
     const TI2=ACC_ICO;
     const TC2={banque:'var(--bl)',invest:'var(--am)',crypto:'#F7931A',epargne:'var(--te)',cash:'var(--te)',autre:'var(--mu2)'};
-    const aIco=TI2[a.type]||ACC_ICO.autre;title=aIco+' '+a.name;sub='Compte '+a.type;color=(aIco.match(/--glow:(#[0-9A-Fa-f]{6})/)||[])[1]||TC2[a.type]||'var(--pu)';total=a.balance;
+    const aIco=TI2[a.type]||ACC_ICO.autre;title=aIco+' '+a.name;sub='Compte '+a.type;color='var(--tx)';total=a.balance;
     items=[{label:'Solde actuel',sub:'Saisi manuellement',amt:fa(a.balance),color}];
   }
   const rows=items.length?items.map(it=>'<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:0.5px solid var(--b)"><div><div style="font-size:13px;font-weight:500;color:var(--tx)">'+it.label+'</div><div style="font-size:11px;color:var(--mu);margin-top:2px">'+it.sub+'</div></div><span style="font-size:13px;font-weight:600;color:'+it.color+'">'+it.amt+'</span></div>').join(''):'<div style="text-align:center;color:var(--mu);padding:32px 0;font-size:13px">Aucune entrée</div>';
