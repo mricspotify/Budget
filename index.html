@@ -67,6 +67,9 @@ body{background:
 .card.tap:active{transform:scale(.98);border-color:var(--b2)}
 .cl{font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.07em;font-weight:600;margin-bottom:6px}
 .cv{font-size:20px;font-weight:700;letter-spacing:-.035em}
+.csub{height:20px;margin-top:5px;font-size:11px;line-height:20px;color:var(--te);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pill{display:inline-block;padding:0 8px;border-radius:10px;background:rgba(55,201,138,.14);color:var(--te);font-weight:600;line-height:20px}
+.pill.neg{background:var(--redim);color:var(--re)}
 
 .sec{background:linear-gradient(165deg,var(--s2),var(--s1));border:1px solid var(--b);border-radius:16px;padding:15px;margin-bottom:12px;box-shadow:var(--elev)}
 .sh{font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.07em;font-weight:600;margin-bottom:13px;display:flex;justify-content:space-between;align-items:center}
@@ -81,6 +84,16 @@ body{background:
 .bname{flex:1;font-size:13px;color:var(--mu2);font-weight:500}
 .btrack{width:68px;height:4px;background:var(--s3);border-radius:3px;overflow:hidden;flex-shrink:0}
 .bbar{height:4px;border-radius:3px;transition:width .4s cubic-bezier(.4,0,.2,1)}
+.bgrow{padding:9px 0;border-bottom:1px solid var(--b);cursor:pointer}
+.bgrow:last-child{border-bottom:none}
+.bgtop{display:flex;align-items:center;gap:11px}
+.bgamt{font-size:12px;color:var(--mu);font-weight:500;white-space:nowrap}
+.bgamt b{font-size:13px;font-weight:700}
+.bgtrack{position:relative;height:6px;background:var(--s3);border-radius:4px;margin:7px 0 0 35px}
+.bgtrack .bbar{height:6px;border-radius:4px}
+.bgpace{position:absolute;top:-3px;width:2px;height:12px;border-radius:1px;background:var(--tx);opacity:.55}
+.bgsub{font-size:11px;margin:5px 0 0 35px;font-weight:500}
+.bd-sum{font-size:11px;text-transform:none;letter-spacing:0;font-weight:600}
 .bamt{font-size:13px;font-weight:700;min-width:62px;text-align:right;letter-spacing:-.02em}
 .chart-wrap{position:relative;height:160px;margin-top:8px}
 
@@ -131,7 +144,7 @@ body{background:
 .total-lbl{font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:8px}
 .total-val{font-size:34px;font-weight:800;color:var(--tx);letter-spacing:-.045em;text-shadow:0 2px 20px rgba(139,130,245,0.4)}
 .total-sub{font-size:13px;color:var(--mu2);font-weight:500;margin-top:6px;letter-spacing:-.01em}
-.total-sub b{color:var(--te);font-weight:700;font-size:15px}
+.total-sub b{color:var(--tx);font-weight:700;font-size:14px}
 .prog-wrap{width:100%;height:6px;background:var(--s3);border-radius:4px;margin-top:16px;overflow:hidden}
 .prog-bar{height:6px;border-radius:4px;background:linear-gradient(90deg,var(--pu),#a99af8);transition:width .5s cubic-bezier(.4,0,.2,1)}
 .prog-info{display:flex;justify-content:space-between;margin-top:7px;font-size:11px;color:var(--mu);font-weight:500}
@@ -276,13 +289,13 @@ body{background:
         <div class="mnav"><button class="mnb" onclick="changeMonth(-1)">‹</button><button class="mnb" onclick="changeMonth(1)">›</button></div>
       </div>
       <div class="grid2">
-        <div class="card tap" onclick="openRevenuPop()" style="border-left:2.5px solid var(--bl)"><div class="cl">Revenu</div><div class="cv" style="color:var(--bl)" id="d-inc">—</div><div id="d-bonuses"></div></div>
-        <div class="card" style="border-left:2.5px solid var(--co)"><div class="cl">Dépensé</div><div class="cv" style="color:var(--co)" id="d-dep">—</div></div>
-        <div class="card" style="border-left:2.5px solid var(--te)"><div class="cl">Reste</div><div class="cv" style="color:var(--te)" id="d-rest">—</div></div>
-        <div class="card" style="border-left:2.5px solid var(--am)"><div class="cl">Épargne totale</div><div class="cv" style="color:var(--am)" id="d-save">—</div></div>
+        <div class="card tap" onclick="openRevenuPop()" style="border-left:2.5px solid var(--bl)"><div class="cl">Revenu</div><div class="cv" style="color:var(--bl)" id="d-inc">—</div><div class="csub" id="d-bonuses"></div></div>
+        <div class="card" style="border-left:2.5px solid var(--co)"><div class="cl">Dépensé</div><div class="cv" style="color:var(--co)" id="d-dep">—</div><div class="csub"></div></div>
+        <div class="card" style="border-left:2.5px solid var(--te)"><div class="cl">Reste</div><div class="cv" style="color:var(--te)" id="d-rest">—</div><div class="csub" id="d-rate"></div></div>
+        <div class="card" style="border-left:2.5px solid var(--am)"><div class="cl">Épargne totale</div><div class="cv" style="color:var(--am)" id="d-save">—</div><div class="csub" id="d-save-sub" style="color:var(--mu)"></div></div>
       </div>
       <div id="cat-cards" style="margin-bottom:12px"></div>
-      <div class="sec"><div class="sh">Répartition</div><div id="breakdown"></div></div>
+      <div class="sec"><div class="sh"><span id="bd-title">Répartition</span><span id="bd-sum" class="bd-sum"></span></div><div id="breakdown"></div></div>
       <div class="tfbar" id="trend-tf">
         <button class="tfb" data-tf="6M" onclick="setTrendTF('6M',this)">6 mois</button>
         <button class="tfb" data-tf="1A" onclick="setTrendTF('1A',this)">1 an</button>
@@ -308,12 +321,13 @@ body{background:
     <div class="page" id="page-save"><div class="inner">
       <div class="ptitle">Épargne &amp; investissements</div>
       <div class="total-block">
-        <div class="total-lbl">Épargne totale</div>
+        <div class="total-lbl">Épargne totale · avec investissements</div>
         <div class="total-val" id="save-total">—</div>
         <div class="total-sub" id="save-total-inv"></div>
         <div class="prog-wrap"><div class="prog-bar" id="save-bar"></div></div>
         <div class="prog-info"><span id="save-prev">—</span><span style="color:var(--pu)" id="save-pct">—</span><span id="save-next">—</span></div>
       </div>
+      <div class="sec" id="patri-sec" style="display:none"><div class="sh">Évolution du patrimoine</div><div class="chart-wrap" style="height:150px"><canvas id="patriChart"></canvas></div></div>
       <div id="inv-cards-list"></div>
       <div id="accounts-cards"></div>
       <button class="btnp" style="margin-top:4px" onclick="openAccountModal()">+ Ajouter un compte</button>
@@ -345,6 +359,10 @@ body{background:
         <div id="rec-body"><div id="recur-list"></div></div>
       </div>
       <div class="sec">
+        <div class="sh">Budgets par catégorie</div>
+        <div id="lim-list"></div>
+      </div>
+      <div class="sec">
         <div class="sh">Données</div>
         <div class="srow"><div><div class="slbl">Nombre de dépenses</div></div><span class="sval" id="s-count">—</span></div>
         <div class="srow"><div><div class="slbl">Réinitialiser</div><div class="ssub">Supprime tout l'historique</div></div><button onclick="resetAll()" style="background:var(--redim);border:0.5px solid var(--re);color:var(--re);border-radius:7px;padding:5px 10px;font-size:12px;cursor:pointer;font-family:inherit">Reset</button></div>
@@ -360,8 +378,8 @@ body{background:
     <button class="nb active" onclick="showPage('dash',this)"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Accueil</button>
     <button class="nb" onclick="showPage('add',this)"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>Ajouter</button>
     <button class="nb" onclick="showPage('hist',this)"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/></svg>Historique</button>
-    <button class="nb" onclick="showPage('save',this)"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>Épargne</button>
-    <button class="nb" onclick="showPage('inv',this)"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><circle cx="12" cy="12" r="2"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg>Invest</button>
+    <button class="nb" onclick="showPage('save',this)"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M5 18V11M9.5 18V11M14.5 18V11M19 18V11"/><path d="M3.5 18h17"/><path d="M12 3 3 8.5h18z" stroke-linejoin="round"/></svg>Épargne</button>
+    <button class="nb" onclick="showPage('inv',this)"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>Invest</button>
     <button class="nb" onclick="showPage('set',this)"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Réglages</button>
   </nav>
 </div>
@@ -380,14 +398,20 @@ const CAT={
   courses:  {label:'Courses',  icon:'🛒',color:'#1D9E75'},
   transport:{label:'Transport',icon:'🚗',color:'#378ADD'},
   extras:   {label:'Extras',   icon:'✨',color:'#EF9F27'},
-  invest:   {label:'Invest',   icon:'📈',color:'#378ADD'},
+  invest:   {label:'Invest',   icon:'📈',color:'#2BB5B8'},
   autre:    {label:'Autre',    icon:'📌',color:'#888780'},
   revenu:   {label:'Revenu',   icon:'💰',color:'#1D9E75'},
 };
 const SK='bg11',SR='br10',SI='bi10',SB='bb10',SL='bl10';
 
 // ─── State ────────────────────────────────────
-let expenses=[],recurItems=[],monthInc={},monthBon={},userAccounts=[],userInvestments={};
+let expenses=[],recurItems=[],monthInc={},monthBon={},userAccounts=[],userInvestments={},limitHist={};
+// Budgets mensuels par catégorie : historique {courses:{'2026-10':400,'2026-12':450}, ...}
+// Le budget d'un mois = dernière valeur posée à ce mois ou avant (0 = pas de budget).
+// Changer un budget = à partir du mois choisi → les mois passés gardent leur ancien budget.
+const BUDGET_CATS=['fixes','courses','transport','extras','invest','autre'];
+function getLimit(k,y,m){const h=limitHist[k];if(!h)return 0;const key=mk(y,m);let best=null;Object.keys(h).forEach(km=>{if(km<=key&&(!best||km>best))best=km;});return best?(h[best]||0):0;}
+function setLimit(k,y,m,v){const key=mk(y,m),h=limitHist[k]||(limitHist[k]={});Object.keys(h).forEach(km=>{if(km>key)delete h[km];});h[key]=v;}
 let lastMonth='',offset=0,editId=null,selCatVal=null,histFilt='all',trendTF='all',selRecurCat=null,tChart=null;
 
 // ─── Persistence ──────────────────────────────
@@ -399,6 +423,7 @@ function save(){
     localStorage.setItem(SB,JSON.stringify(monthBon));
     localStorage.setItem(SL,lastMonth);
     localStorage.setItem('bg11_acc',JSON.stringify(userAccounts));
+    localStorage.setItem('bg11_limh',JSON.stringify(limitHist));
   }catch(e){}
   supaSave();
 }
@@ -410,7 +435,8 @@ function load(){
     monthBon   =JSON.parse(localStorage.getItem(SB))||{};
     lastMonth  =localStorage.getItem(SL)||'';
     userAccounts=JSON.parse(localStorage.getItem('bg11_acc'))||[];
-  }catch(e){expenses=[];recurItems=[];monthInc={};monthBon={};userAccounts=[];}
+    limitHist  =JSON.parse(localStorage.getItem('bg11_limh'))||{};
+  }catch(e){expenses=[];recurItems=[];monthInc={};monthBon={};userAccounts=[];limitHist={};}
 }
 function saveInvestments(){try{localStorage.setItem('bg11_inv',JSON.stringify(userInvestments));}catch(e){}}
 function loadInvestments(){try{const s=localStorage.getItem('bg11_inv');if(s)userInvestments=JSON.parse(s);}catch(e){}}
@@ -531,8 +557,13 @@ function renderDash(){
   document.getElementById('d-inc').textContent=sal>0?fa(sal):'— €';
   document.getElementById('d-dep').textContent=fa(total);
   const re=document.getElementById('d-rest');re.textContent=fa(rest);re.style.color=rest>=0?'var(--te)':'var(--re)';
-  document.getElementById('d-save').textContent=fr(calcSaveTotal());
-  document.getElementById('d-bonuses').innerHTML=(monthBon[mk(y,m)]||[]).map(b=>`<div style="font-size:11px;color:var(--te);margin-top:3px">+${fa(b.amount)} ${b.desc}</div>`).join('');
+  renderDashSave();if(!pricesLoaded)loadPricesOnce().then(renderDashSave);
+  const bons=monthBon[mk(y,m)]||[],bEl=document.getElementById('d-bonuses');
+  bEl.textContent=!bons.length?'':bons.length===1?'+ '+fr(bons[0].amount)+' '+bons[0].desc:'+ '+fr(bons.reduce((s,b)=>s+b.amount,0))+' · '+bons.length+' rentrées';
+  bEl.title=bons.map(b=>'+'+fa(b.amount)+' '+b.desc).join('\n');
+  // Taux d'épargne = part du revenu du mois qui reste (Reste ÷ Revenu)
+  const rEl=document.getElementById('d-rate');rEl.textContent='';
+  if(incTotal>0){const pct=Math.round(rest/incTotal*100),pill=document.createElement('span');pill.className='pill'+(pct<0?' neg':'');pill.textContent=pct+' % gardé';rEl.appendChild(pill);}
   // Cards catégories : dépenses + revenu ponctuel (trié : dépenses d'abord, revenu à la fin)
   const allCats=Object.entries(by).filter(([k,v])=>v>0).sort((a,b)=>{if(a[0]==='revenu')return 1;if(b[0]==='revenu')return -1;return b[1]-a[1];});
   const expCats=allCats.filter(([k])=>k!=='revenu');
@@ -541,9 +572,59 @@ function renderDash(){
     const cols=allCats.length>=3?3:allCats.length;
     cc.innerHTML='<div style="display:grid;grid-template-columns:repeat('+cols+',1fr);gap:8px">'+allCats.map(([k,v])=>{const c=CAT[k],isRev=k==='revenu';return '<div class="card tap" onclick="openCatPop(\''+k+'\','+y+','+m+')" style="text-align:center;padding:11px 8px'+(isRev?';border:0.5px solid rgba(29,158,117,0.3);background:rgba(29,158,117,0.06)':'')+'"><div style="font-size:20px;margin-bottom:3px">'+c.icon+'</div><div style="font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px">'+c.label+'</div><div style="font-size:14px;font-weight:600;color:'+(isRev?'var(--te)':c.color)+'">'+(isRev?'+':'')+fa(v)+'</div></div>';}).join('')+'</div>';
   }
-  const maxV=Math.max(...expCats.map(([,v])=>v),1);
-  document.getElementById('breakdown').innerHTML=expCats.map(([k,v])=>{const c=CAT[k],pct=Math.round(v/maxV*100);return '<div class="brow"><span class="bemoji">'+c.icon+'</span><span class="bname">'+c.label+'</span><div class="btrack"><div class="bbar" style="background:'+c.color+';width:'+pct+'%"></div></div><span class="bamt" style="color:'+c.color+'">'+fa(v)+'</span></div>';}).join('');
+  renderBudgets(y,m,by,expCats);
   renderTrend(y,m);
+}
+
+// ─── Suivi des budgets (accueil) ──────────────
+// Catégorie avec budget → barre « dépensé / budget » + reste ; sans budget → ligne simple comme avant.
+// Repère vertical = où on « devrait » en être à cette date (mois en cours seulement).
+function renderBudgets(y,m,by,expCats){
+  const now=new Date(),isCur=y===now.getFullYear()&&m===now.getMonth();
+  const dim=new Date(y,m+1,0).getDate(),pace=isCur?now.getDate()/dim:null;
+  const L=k=>getLimit(k,y,m),withLim=BUDGET_CATS.filter(k=>L(k)>0);
+  const rows=[];
+  withLim.forEach(k=>{
+    const c=CAT[k],lim=L(k),v=by[k]||0,ratio=v/lim,left=lim-v;
+    // Feu tricolore (pas la couleur de catégorie : Extras est déjà orange → confusion avec l'alerte)
+    const col=ratio>1?'var(--re)':ratio>=.85?'var(--am)':'var(--te)';
+    const status=left>=0?'reste '+fr(left):'+'+fr(-left)+' dépassé';
+    rows.push('<div class="bgrow tap" onclick="openLimitModal(\''+k+'\','+y+','+m+')">'+
+      '<div class="bgtop"><span class="bemoji">'+c.icon+'</span><span class="bname">'+c.label+'</span>'+
+      '<span class="bgamt"><b style="color:'+col+'">'+fr(v)+'</b> / '+fr(lim)+'</span></div>'+
+      '<div class="bgtrack"><div class="bbar" style="background:'+col+';width:'+Math.min(100,ratio*100).toFixed(1)+'%"></div>'+
+      (pace!==null?'<div class="bgpace" style="left:'+(pace*100).toFixed(1)+'%"></div>':'')+'</div>'+
+      '<div class="bgsub" style="color:'+(left>=0?'var(--mu)':'var(--re)')+'">'+status+'</div></div>');
+  });
+  const others=expCats.filter(([k])=>!(L(k)>0));
+  const maxV=Math.max(...others.map(([,v])=>v),1);
+  others.forEach(([k,v])=>{const c=CAT[k],pct=Math.round(v/maxV*100);
+    rows.push('<div class="brow'+(BUDGET_CATS.includes(k)?' tap" onclick="openLimitModal(\''+k+'\','+y+','+m+')':'')+'"><span class="bemoji">'+c.icon+'</span><span class="bname">'+c.label+'</span><div class="btrack"><div class="bbar" style="background:'+c.color+';width:'+pct+'%"></div></div><span class="bamt" style="color:'+c.color+'">'+fa(v)+'</span></div>');});
+  document.getElementById('breakdown').innerHTML=rows.join('');
+  document.getElementById('bd-title').textContent=withLim.length?'Suivi des budgets':'Répartition';
+  const sumEl=document.getElementById('bd-sum');
+  if(withLim.length){const sp=withLim.reduce((s,k)=>s+(by[k]||0),0),tl=withLim.reduce((s,k)=>s+L(k),0);sumEl.textContent=fr(sp)+' / '+fr(tl);sumEl.style.color=sp>tl?'var(--re)':'var(--mu2)';}
+  else sumEl.textContent='';
+}
+function openLimitModal(k,y,m){
+  if(y===undefined){const n=new Date();y=n.getFullYear();m=n.getMonth();}
+  const c=CAT[k],cur=getLimit(k,y,m)||'';
+  document.body.insertAdjacentHTML('beforeend','<div class="overlay" id="limpop" onclick="if(event.target.id===\'limpop\')this.remove()"><div class="modal">'+
+    '<div class="modal-title">'+c.icon+' Budget '+c.label+'</div>'+
+    '<div style="font-size:12px;color:var(--mu);margin:-6px 0 14px">À partir de '+MONTHS[m]+' '+y+' · les mois précédents ne changent pas</div>'+
+    '<div class="fsec" style="margin-bottom:10px"><label class="fl">Montant maximum par mois (€)</label><input class="fi" type="number" inputmode="decimal" id="lim-amt" placeholder="Ex : 400" value="'+cur+'"></div>'+
+    '<button class="btnp" onclick="saveLimit(\''+k+'\','+y+','+m+')">Enregistrer</button>'+
+    (cur?'<button onclick="removeLimit(\''+k+'\','+y+','+m+')" style="width:100%;background:none;border:none;color:var(--re);padding:12px;cursor:pointer;font-family:inherit;font-size:14px;margin-top:4px">Supprimer ce budget</button>':'')+
+    '<button onclick="document.getElementById(\'limpop\').remove()" style="width:100%;background:none;border:none;color:var(--mu);padding:12px;cursor:pointer;font-family:inherit;font-size:14px">Annuler</button></div></div>');
+  setTimeout(()=>document.getElementById('lim-amt')?.focus(),50);
+}
+function saveLimit(k,y,m){const v=parseFloat(document.getElementById('lim-amt').value);if(!v||v<=0){showToast('Montant invalide');return;}setLimit(k,y,m,v);save();document.getElementById('limpop').remove();renderDash();renderSet();showToast('Budget enregistré ✓');}
+function removeLimit(k,y,m){setLimit(k,y,m,0);save();document.getElementById('limpop')?.remove();renderDash();renderSet();showToast('Budget supprimé');}
+function renderLimits(){
+  const el=document.getElementById('lim-list');if(!el)return;
+  const n=new Date(),y=n.getFullYear(),m=n.getMonth();
+  el.innerHTML='<div style="font-size:11px;color:var(--mu);padding:0 0 6px">Budgets de '+MONTHS[m]+' '+y+' · repris automatiquement chaque nouveau mois</div>'+BUDGET_CATS.map(k=>{const c=CAT[k],v=getLimit(k,y,m);
+    return '<div class="srow"><div style="display:flex;align-items:center;gap:10px"><span style="font-size:18px">'+c.icon+'</span><div><div class="slbl">'+c.label+'</div><div class="ssub">'+(v?fr(v)+' / mois':'Aucun budget')+'</div></div></div><button class="smb" onclick="openLimitModal(\''+k+'\','+y+','+m+')">'+(v?'Modifier':'+ Définir')+'</button></div>';}).join('');
 }
 
 // Popup détail Revenu (clique sur la carte bleue)
@@ -701,15 +782,8 @@ function renderSave(){
   const rentreesTotal=Object.values(rentreesMap).reduce((s,v)=>s+v.total,0);
   const accsTotal=userAccounts.reduce((s,a)=>s+a.balance,0);
   const grand=resteTotal+rentreesTotal+accsTotal;
-  const goal=Math.ceil(grand/10000)*10000||10000,prev=goal-10000;
-  const pct=grand>0?Math.min(100,Math.round(((grand-prev)/(goal-prev))*100)):0;
-  document.getElementById('save-total').textContent=fr(grand);
   window._saveGrand=grand;renderSaveInvLine();
   if(!pricesLoaded)loadPricesOnce().then(renderSaveInvLine);
-  document.getElementById('save-bar').style.width=pct+'%';
-  document.getElementById('save-pct').textContent=pct+'% · Prochain objectif '+fr(goal);
-  document.getElementById('save-prev').textContent=fr(prev);
-  document.getElementById('save-next').textContent=fr(goal);
   window._saveData={resteParMois,rentreesMap};
   const mkCard=(icon,name,sub,amt,color,click,menu='')=>'<div class="sav-card" onclick="'+click+'" style="--card-color:'+color+'"><div class="sav-left"><div class="sav-icon" style="background:'+color+'22;color:'+color+'">'+icon+'</div><div class="sav-info"><div class="sav-name">'+name+'</div><div class="sav-sub">'+sub+'</div></div></div><div class="sav-right"><div class="sav-amt" style="color:'+color+'">'+fa(amt)+'</div>'+menu+'</div></div>';
   let html=mkCard('💵','Reste accumulé','Cumul mensuel · '+resteParMois.length+' mois',resteTotal,'var(--te)',"openSavePop('reste')");
@@ -727,14 +801,66 @@ function renderSave(){
   document.getElementById('accounts-cards').innerHTML='';
 }
 // Ligne sous l'épargne totale : épargne + valeur actuelle des investissements (onglet Invest)
+function renderDashSave(){
+  const el=document.getElementById('d-save');if(!el)return;
+  const base=calcSaveTotal(),inv=invTotalValue();
+  el.textContent=fr(base+inv);
+  document.getElementById('d-save-sub').textContent=inv>0?'sans invest. '+fr(base):'';
+}
+// Valeur actuelle des investissements (onglet Invest) ; 0 si aucun achat
+function invTotalValue(){let v=0;Object.values(buildAssetMap()).forEach(a=>{const s=calcAssetStats(a);if(s.totalInvested>0)v+=s.currentValue;});return v;}
 function renderSaveInvLine(){
   const el=document.getElementById('save-total-inv');if(!el||window._saveGrand===undefined)return;
-  let invVal=0,invested=0;
-  Object.values(buildAssetMap()).forEach(a=>{const s=calcAssetStats(a);if(s.totalInvested>0){invVal+=s.currentValue;invested+=s.totalInvested;}});
+  const grand=window._saveGrand,invVal=invTotalValue(),total=grand+invVal;
+  document.getElementById('save-total').textContent=fr(total);
   el.textContent='';
-  if(invested<=0)return;
-  el.append('Avec investissements : ');
-  const b=document.createElement('b');b.textContent=fr(window._saveGrand+invVal);el.append(b);
+  if(invVal>0){el.append('Sans investissements : ');const b=document.createElement('b');b.textContent=fr(grand);el.append(b);}
+  const goal=Math.ceil(total/10000)*10000||10000,prev=goal-10000;
+  const pct=total>0?Math.min(100,Math.round(((total-prev)/(goal-prev))*100)):0;
+  document.getElementById('save-bar').style.width=pct+'%';
+  document.getElementById('save-pct').textContent=pct+'% · Prochain objectif '+fr(goal);
+  document.getElementById('save-prev').textContent=fr(prev);
+  document.getElementById('save-next').textContent=fr(goal);
+  renderDashSave();renderPatri();
+}
+// Patrimoine fin de mois = reste cumulé + rentrées exceptionnelles + comptes manuels (solde actuel, pas d'historique)
+// + investissements : parts détenues × prix RÉEL à la fin de ce mois (historique prix.json / CoinGecko 1 an ;
+// repli = montant investi si l'historique ne remonte pas) ; mois en cours = prix actuel → dernier point = gros chiffre.
+// Les achats Invest sont aussi saisis en dépense Invest → sortent du reste, entrent ici : un achat ne change pas le total.
+let patriChart=null;
+function renderPatri(){
+  const sec=document.getElementById('patri-sec'),cv=document.getElementById('patriChart');if(!sec||!cv||typeof Chart==='undefined')return;
+  const all=getAllMonths(),now=new Date(),curKey=mk(now.getFullYear(),now.getMonth());
+  if(!all.length){sec.style.display='none';return;}
+  const[fy,fm]=all[0].split('-').map(Number);
+  const months=[];for(let d=new Date(fy,fm-1,1);mk(d.getFullYear(),d.getMonth())<=curKey;d=new Date(d.getFullYear(),d.getMonth()+1,1))months.push([d.getFullYear(),d.getMonth()]);
+  if(months.length<2){sec.style.display='none';return;}
+  const accs=userAccounts.reduce((s,a)=>s+a.balance,0);
+  const assets=Object.values(buildAssetMap()).filter(a=>(a.buys||[]).length);
+  const invAt=end=>{const ts=Math.min(end.getTime()-1,Date.now());let v=0;
+    assets.forEach(a=>{const held=a.buys.filter(b=>new Date(b.date)<end);if(!held.length)return;
+      const qty=held.reduce((s,b)=>s+(b.qty||0),0),px=priceAt(a,ts);
+      v+=px&&qty>0?qty*px:held.reduce((s,b)=>s+(b.amountEur||0),0);});return v;};
+  let cum=0;const labels=[],vals=[];
+  months.forEach(([y,m],i)=>{
+    const txs=getExp(y,m),dep=txs.filter(e=>e.cat!=='revenu').reduce((s,e)=>s+e.amount,0),revAmt=txs.filter(e=>e.cat==='revenu').reduce((s,e)=>s+e.amount,0),sal=getIncBase(y,m);
+    if(sal>0||revAmt>0)cum+=sal+revAmt+getBonRemb(y,m)-dep;
+    cum+=(monthBon[mk(y,m)]||[]).filter(b=>!b.desc.toLowerCase().includes('rembours')).reduce((s,b)=>s+b.amount,0);
+    const end=new Date(y,m+1,1),isLast=i===months.length-1;
+    const inv=isLast?invTotalValue():invAt(end);
+    labels.push(months.length>13?MS[m]+' '+String(y).slice(-2):MS[m]);vals.push(Math.round(cum+accs+inv));
+  });
+  sec.style.display='';
+  const fmt=v=>Math.abs(v)>=1000?(v/1000).toFixed(v%1000?1:0)+'k€':Math.round(v)+'€';
+  try{if(patriChart)patriChart.destroy();
+    const neon={id:'neon',beforeDatasetDraw(c){c.ctx.save();c.ctx.shadowColor='rgba(139,130,245,0.85)';c.ctx.shadowBlur=14;},afterDatasetDraw(c){c.ctx.restore();}};
+    patriChart=new Chart(cv.getContext('2d'),{type:'line',plugins:[neon],data:{labels,datasets:[{data:vals,borderColor:'#A99AF8',borderWidth:2.5,tension:0.3,pointRadius:0,pointHoverRadius:5,pointBackgroundColor:'#C9C0FF',fill:true,
+      backgroundColor:c=>{const g=c.chart.ctx.createLinearGradient(0,0,0,150);g.addColorStop(0,'rgba(139,130,245,0.42)');g.addColorStop(1,'rgba(139,130,245,0)');return g;}}]},
+      options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+        plugins:{legend:{display:false},tooltip:{backgroundColor:'#20202c',borderColor:'rgba(255,255,255,0.12)',borderWidth:1,titleColor:'#f3f3f8',bodyColor:'#f3f3f8',padding:9,cornerRadius:9,displayColors:false,callbacks:{label:c=>' '+fr(c.parsed.y)}}},
+        scales:{x:{grid:{display:false},ticks:{color:'rgba(243,243,248,0.42)',font:{size:10},maxRotation:0,autoSkip:true,maxTicksLimit:7},border:{display:false}},
+                y:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'rgba(243,243,248,0.42)',font:{size:10},maxTicksLimit:4,callback:fmt},border:{display:false}}}}});
+  }catch(e){console.warn('patrimoine',e);}
 }
 
 function openSavePop(type,desc){
@@ -807,6 +933,7 @@ function deleteAccount(idx){
 
 // ─── Settings ─────────────────────────────────
 function renderSet(){
+  renderLimits();
   document.getElementById('s-count').textContent=expenses.length;
   const entries=Object.entries(monthInc).sort((a,b)=>b[0].localeCompare(a[0]));
   document.getElementById('inc-list').innerHTML=entries.length?entries.map(([k,v])=>{const[y,m]=k.split('-');return '<div class="incrow"><div><div style="font-size:13px">'+MONTHS[parseInt(m)-1]+' '+y+'</div></div><div style="display:flex;align-items:center;gap:8px"><span style="font-size:13px;font-weight:600;color:var(--te)">'+fa(v)+'</span><button class="smb" onclick="editInc(\''+k+'\','+v+')">Modifier</button></div></div>';}).join(''):'<div style="color:var(--mu);font-size:13px;padding:8px 0">Aucun revenu</div>';
@@ -847,10 +974,12 @@ function editInc(key,cur){
 function saveInc(key){const v=parseFloat(document.getElementById('salin').value);if(!v||v<=0){showToast('Montant invalide');return;}monthInc[key]=v;save();document.getElementById('salover').remove();renderSet();renderDash();showToast('Revenu modifié ✓');}
 function openSalModal(fromSet){
   const now=new Date(),y=now.getFullYear(),m=now.getMonth(),ex=getIncBase(y,m);
-  document.body.insertAdjacentHTML('beforeend','<div class="saloverlay" id="salover" onclick="if(event.target.id===\'salover\')this.remove()"><div class="salmodal"><div class="salemoji">💰</div><div class="saltitle">'+(fromSet?'Ajouter un revenu':'Nouveau mois !')+'</div><div class="salsub">'+MONTHS[m]+' '+y+' — Quel est ton salaire ?</div><input class="salinput" type="number" id="salin" placeholder="1500" inputmode="decimal" value="'+(ex||'')+'"><div class="salhint">Modifiable à tout moment dans Réglages</div><button class="btnp" onclick="saveSal('+y+','+m+')">Confirmer</button>'+(fromSet?'<button onclick="document.getElementById(\'salover\').remove()" style="width:100%;background:none;border:none;color:var(--mu);padding:12px;cursor:pointer;font-family:inherit;font-size:14px;margin-top:4px">Annuler</button>':'')+'</div></div>');
+  document.body.insertAdjacentHTML('beforeend','<div class="saloverlay" id="salover" onclick="if(event.target.id===\'salover\')this.remove()"><div class="salmodal"><div class="salemoji">💰</div><div class="saltitle">'+(fromSet?'Ajouter un revenu':'Nouveau mois !')+'</div><div class="salsub">'+(fromSet?'Pour quel mois ?':MONTHS[m]+' '+y+' — Quel est ton salaire ?')+'</div>'+(fromSet?'<input class="fi" type="month" id="salmonth" value="'+mk(y,m)+'" max="'+mk(new Date(y,m+1,1).getFullYear(),new Date(y,m+1,1).getMonth())+'" onchange="document.getElementById(\'salin\').value=monthInc[this.value]||\'\'" style="margin-bottom:12px;text-align:center;color-scheme:dark">':'')+'<input class="salinput" type="number" id="salin" placeholder="1500" inputmode="decimal" value="'+(ex||'')+'"><div class="salhint">Modifiable à tout moment dans Réglages</div><button class="btnp" onclick="saveSal('+y+','+m+')">Confirmer</button>'+(fromSet?'<button onclick="document.getElementById(\'salover\').remove()" style="width:100%;background:none;border:none;color:var(--mu);padding:12px;cursor:pointer;font-family:inherit;font-size:14px;margin-top:4px">Annuler</button>':'')+'</div></div>');
   setTimeout(()=>document.getElementById('salin').focus(),100);
 }
-function saveSal(y,m){const v=parseFloat(document.getElementById('salin').value);if(!v||v<=0){showToast('Montant invalide');return;}monthInc[mk(y,m)]=v;save();document.getElementById('salover').remove();renderDash();renderSet();showToast('Revenu enregistré ✓');}
+function saveSal(y,m){const v=parseFloat(document.getElementById('salin').value);if(!v||v<=0){showToast('Montant invalide');return;}
+  const sm=document.getElementById('salmonth');if(sm){if(!/^\d{4}-\d{2}$/.test(sm.value)){showToast('Choisis un mois');return;}const[yy,mm]=sm.value.split('-').map(Number);y=yy;m=mm-1;}
+  monthInc[mk(y,m)]=v;save();document.getElementById('salover').remove();renderDash();renderSet();showToast('Revenu enregistré ✓');}
 function openBonusModal(preDesc){
   const now=new Date(),ym=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
   const descField=preDesc
@@ -887,7 +1016,7 @@ function resetAll(){
   save();saveInvestments();renderDash();renderSet();renderSave();showToast('Réinitialisé');
 }
 function exportData(){
-  const blob=new Blob([JSON.stringify({expenses,monthInc,monthBon,recurItems,accounts:userAccounts,investments:userInvestments},null,2)],{type:'application/json'});
+  const blob=new Blob([JSON.stringify({expenses,monthInc,monthBon,recurItems,accounts:userAccounts,investments:userInvestments,limitHist},null,2)],{type:'application/json'});
   const url=URL.createObjectURL(blob),a=document.createElement('a');
   a.href=url;a.download='monbudget_backup.json';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
   showToast('Export téléchargé ✓');
@@ -904,6 +1033,7 @@ function importData(input){
       if(data.recurItems) recurItems  =data.recurItems;
       if(data.accounts)   userAccounts=data.accounts;
       if(data.investments){userInvestments=purgeInv(data.investments);}
+      if(data.limitHist)  limitHist   =data.limitHist;
       save();saveInvestments();
       supaSave().then(()=>showToast('Données importées et sauvegardées ✓'));
       renderDash();renderSet();renderSave();buildFilter();
@@ -1003,11 +1133,24 @@ async function fetchGhPrices(){
         for(let i=0;i<h.p.length;i+=stride){prices.push(h.p[i]);const d=new Date(h.t[i]*1000);labels.push(tf==='1S'?JOURS[d.getDay()]+' '+d.getHours()+'h':tf==='1M'?('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2):MS[d.getMonth()]+' '+d.getFullYear().toString().slice(-2));}
         history[tf]={prices,labels};
       });
-      marketData[k]={price:a.price,changePct24h:a.changePct24h||0,updated:a.marketTime||data.updated,history};
+      // raw = historique long (hebdo « Global ») + quotidien (1 an), trié → prix à n'importe quelle fin de mois
+      const rawMap={};['Global','1A'].forEach(tf=>{const h=(a.history||{})[tf];if(h)h.t.forEach((t,i)=>{rawMap[t*1000]=h.p[i];});});
+      const raw=Object.keys(rawMap).map(Number).sort((x,y)=>x-y).map(t=>[t,rawMap[t]]);
+      marketData[k]={price:a.price,changePct24h:a.changePct24h||0,updated:a.marketTime||data.updated,history,raw};
     });
   }catch(e){console.warn('prix.json',e);}
 }
-async function fetchAllPrices(){await Promise.allSettled([fetchCryptoPrices(),fetchGhPrices()]);}
+async function fetchAllPrices(){
+  await Promise.allSettled([fetchCryptoPrices(),fetchGhPrices()]);
+  const owned=Object.values(buildAssetMap()).filter(a=>a.coingecko&&(a.buys||[]).length&&!marketData[a.coingecko]?.raw);
+  for(const a of owned)await fetchCoinHistory(a.coingecko,'1A'); // l'un après l'autre : limite gratuite CoinGecko
+}
+// Prix d'un actif à une date (dernier prix connu à cette date) ; null si l'historique ne remonte pas jusque-là
+function priceAt(asset,ts){
+  const raw=marketData[mdKey(asset)]?.raw;if(!raw||!raw.length||ts<raw[0][0]-8*864e5)return null;
+  let lo=0,hi=raw.length-1,best=null;while(lo<=hi){const mid=(lo+hi)>>1;if(raw[mid][0]<=ts){best=raw[mid][1];lo=mid+1;}else hi=mid-1;}
+  return best;
+}
 async function fetchCoinHistory(cgId,tf){
   if(!cgId)return;
   const days={'1S':7,'1M':30,'1A':365,'Global':1825}[tf]||30;
@@ -1021,6 +1164,7 @@ async function fetchCoinHistory(cgId,tf){
     for(let i=0;i<raw.length;i+=stride){prices.push(raw[i][1]);const d=new Date(raw[i][0]);if(days<=7)labels.push(JOURS[d.getDay()]+' '+d.getHours()+'h');else if(days<=30)labels.push(('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2));else labels.push(MS[d.getMonth()]+' '+d.getFullYear().toString().slice(-2));}
     if(!marketData[cgId])marketData[cgId]={history:{}};
     marketData[cgId].history[tf]={prices,labels};
+    if(tf==='1A')marketData[cgId].raw=raw.map(x=>[x[0],x[1]]);
   }catch(e){console.warn('fetchCoinHistory',cgId,tf,e);}
 }
 let pricesPromise=null;
