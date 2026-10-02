@@ -1005,13 +1005,13 @@ function renderSet(){
 function editInc(key,cur){
   const[y,m]=key.split('-'),lbl=MONTHS[parseInt(m)-1]+' '+y;
   document.body.insertAdjacentHTML('beforeend','<div class="saloverlay" id="salover" onclick="if(event.target.id===\'salover\')this.remove()"><div class="salmodal"><div class="salemoji">'+ico('salary')+'</div><div class="saltitle">Modifier le revenu</div><div class="salsub">'+lbl+'</div><input class="salinput" type="number" id="salin" inputmode="decimal" value="'+cur+'"><div class="salhint">Modifie le salaire pour ce mois</div><button class="btnp" onclick="saveInc(\''+key+'\')">Confirmer</button><button onclick="document.getElementById(\'salover\').remove()" style="width:100%;background:none;border:none;color:var(--mu);padding:12px;cursor:pointer;font-family:inherit;font-size:14px;margin-top:4px">Annuler</button></div></div>');
-  setTimeout(()=>document.getElementById('salin').focus(),100);
+  setTimeout(()=>document.getElementById('salin')?.focus(),100);
 }
 function saveInc(key){const v=parseFloat(document.getElementById('salin').value);if(!v||v<=0){showToast('Montant invalide');return;}monthInc[key]=v;save();document.getElementById('salover').remove();renderSet();renderDash();showToast('Revenu modifié ✓');}
 function openSalModal(fromSet){
   const now=new Date(),y=now.getFullYear(),m=now.getMonth(),ex=getIncBase(y,m);
   document.body.insertAdjacentHTML('beforeend','<div class="saloverlay" id="salover" onclick="if(event.target.id===\'salover\')this.remove()"><div class="salmodal"><div class="salemoji">'+ico('salary')+'</div><div class="saltitle">'+(fromSet?'Ajouter un revenu':'Nouveau mois !')+'</div><div class="salsub">'+(fromSet?'Pour quel mois ?':MONTHS[m]+' '+y+' — Quel est ton salaire ?')+'</div>'+(fromSet?'<input class="fi" type="month" id="salmonth" value="'+mk(y,m)+'" max="'+mk(new Date(y,m+1,1).getFullYear(),new Date(y,m+1,1).getMonth())+'" onchange="document.getElementById(\'salin\').value=monthInc[this.value]||\'\'" style="margin-bottom:12px;text-align:center;color-scheme:dark">':'')+'<input class="salinput" type="number" id="salin" placeholder="1500" inputmode="decimal" value="'+(ex||'')+'"><div class="salhint">Modifiable à tout moment dans Réglages</div><button class="btnp" onclick="saveSal('+y+','+m+')">Confirmer</button>'+(fromSet?'<button onclick="document.getElementById(\'salover\').remove()" style="width:100%;background:none;border:none;color:var(--mu);padding:12px;cursor:pointer;font-family:inherit;font-size:14px;margin-top:4px">Annuler</button>':'')+'</div></div>');
-  setTimeout(()=>document.getElementById('salin').focus(),100);
+  setTimeout(()=>document.getElementById('salin')?.focus(),100);
 }
 function saveSal(y,m){const v=parseFloat(document.getElementById('salin').value);if(!v||v<=0){showToast('Montant invalide');return;}
   const sm=document.getElementById('salmonth');if(sm){if(!/^\d{4}-\d{2}$/.test(sm.value)){showToast('Choisis un mois');return;}const[yy,mm]=sm.value.split('-').map(Number);y=yy;m=mm-1;}
