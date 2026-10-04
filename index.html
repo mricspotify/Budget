@@ -101,11 +101,10 @@ button.topbar-icon:active{transform:scale(.94)}
 .bil-lg .dp{color:var(--tx)}
 .bil-lg #d-inc{font-size:15.5px;text-shadow:0 0 8px rgba(243,243,248,.22)}
 .bil-lg .tap{cursor:pointer}
-.bil-bar{display:flex;flex-direction:row-reverse;height:8px;margin:10px 0 3px;background:rgba(255,255,255,.07);border-radius:6px} /* jauge L2 : le vert (reste) part de la gauche, point blanc au bout */
-.bil-bar i{min-width:0;transition:flex-basis .3s}
-.bil-bar .dep{background:transparent}
-.bil-bar .keep{background:var(--bkeep);border-radius:6px;position:relative}
-.bil-bar .keep::after{content:'';position:absolute;right:-3px;top:50%;width:14px;height:14px;margin-top:-7px;border-radius:50%;background:var(--tx);border:3px solid var(--bkeep);box-sizing:border-box}
+.bil-bar{display:flex;height:12px;margin:8px 0 0;gap:3px} /* barre L5 : dépensé rayé (« déjà parti »), reste plein vert */
+.bil-bar i{border-radius:7px;min-width:0;transition:flex-basis .3s}
+.bil-bar .dep{background:repeating-linear-gradient(135deg,rgba(255,255,255,.18) 0 4px,rgba(255,255,255,.06) 4px 8px)}
+.bil-bar .keep{background:var(--bkeep)}
 .bil-bon{display:flex;justify-content:space-between;align-items:center;gap:10px;border-top:1px solid var(--b);margin-top:14px;padding-top:10px}
 .bil-bon .cl{font-size:9px;margin-bottom:0;flex-shrink:0}
 .bil-chips{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
